@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-gradient-to-b from-blue-50 to-white min-h-screen py-12">
+  <div class="container mx-auto px-4 max-w-5xl">
+    <!-- Booking Header -->
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-playfair font-bold text-blue-900 mb-2">Booking Summary</h1>
+      <p class="text-lg text-blue-700 max-w-3xl mx-auto">Review your booking details before proceeding to payment.</p>
+      <div class="w-24 h-1 bg-amber-400 mx-auto mt-4 rounded-full"></div>
+    </div>
+
+        <!-- Booking Details -->
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden max-w-5xl mx-auto">
+            <div class="bg-blue-800 px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-white">Booking Reference: #{{ booking.id }}</h2>
+                    <span class="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium">Confirmed</span>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <!-- Guest Information -->
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Guest Information</h2>
+                    <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <div class="mb-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Guest Name</h3>
+                                    <p class="text-lg font-medium text-gray-800">{{ current_user.username if current_user.is_authenticated else 'Guest' }}</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Email</h3>
+                                    <p class="text-lg font-medium text-gray-800">{{ current_user.email if current_user.is_authenticated else 'Not provided' }}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="mb-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Phone</h3>
+                                    <p class="text-lg font-medium text-gray-800">{{ current_user.phone if current_user.is_authenticated and current_user.phone else 'Not provided' }}</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Booking Date</h3>
+                                    <p class="text-lg font-medium text-gray-800">{{ booking.booking_date.strftime('%d %b %Y, %H:%M') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stay Details -->
+                <div class="mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Stay Details</h2>
+                    <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <div class="mb-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Check-in Date</h3>
+                                    <p class="text-lg font-medium text-gray-800">{{ booking.check_in.strftime('%d %b %Y') }}</p>
+                                    <p class="text-sm text-gray-500">Check-in time: 1:00 PM</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Villa Type</h3>
+                                    <p class="text-lg font-medium text-gray-800">{{ booking.villa_type }}</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Guests</h3>
+                                    <p class="text-lg font-medium text-gray-800">{{ booking.adults }} Adults, {{ booking.children }} Children</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="mb-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Check-out Date</h3>
+                                    <p class="text-lg font-medium text-gray-800">{{ booking.check_out.strftime('%d %b %Y') }}</p>
+                                    <p class="text-sm text-gray-500">Check-out time: 11:00 AM</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Duration</h3>
+                                    <p class="text-lg font-medium text-gray-800">{{ (booking.check_out - booking.check_in).days }} Nights</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h3 class="text-sm font-medium text-gray-500">Meal Plan</h3>
+                                    <p class="text-lg font-medium text-gray-800">
+                                        {% if booking.meal_plan == 'none' %}
+                                            No Meal Plan
+                                        {% elif booking.meal_plan == 'breakfast' %}
+                                            Breakfast Only
+                                        {% elif booking.meal_plan == 'half-board' %}
+                                            Half Board (Breakfast & Dinner)
+                                        {% elif booking.meal_plan == 'full-board' %}
+                                            Full Board (All Meals)
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

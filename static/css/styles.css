@@ -1,0 +1,298 @@
+:root {
+    /* Primary Colors - Blue */
+    --color-primary-50: #eff6ff;
+    --color-primary-100: #dbeafe;
+    --color-primary-200: #bfdbfe;
+    --color-primary-300: #93c5fd;
+    --color-primary-400: #60a5fa;
+    --color-primary-500: #3b82f6;
+    --color-primary-600: #2563eb;
+    --color-primary-700: #1d4ed8;
+    --color-primary-800: #1e40af;
+    --color-primary-900: #1e3a8a;
+    --color-primary-950: #172554;
+    
+    /* Secondary Colors - Purple */
+    --color-secondary-50: #f5f3ff;
+    --color-secondary-100: #ede9fe;
+    --color-secondary-200: #ddd6fe;
+    --color-secondary-300: #c4b5fd;
+    --color-secondary-400: #a78bfa;
+    --color-secondary-500: #8b5cf6;
+    --color-secondary-600: #7c3aed;
+    --color-secondary-700: #6d28d9;
+    --color-secondary-800: #5b21b6;
+    --color-secondary-900: #4c1d95;
+    --color-secondary-950: #2e1065;
+    
+    /* Accent Colors - Amber */
+    --color-accent-50: #fffbeb;
+    --color-accent-100: #fef3c7;
+    --color-accent-200: #fde68a;
+    --color-accent-300: #fcd34d;
+    --color-accent-400: #fbbf24;
+    --color-accent-500: #f59e0b;
+    --color-accent-600: #d97706;
+    --color-accent-700: #b45309;
+    --color-accent-800: #92400e;
+    --color-accent-900: #78350f;
+    --color-accent-950: #451a03;
+    
+    /* Neutral Colors */
+    --color-neutral-50: #f8fafc;
+    --color-neutral-100: #f1f5f9;
+    --color-neutral-200: #e2e8f0;
+    --color-neutral-300: #cbd5e1;
+    --color-neutral-400: #94a3b8;
+    --color-neutral-500: #64748b;
+    --color-neutral-600: #475569;
+    --color-neutral-700: #334155;
+    --color-neutral-800: #1e293b;
+    --color-neutral-900: #0f172a;
+    --color-neutral-950: #020617;
+    
+    /* Animation Durations */
+    --transition-slow: 0.5s;
+    --transition-medium: 0.3s;
+    --transition-fast: 0.15s;
+    
+    /* Spacing */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Border Radius */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-full: 9999px;
+}
+
+/* Dark mode variables */
+.dark {
+    --color-primary-50: #172554;
+    --color-primary-100: #1e3a8a;
+    --color-primary-200: #1e40af;
+    --color-primary-300: #1d4ed8;
+    --color-primary-400: #2563eb;
+    --color-primary-500: #3b82f6;
+    --color-primary-600: #60a5fa;
+    --color-primary-700: #93c5fd;
+    --color-primary-800: #bfdbfe;
+    --color-primary-900: #dbeafe;
+    --color-primary-950: #eff6ff;
+    
+    /* Inverted Secondary Colors for dark mode */
+    --color-secondary-50: #2e1065;
+    --color-secondary-100: #4c1d95;
+    --color-secondary-200: #5b21b6;
+    --color-secondary-300: #6d28d9;
+    --color-secondary-400: #7c3aed;
+    --color-secondary-500: #8b5cf6;
+    --color-secondary-600: #a78bfa;
+    --color-secondary-700: #c4b5fd;
+    --color-secondary-800: #ddd6fe;
+    --color-secondary-900: #ede9fe;
+    --color-secondary-950: #f5f3ff;
+    
+    /* Inverted Accent Colors for dark mode */
+    --color-accent-50: #451a03;
+    --color-accent-100: #78350f;
+    --color-accent-200: #92400e;
+    --color-accent-300: #b45309;
+    --color-accent-400: #d97706;
+    --color-accent-500: #f59e0b;
+    --color-accent-600: #fbbf24;
+    --color-accent-700: #fcd34d;
+    --color-accent-800: #fde68a;
+    --color-accent-900: #fef3c7;
+    --color-accent-950: #fffbeb;
+}
+
+body {
+    font-family: 'Poppins', 'Montserrat', 'Raleway', 'Playfair Display', sans-serif;
+    transition: background-color var(--transition-medium), color var(--transition-medium);
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+.card-hover {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-hover:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 8px 32px rgba(60, 60, 120, 0.15);
+}
+
+/* Navigation improvements */
+.navbar-brand {
+    font-size: 1.7rem;
+    letter-spacing: 1px;
+}
+
+/* Icon sizing */
+.nav-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+}
+
+.theme-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+}
+
+.brand-icon {
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+}
+
+.brand-icon-small {
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+}
+
+/* Navigation link improvements */
+.nav-link {
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-link:hover {
+    transform: translateY(-2px);
+}
+
+/* Dark mode improvements */
+.dark body {
+    background-color: #0f172a;
+    color: #f1f5f9;
+}
+
+.dark .bg-white {
+    background-color: #1e293b;
+}
+
+.dark .text-gray-900 {
+    color: #f1f5f9;
+}
+
+/* Smooth scrolling for all elements */
+* {
+    scroll-behavior: smooth;
+}
+
+/* Fix for sticky navigation */
+.sticky {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+/* Responsive text sizing */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.4rem;
+    }
+    
+    .nav-icon {
+        width: 1rem;
+        height: 1rem;
+    }
+    
+    .theme-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+}
+
+/* Animation improvements */
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+.hover\:scale-105:hover {
+    transform: scale(1.05);
+}
+
+/* Fix for overflow issues */
+.container {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Ensure proper spacing */
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.gap-4 {
+    gap: 1rem;
+}
+
+/* Add these responsive utilities to your styles.css */
+
+/* Responsive tables */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Responsive form elements */
+@media (max-width: 640px) {
+  input, select, textarea {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .col-span-2 {
+    grid-column: span 1 !important;
+  }
+}
+
+/* Better mobile padding */
+@media (max-width: 768px) {
+  .container {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+  }
+  
+  .section-padding {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
+  }
+  
+  h1 {
+    font-size: 1.75rem !important;
+  }
+  
+  h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  h3 {
+    font-size: 1.25rem !important;
+  }
+}
+
+/* Improved mobile navigation */
+@media (max-width: 768px) {
+  .mobile-menu {
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+}

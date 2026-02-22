@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="relative bg-gradient-to-b from-blue-50 to-white py-16">
+  <!-- Decorative elements -->
+  <div class="absolute top-0 right-0 w-1/3 h-64 bg-gray-100 rounded-bl-full opacity-30"></div>
+  <div class="absolute bottom-0 left-0 w-1/4 h-48 bg-blue-100 rounded-tr-full opacity-30"></div>
+  
+  <div class="container mx-auto px-4 relative z-10">
+    <div class="text-center mb-12">
+      <h1 class="text-4xl md:text-5xl font-extrabold text-blue-900 mb-3" style="font-family: 'Playfair Display', serif;">Get in Touch</h1>
+      <p class="text-lg text-blue-700 max-w-2xl mx-auto">We'd love to hear from you. Whether you have a question about our villa, amenities, or anything else, our team is ready to answer all your questions.</p>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <!-- Contact Form -->
+      <div class="lg:col-span-2 bg-white rounded-2xl shadow-xl p-8 border border-gray-200 transform transition-all duration-300 hover:shadow-2xl">
+        <div class="flex items-center mb-6">
+          <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-md mr-4">
+            <i class="fas fa-envelope text-white text-xl"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800" style="font-family: 'Playfair Display', serif;">Send us a message</h2>
+        </div>
+        
+        <form method="POST" class="space-y-6">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="name" class="block text-gray-700 font-medium mb-2 flex items-center">
+                <i class="fas fa-user text-blue-500 mr-2"></i> Your Name
+              </label>
+              <input type="text" id="name" name="name" required 
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200">
+            </div>
+            
+            <div>
+              <label for="email" class="block text-gray-700 font-medium mb-2 flex items-center">
+                <i class="fas fa-envelope text-blue-500 mr-2"></i> Email Address
+              </label>
+              <input type="email" id="email" name="email" required 
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200">
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="phone" class="block text-gray-700 font-medium mb-2 flex items-center">
+                <i class="fas fa-phone-alt text-blue-500 mr-2"></i> Phone Number
+              </label>
+              <input type="tel" id="phone" name="phone" 
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200">
+            </div>
+            
+            <div>
+              <label for="subject" class="block text-gray-700 font-medium mb-2 flex items-center">
+                <i class="fas fa-tag text-blue-500 mr-2"></i> Subject
+              </label>
+              <select id="subject" name="subject" 
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200 bg-white">
+                <option value="General Inquiry">General Enquiry</option>
+                <option value="Booking Question">Booking Question</option>
+                <option value="Menu Inquiry">Menu Inquiry</option>
+                <option value="Special Request">Special Request</option>
+                <option value="Feedback">Feedback</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          
+          <div>
+            <label for="message" class="block text-gray-700 font-medium mb-2 flex items-center">
+              <i class="fas fa-comment-alt text-blue-500 mr-2"></i> Your Message
+            </label>
+            <textarea id="message" name="message" rows="6" required 
+              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-200"
+              placeholder="Please provide details about your inquiry..."></textarea>
+          </div>
+          
+          <div class="flex justify-end">
+            <button type="submit" 
+              class="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-bold hover:from-blue-600 hover:to-blue-700 transition shadow-lg transform hover:-translate-y-1 duration-200 flex items-center">
+              <i class="fas fa-paper-plane mr-2"></i> Send Message
+            </button>
+          </div>
+          <div class="mt-4 text-sm text-gray-500 text-center">
+            <p>Your message will be sent directly to our team. We typically respond within 24 hours.</p>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Contact Information -->
+      <div class="space-y-6">
+        <div class="bg-gradient-to-br from-blue-800 to-blue-900 rounded-2xl shadow-xl p-6 text-white relative overflow-hidden">
+          <!-- Decorative pattern -->
+          <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-bl-full"></div>
+          <div class="absolute bottom-0 left-0 w-24 h-24 bg-blue-400/20 rounded-tr-full"></div>
+          
+          <div class="relative z-10">
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center shadow-md mr-3">
+                <i class="fas fa-home text-white"></i>
+              </div>
+              <h2 class="text-xl font-bold" style="font-family: 'Playfair Display', serif;">The Royal Chalet</h2>
+            </div>
+            
+            <div class="space-y-4 pl-2">
+              <div class="flex items-start">
+                <i class="fas fa-map-marker-alt text-blue-300 mt-1 mr-3"></i>
+                <p>Tungarli Rd, Tungarli, Lonavala, Maharashtra 410403</p>
+              </div>
+              
+              <div class="flex items-start">
+                <i class="fas fa-phone-alt text-blue-300 mt-1 mr-3"></i>
+                <div>
+                  <p>+91 74200 80555</p>
+                  <p class="text-sm text-blue-200">Open daily from 10am to 8pm</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <i class="fas fa-phone-alt text-blue-300 mt-1 mr-3"></i>
+                <div>
+                  <p>WhatsApp: +91 74200 80555</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start">
+                <i class="fas fa-envelope text-blue-300 mt-1 mr-3"></i>
+                <p>info@theroyalchalet.com</p>
+              </div>
+              
+              <div class="flex items-start">
+                <i class="fas fa-clock text-blue-300 mt-1 mr-3"></i>
+                <div>
+                  <p>Check-in: {{ villa_settings.get('check_in_time', '14:00') | format_time }}</p>
+                  <p>Check-out: {{ villa_settings.get('check_out_time', '11:00') | format_time }}</p>
+                </div>
+              </div>
+              
+              <div class="mt-4">
+                <a href="https://maps.app.goo.gl/keAEvCm7eewRqUiL7" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 shadow-md">
+                  <i class="fas fa-map-marker-alt mr-2"></i> View on Google Maps
+                </a>
+              </div>
+            </div>
+            
+            <div class="mt-6 flex space-x-47 pl-2">
+              <a href="https://www.facebook.com/profile.php?id=100092981711228&mibextid=rS40aB7S9Ucbxw6v" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-blue-400 hover:text-white transition-all duration-300">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="https://www.instagram.com/villa_theroyalchalet?igsh=eWZlbTR0djFvbjIw" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-blue-400 hover:text-white transition-all duration-300">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="https://wa.me/919503589999" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-green-500 hover:text-white transition-all duration-300">
+                <i class="fab fa-whatsapp"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl shadow-xl p-6 border border-gray-200">
+          <div class="flex items-center mb-4">
+            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-md mr-3">
+              <i class="fas fa-info-circle text-white"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800" style="font-family: 'Playfair Display', serif;">Quick Information</h2>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-users text-blue-500 mr-2"></i>
+                <p class="font-bold text-gray-800">Max Guests</p>
+              </div>
+              <p class="text-gray-700 pl-6">{{ villa_settings.get('max_guests', '8') }} persons</p>
+            </div>
+            
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-calendar-day text-blue-500 mr-2"></i>
+                <p class="font-bold text-gray-800">Weekday Price</p>
+              </div>
+              <p class="text-gray-700 pl-6">₹{{ villa_settings.get('weekday_price', '10000') | int | format_number }}/night</p>
+            </div>
+            
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-calendar-week text-blue-500 mr-2"></i>
+                <p class="font-bold text-gray-800">Weekend Price</p>
+              </div>
+              <p class="text-gray-700 pl-6">₹{{ villa_settings.get('weekend_price', '15000') | int | format_number }}/night</p>
+            </div>
+            
+            <div class="bg-blue-50 p-4 rounded-lg">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-clock text-blue-500 mr-2"></i>
+                <p class="font-bold text-gray-800">Response Time</p>
+              </div>
+              <p class="text-gray-700 pl-6">Within 24 hours</p>
+            </div>
+          </div>
+          
+          <div class="mt-6 flex justify-center">
+            <a href="/booking" class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-bold hover:from-blue-700 hover:to-blue-800 transition shadow-md transform hover:-translate-y-1 duration-200 flex items-center justify-center">
+              <i class="fas fa-calendar-plus mr-2"></i> Book Your Stay
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

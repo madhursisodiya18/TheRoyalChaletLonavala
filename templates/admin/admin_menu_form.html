@@ -1,0 +1,160 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}{{ action }} Menu Item{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center" style="background-image: url('{{ url_for('static', filename='Villa From Outside1.jpg') }}'); background-size: cover; background-position: center;">
+    <div class="container mx-auto px-4 py-8 backdrop-blur-sm">
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white/90 rounded-t-lg shadow-lg p-6 border-b-4 border-amber-500">
+                <h2 class="text-3xl font-extrabold text-amber-500 tracking-wide" style="font-family: 'Playfair Display', serif; letter-spacing: 1px;">
+                    {% if action == 'Add' %}
+                        <i class="fas fa-utensils mr-3"></i>Add New Menu Item
+                    {% else %}
+                        <i class="fas fa-edit mr-3"></i>Edit Menu Item: {{ item.name if item else '' }}
+                    {% endif %}
+                </h2>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="mt-4">
+                        {% for category, message in messages %}
+                            <div class="flash-message mb-4 p-4 rounded-lg shadow-md transition-opacity duration-500 {{ 'bg-green-100 text-green-700 border-l-4 border-green-500' if category == 'success' else 'bg-red-100 text-red-700 border-l-4 border-red-500' }}">
+                                <div class="flex items-center">
+                                    <i class="{{ 'fas fa-check-circle' if category == 'success' else 'fas fa-exclamation-circle' }} mr-3 text-xl"></i>
+                                    <span>{{ message }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="bg-white/90 backdrop-blur-sm rounded-b-lg shadow-lg p-6 border border-amber-200">
+            <form method="POST" class="space-y-6">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="relative">
+                        <label for="name" class="block text-sm font-semibold text-amber-800 mb-2">
+                            <i class="fas fa-tag mr-1"></i> Name *
+                        </label>
+                        <input type="text" id="name" name="name" required
+                               value="{{ item.name if item else '' }}"
+                               class="w-full px-4 py-3 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/90"
+                               placeholder="e.g., Masala Dosa">
+                    </div>
+                    
+                    <div class="relative">
+                        <label for="price" class="block text-sm font-semibold text-amber-800 mb-2">
+                            <i class="fas fa-rupee-sign mr-1"></i> Price (₹) *
+                        </label>
+                        <input type="number" id="price" name="price" required min="0"
+                               value="{{ item.price if item else '' }}"
+                               class="w-full px-4 py-3 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/90"
+                               placeholder="150">
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <label for="description" class="block text-sm font-semibold text-amber-800 mb-2">
+                        <i class="fas fa-align-left mr-1"></i> Description
+                    </label>
+                    <textarea id="description" name="description" rows="3"
+                              class="w-full px-4 py-3 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/90"
+                              placeholder="Brief description of the dish">{{ item.description if item else '' }}</textarea>
+                    <p class="text-xs text-amber-700 mt-1 italic">Describe the dish, ingredients, and any special features</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="relative">
+                        <label for="section_id" class="block text-sm font-semibold text-amber-800 mb-2">
+                            <i class="fas fa-folder mr-1"></i> Section *
+                        </label>
+                        <div class="relative">
+                            <select id="section_id" name="section_id" required
+                                    class="w-full px-4 py-3 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/90 appearance-none">
+                                <option value="">Choose a section...</option>
+                                {% for section in sections %}
+                                <option value="{{ section.id }}" 
+                                        {% if item and item.section_id == section.id %}selected{% endif %}>
+                                    {{ section.display_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-amber-500">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <p class="text-xs text-amber-700 mt-1 italic">Menu category this item belongs to</p>
+                    </div>
+                    
+                    <div class="relative">
+                        <label for="subcategory" class="block text-sm font-semibold text-amber-800 mb-2">
+                            <i class="fas fa-tags mr-1"></i> Subcategory
+                        </label>
+                        <input type="text" id="subcategory" name="subcategory"
+                               value="{{ item.subcategory if item else '' }}"
+                               class="w-full px-4 py-3 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/90"
+                               placeholder="e.g., South Indian">
+                        <p class="text-xs text-amber-700 mt-1 italic">Optional subcategory</p>
+                    </div>
+                    
+                    <div class="relative">
+                        <label for="preparation_time" class="block text-sm font-semibold text-amber-800 mb-2">
+                            <i class="fas fa-clock mr-1"></i> Prep Time (min)
+                        </label>
+                        <input type="number" id="preparation_time" name="preparation_time" min="1"
+                               value="{{ item.preparation_time if item else 15 }}"
+                               class="w-full px-4 py-3 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white/90">
+                        <p class="text-xs text-amber-700 mt-1 italic">Estimated preparation time</p>
+                    </div>
+                </div>
+
+                {% if action == 'Edit' %}
+                <div class="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                    <label class="flex items-center">
+                        <input type="checkbox" name="is_available" 
+                               {% if item and item.is_available %}checked{% endif %}
+                               class="w-5 h-5 rounded border-amber-300 text-amber-600 shadow-sm focus:border-amber-300 focus:ring focus:ring-amber-200 focus:ring-opacity-50">
+                        <span class="ml-2 text-sm font-medium text-amber-800">Available (visible to customers)</span>
+                    </label>
+                    <p class="text-xs text-amber-700 mt-1 ml-7 italic">Unavailable items won't appear in the menu</p>
+                </div>
+                {% endif %}
+
+                <div class="flex justify-between mt-8">
+                    <a href="{{ url_for('admin_menu') }}" class="px-5 py-3 bg-gray-100 text-amber-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center shadow-sm">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Menu
+                    </a>
+                    <button type="submit" class="px-5 py-3 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors flex items-center shadow-md">
+                        {% if action == 'Add' %}
+                            <i class="fas fa-plus mr-2"></i>Create Item
+                        {% else %}
+                            <i class="fas fa-save mr-2"></i>Save Changes
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Flash messages auto-dismiss
+        const flashMessages = document.querySelectorAll('.flash-message');
+        flashMessages.forEach(message => {
+            setTimeout(() => {
+                message.classList.add('opacity-0');
+                setTimeout(() => {
+                    message.remove();
+                }, 500);
+            }, 5000);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-amber-700" style="font-family: 'Playfair Display', serif;">Menu Sections Management</h1>
+        <a href="{{ url_for('admin_add_section') }}" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+            <i class="fas fa-plus mr-2"></i>Add New Section
+        </a>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-2">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-amber-200">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-amber-200">
+                <thead class="bg-amber-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Display Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Icon</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-amber-100">
+                    {% for section in sections %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ section.name }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ section.display_name }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900">{{ section.description or 'No description' }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">
+                                <i class="{{ section.icon }} text-lg"></i>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">
+                                <span class="bg-amber-100 text-amber-800 px-2 py-1 rounded-full text-xs">
+                                    {{ section.menu_items|length }} items
+                                </span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if section.is_active %}
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Active</span>
+                            {% else %}
+                                <span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <a href="{{ url_for('admin_edit_section', section_id=section.id) }}" 
+                                   class="text-amber-600 hover:text-amber-900">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% if section.menu_items|length == 0 %}
+                                <form method="POST" action="{{ url_for('admin_delete_section', section_id=section.id) }}" 
+                                      class="inline" onsubmit="return confirm('Are you sure you want to delete this section?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="text-red-600 hover:text-red-900">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="text-gray-400" title="Cannot delete section with items">
+                                    <i class="fas fa-trash"></i>
+                                </span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if not sections %}
+    <div class="text-center py-12">
+        <i class="fas fa-utensils text-6xl text-gray-300 mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No sections found</h3>
+        <p class="text-gray-500 mb-4">Create your first menu section to get started.</p>
+        <a href="{{ url_for('admin_add_section') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+            <i class="fas fa-plus mr-2"></i>Add First Section
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

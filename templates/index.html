@@ -1,0 +1,1060 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Hero Section with Image Slider -->
+<section class="relative min-h-screen flex items-center justify-center">
+  <!-- Image Slider -->
+  <div class="hero-slider absolute inset-0 w-full h-full">
+    <div class="slide active" style="background-image: url('{{ url_for('static', filename='Slide1.jpg') }}');"></div>
+    <div class="slide" style="background-image: url('{{ url_for('static', filename='Slide2.jpg') }}');"></div>
+    <div class="slide" style="background-image: url('{{ url_for('static', filename='Slide3.jpg') }}');"></div>
+    <div class="slide" style="background-image: url('{{ url_for('static', filename='slide4.jpg') }}');"></div>
+  </div>
+
+  <div class="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-gray-950/70 to-gray-900/80"></div>
+  <div class="relative z-10 container mx-auto text-center text-white px-4">
+    <h1 class="text-8xl md:text-8xl font-extrabold mb-8" style="font-family: 'Cinzel', serif; letter-spacing: 4px; text-shadow: 3px 3px 6px rgba(5, 5, 14, 0.7);">THE ROYAL CHALET</h1>
+    <p class="text-2xl md:text-4xl mb-8 font-light" style="font-family: 'Montserrat', serif; text-shadow: 2px 2px 4px rgba(0, 0, 9, 0.7);">Luxury Villa Retreat in Lonavala, Pune</p>
+    
+    <div class="flex flex-col sm:flex-row gap-6 justify-center">
+      <a href="#about" class="inline-block px-12 py-5 bg-green-700 text-white font-bold rounded-full shadow-2xl hover:bg-green-800 transition-all text-xl transform hover:scale-105 hover:shadow-3xl">Explore Villa</a>
+    </div>
+    
+    <!-- Slider Navigation -->
+    <div class="slider-nav flex justify-center mt-8 space-x-2">
+      <button class="slider-dot active w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-all" data-slide="0"></button>
+      <button class="slider-dot w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-all" data-slide="1"></button>
+      <button class="slider-dot w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-all" data-slide="2"></button>
+      <button class="slider-dot w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-all" data-slide="3"></button>
+    </div>
+    
+
+  
+
+
+
+
+
+            <!-- Price Estimate Display -->
+            <div class="p-5 bg-amber-50 rounded-lg border border-amber-100 hidden" id="price-estimate-container">
+              <div class="flex flex-col space-y-4">
+                <div class="flex justify-between items-center pb-3 border-b border-amber-200">
+                  <h4 class="text-lg font-semibold text-gray-800">Your Stay Summary</h4>
+                  <span class="text-sm text-amber-600 font-medium"><span id="total-nights">0</span> nights, <span id="num-guests">0</span> guests</span>
+                </div>
+                
+                <div class="space-y-2">
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">Base rate per night</span>
+                    <span class="font-medium">₹<span id="price-per-night">15,000</span></span>
+                  </div>
+                  <div class="flex justify-between text-sm text-gray-500" id="weekend-rate-info" style="display: none;">
+                    <span>Weekend rate adjustment</span>
+                    <span>+20%</span>
+                  </div>
+                  <div class="flex justify-between text-sm text-gray-500" id="discount-info" style="display: none;">
+                    <span>Length of stay discount</span>
+                    <span>-10%</span>
+                  </div>
+                </div>
+                
+                <div class="flex justify-between items-center pt-3 border-t border-amber-200">
+                  <div>
+                    <p class="text-xl font-bold text-gray-800">Total</p>
+                    <p class="text-xs text-gray-500">*Taxes and fees not included</p>
+                  </div>
+                  <p class="text-2xl font-bold text-amber-600">₹<span id="total-price">0</span></p>
+                </div>
+              </div>
+            </div>
+            
+          
+</section>
+
+<section id="about" class="py-24 bg-white">
+  <div class="container mx-auto px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div data-aos="fade-right">
+        <h2 class="text-5xl font-bold mb-8 text-gray-800" style="font-family: 'Playfair Display', serif;">About The Royal Chalet</h2>
+        <p class="text-xl text-gray-700 mb-6 leading-relaxed" style="font-family: 'Montserrat', serif;">The Royal Chalet is a luxurious mountain villa just minutes from the main road yet blissfully secluded from noise. Blending traditional charm with modern comfort, it features a stunning living room, kitchen, and bedrooms that open to a serene pool with lush green views.</p>
+        <p class="text-xl text-gray-700 mb-8 leading-relaxed" style="font-family: 'Montserrat', serif;">With four elegant ensuite bedrooms and a cozy terrace overlooking the hills, it’s perfect for family getaways or intimate gatherings. Guests can enjoy delicious home-style meals or evening barbeque sessions by the pool under the stars, creating unforgettable moments.</p>
+        <p class="text-xl text-gray-700 mb-8 leading-relaxed" style="font-family: 'Montserrat', serif;">Whether you wish to work, unwind, or celebrate, The Royal Chalet has it all. Nestled in the heart of Lonavala Khandala, the “Jewel of Sahyadri,” it’s surrounded by lush valleys, tranquil lakes, and waterfalls—an idyllic escape from city life.</p>
+        <div class="flex flex-col sm:flex-row gap-6">
+          <a href="#amenities" class="bg-blue-800 text-white px-10 py-4 rounded-full font-bold hover:bg-blue-700 transition-colors text-lg text-center">Explore Amenities</a>
+        </div>
+      </div>
+      <div data-aos="fade-left">
+        <img src="{{ url_for('static', filename='Swiming pool 8.jpg') }}" alt="Villa Exterior" class="rounded-4xl shadow-2xl w-full h-[550px] object-cover">
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- Interactive Gallery Section -->
+<section id="gallery" class="py-20 bg-gradient-to-r from-green-50 to-white">
+  <div class="container mx-auto px-4">
+    <h2 class="text-5xl font-bold mb-6 text-center text-gray-800">The Royal Chalet Gallery</h2>
+    <div class="flex justify-center mb-16">
+      <div class="w-24 h-1 bg-green-600 rounded-full"></div>
+    </div>
+    
+    <!-- Simplified Tab Navigation -->
+    <div class="flex flex-wrap justify-center gap-4 mb-12" id="gallery-tabs">
+      <button class="tab-btn active px-6 py-3 bg-green-600 text-white rounded-md font-semibold hover:bg-green-700 transition-all" data-tab="villa-facade">Villa Facade</button>
+      <button class="tab-btn px-6 py-3 bg-gray-200 text-gray-700 rounded-md font-semibold hover:bg-green-200 transition-all" data-tab="bedrooms">Bedrooms & Washrooms</button>
+      <button class="tab-btn px-6 py-3 bg-gray-200 text-gray-700 rounded-md font-semibold hover:bg-green-200 transition-all" data-tab="living">Living Area & Kitchen</button>
+      <button class="tab-btn px-6 py-3 bg-gray-200 text-gray-700 rounded-md font-semibold hover:bg-green-200 transition-all" data-tab="pool">Pool & Garden</button>
+    </div>
+
+    <!-- Tab Content -->
+    <div id="gallery-content">
+      <!-- Villa Facade Tab -->
+      <div class="tab-content active" id="villa-facade-content">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="gallery-item" data-aos="zoom-in">
+            <img src="{{ url_for('static', filename='Villa From Outside1.jpg') }}" alt="Royal Chalet Grand Entrance" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Side View</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="100">
+            <img src="{{ url_for('static', filename='Villa From Outside2.jpg') }}" alt="Royal Chalet Exterior View" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Exterior Facade</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="200">
+            <img src="{{ url_for('static', filename='Villa From Outside.jpg') }}" alt="Royal Chalet Panoramic View" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Elegant Entrance</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Bedrooms & Washrooms Tab -->
+      <div class="tab-content hidden" id="bedrooms-content">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Row 1: Master Bedroom -->
+          <div class="gallery-item" data-aos="zoom-in">
+            <img src="{{ url_for('static', filename='masterbedroom.jpg') }}" alt="Royal Chalet Master Suite" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Luxury Master Suite</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="100">
+            <img src="{{ url_for('static', filename='masterbedroom2.jpg') }}" alt="Royal Chalet Master Bedroom" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Master Bedroom Comfort</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="200">
+            <img src="{{ url_for('static', filename='masterbedroom bathroom1.jpg') }}" alt="Royal Chalet Master Bathroom" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Ensuite Master Bath</h4>
+            </div>
+          </div>
+          
+          <!-- Row 2: Bedroom 1 -->
+          <div class="gallery-item" data-aos="zoom-in">
+            <img src="{{ url_for('static', filename='4.jpg') }}" alt="Royal Chalet Guest Suite 1" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Elegant Guest Suite</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="100">
+            <img src="{{ url_for('static', filename='5.jpg') }}" alt="Royal Chalet Guest Room" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Cozy Guest Retreat</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="200">
+            <img src="{{ url_for('static', filename='6.jpg') }}" alt="Royal Chalet Guest Bathroom" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Luxury Guest Bath</h4>
+            </div>
+          </div>
+          
+          <!-- Row 3: Bedroom 2 -->
+          <div class="gallery-item" data-aos="zoom-in">
+            <img src="{{ url_for('static', filename='7.jpg') }}" alt="Royal Chalet Family Suite" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Family Suite</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="100">
+            <img src="{{ url_for('static', filename='8.jpg') }}" alt="Royal Chalet Family Room" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Spacious Family Room</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="200">
+            <img src="{{ url_for('static', filename='9.jpg') }}" alt="Royal Chalet Family Bathroom" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Modern Family Bath</h4>
+            </div>
+          </div>
+          
+          <!-- Row 4: Bedroom 3 -->
+          <div class="gallery-item" data-aos="zoom-in">
+            <img src="{{ url_for('static', filename='10.jpg') }}" alt="Royal Chalet Premium Suite" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Premium Guest Suite</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="100">
+            <img src="{{ url_for('static', filename='11.jpg') }}" alt="Royal Chalet Premium Room" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Deluxe Guest Room</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="200">
+            <img src="{{ url_for('static', filename='12.jpg') }}" alt="Royal Chalet Premium Bathroom" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Designer Bath</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Living Area & Kitchen Tab -->
+      <div class="tab-content hidden" id="living-content">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="gallery-item" data-aos="zoom-in">
+            <img src="{{ url_for('static', filename='hall1.jpg') }}" alt="Royal Chalet Grand Living Room" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-green-800">Grand Living Room</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="100">
+            <img src="{{ url_for('static', filename='hall2.jpg') }}" alt="Royal Chalet Lounge Area" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-green-800">Elegant Lounge</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="200">
+            <img src="{{ url_for('static', filename='hall3.jpg') }}" alt="Royal Chalet Entertainment Area" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-green-800">Entertainment Space</h4>
+            </div>
+          </div>
+
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="100">
+            <img src="{{ url_for('static', filename='outside kitchen.jpg') }}" alt="Royal Chalet Outdoor Kitchen" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-green-800">Outdoor Kitchen</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      
+      <!-- Pool & Garden Tab -->
+      <div class="tab-content hidden" id="pool-content">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="gallery-item" data-aos="zoom-in">
+            <img src="{{ url_for('static', filename='Swiming pool 1.jpg') }}" alt="Royal Chalet Infinity Pool" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Infinity Pool</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="100">
+            <img src="{{ url_for('static', filename='Swiming pool 2.jpg') }}" alt="Royal Chalet Pool Deck" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Luxury Pool Deck</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="200">
+            <img src="{{ url_for('static', filename='Swiming pool 3.jpg') }}" alt="Royal Chalet Pool Lounge" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Pool Lounge Area</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in">
+            <img src="{{ url_for('static', filename='Swiming pool 4.jpg') }}" alt="Royal Chalet Garden View" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Lush Garden View</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="100">
+            <img src="{{ url_for('static', filename='Swiming pool 5.jpg') }}" alt="Royal Chalet Landscaped Garden" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Landscaped Gardens</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="200">
+            <img src="{{ url_for('static', filename='balcony view.jpg') }}" alt="Royal Chalet Balcony View" class="rounded-lg shadow-xl w-full aspect-square object-cover hover:scale-105 transition-all duration-500 cursor-pointer" />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Scenic Balcony View</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        </div>
+      </div>
+
+
+      <!-- Pool Tab -->
+      <div class="tab-content hidden" id="pool-content">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div class="gallery-item" data-aos="zoom-in">
+            <img src="{{ url_for('static', filename='Swiming pool 1.jpg') }}" alt="Sunset Deck" class="rounded-2xl shadow-xl w-full h-72 object-cover hover:scale-105 transition-all duration-500 cursor-pointer" data-animdesc="Dive into serenity with our infinity pool, where the horizon meets the water." />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Sunset Deck</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="100">
+            <img src="{{ url_for('static', filename='Swiming pool 2.jpg') }}" alt="Skyline View" class="rounded-2xl shadow-xl w-full h-72 object-cover hover:scale-105 transition-all duration-500 cursor-pointer" data-animdesc="Enjoy breathtaking views of the Western Ghats from the sparkling blue waters." />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Skyline View</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="200">
+            <img src="{{ url_for('static', filename='Swiming pool 3.jpg') }}" alt="Lagoon Retreat" class="rounded-2xl shadow-xl w-full h-72 object-cover hover:scale-105 transition-all duration-500 cursor-pointer" data-animdesc="Relax in the sun-drenched lounge area, perfect for unwinding with a view." />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Lagoon Retreat</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="300">
+            <img src="{{ url_for('static', filename='Swiming pool 4.jpg') }}" alt="Aqua Lounge" class="rounded-2xl shadow-xl w-full h-72 object-cover hover:scale-105 transition-all duration-500 cursor-pointer" data-animdesc="Experience magical evenings with ambient pool lighting and starry skies." />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Aqua Lounge</h4>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mt-8">
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="400">
+            <img src="{{ url_for('static', filename='Swiming pool 5.jpg') }}" alt="Serenity Edge" class="rounded-2xl shadow-xl w-full h-72 object-cover hover:scale-105 transition-all duration-500 cursor-pointer" data-animdesc="Host unforgettable gatherings on the spacious pool deck, designed for luxury." />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Serenity Edge</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="500">
+            <img src="{{ url_for('static', filename='Swiming pool 6.jpg') }}" alt="Palm Oasis" class="rounded-2xl shadow-xl w-full h-72 object-cover hover:scale-105 transition-all duration-500 cursor-pointer" data-animdesc="Awaken to breathtaking sunrises reflected in the tranquil pool waters." />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Palm Oasis</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="600">
+            <img src="{{ url_for('static', filename='Swiming pool 7.jpg') }}" alt="Crystal Bay" class="rounded-2xl shadow-xl w-full h-72 object-cover hover:scale-105 transition-all duration-500 cursor-pointer" data-animdesc="Crystal-clear waters and lush surroundings create a private oasis." />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Crystal Bay</h4>
+            </div>
+          </div>
+          <div class="gallery-item" data-aos="zoom-in" data-aos-delay="700">
+            <img src="{{ url_for('static', filename='Swiming pool 8.jpg') }}" alt="Twilight Haven" class="rounded-2xl shadow-xl w-full h-72 object-cover hover:scale-105 transition-all duration-500 cursor-pointer" data-animdesc="A tranquil oasis for relaxation, fun, and unforgettable moments." />
+            <div class="mt-4 text-center">
+              <h4 class="font-semibold text-gray-800">Twilight Haven</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Image Modal -->
+<div id="image-modal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4">
+  <div class="relative max-w-4xl max-h-full">
+    <button id="close-modal" class="absolute top-4 right-4 text-white text-4xl hover:text-gray-300 z-10">&times;</button>
+    <img id="modal-image" src="" alt="" class="max-w-full max-h-full object-contain rounded-lg">
+    <div id="modal-caption" class="absolute bottom-4 left-4 right-4 bg-black bg-opacity-70 text-white p-4 rounded-lg">
+      <h3 id="modal-title" class="text-xl font-bold mb-2"></h3>
+      
+<!-- Special Offer Details Modal -->
+<div id="offer-details-modal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center p-4">
+  <div class="relative bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4">
+    <button id="close-offer-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold z-10">&times;</button>
+    
+    <div class="p-6 md:p-8">
+      <div class="text-center mb-6">
+        <h3 class="text-3xl font-bold text-gray-800 mb-2">Summer Special Offer</h3>
+        <div class="h-1 w-24 bg-blue-600 mx-auto"></div>
+      </div>
+      
+      <div class="space-y-6">
+        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+          <h4 class="font-bold text-blue-800 text-lg mb-2">Offer Details</h4>
+          <p class="text-gray-700">Book 3 nights or more and receive 15% off your entire stay. This exclusive summer promotion is our way of inviting you to experience extended luxury at The Royal Chalet.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+            <h4 class="font-bold text-gray-800 mb-2">Validity</h4>
+            <p class="text-gray-700">Offer valid for bookings made before August 31st, 2023. Stay dates can extend through December 2023.</p>
+          </div>
+          
+          <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+            <h4 class="font-bold text-gray-800 mb-2">Restrictions</h4>
+            <p class="text-gray-700">Cannot be combined with other offers. Subject to availability. Blackout dates may apply.</p>
+          </div>
+        </div>
+        
+        <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-100">
+          <h4 class="font-bold text-yellow-800 mb-2">How to Redeem</h4>
+          <p class="text-gray-700">Simply book through our website and the discount will be automatically applied when you select 3 or more nights. No promo code needed!</p>
+        </div>
+        
+        <div class="text-center pt-4">
+          <a href="/booking" class="inline-block px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors">Book Now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      <p id="modal-description" class="text-sm"></p>
+    </div>
+  </div>
+</div>
+
+<!-- Animated Modal Overlay for Image Descriptions -->
+<div id="anim-modal" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden flex items-center justify-center transition-opacity duration-500">
+  <div class="relative bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full animate-fadeIn">
+    <button id="close-anim-modal" class="absolute top-2 right-4 text-3xl text-gray-500 hover:text-gray-800">&times;</button>
+    <div id="anim-modal-text" class="text-xl text-gray-800 font-semibold text-center"></div>
+  </div>
+</div>
+    <style>
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fadeIn { animation: fadeIn 0.5s ease; }
+      
+      /* Mobile Optimization */
+      @media (max-width: 768px) {
+        .gallery-item img {
+          height: 200px !important;
+        }
+        .tab-btn {
+          font-size: 0.875rem;
+          padding: 0.5rem 1rem;
+        }
+        .floating-widget {
+          width: 90vw !important;
+          right: 5vw !important;
+        }
+        .royal-crown-title {
+          font-size: 1.5rem !important;
+        }
+        .royal-crown-title .fa-crown {
+          font-size: 1.5rem !important;
+          margin-right: 8px !important;
+        }
+      }
+      
+      /* Touch-friendly improvements */
+      .tab-btn, .gallery-item img, button, a {
+        min-height: 44px;
+        min-width: 44px;
+      }
+      
+      /* Better mobile spacing */
+      @media (max-width: 640px) {
+        .container {
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+        .py-20 {
+          padding-top: 3rem;
+          padding-bottom: 3rem;
+        }
+        .py-24 {
+          padding-top: 3rem;
+          padding-bottom: 3rem;
+        }
+      }
+    </style>
+<script>
+// Gallery Tab Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.getAttribute('data-tab');
+      
+      // Remove active class from all buttons and contents
+      tabBtns.forEach(b => b.classList.remove('active', 'bg-blue-700', 'text-white'));
+      tabBtns.forEach(b => b.classList.add('bg-gray-200', 'text-gray-700'));
+      tabContents.forEach(content => content.classList.add('hidden'));
+      tabContents.forEach(content => content.classList.remove('active'));
+
+      // Add active class to clicked button and target content
+      btn.classList.add('active', 'bg-gray-700', 'text-white');
+      btn.classList.remove('bg-gray-200', 'text-gray-700');
+      document.getElementById(targetTab + '-content').classList.remove('hidden');
+      document.getElementById(targetTab + '-content').classList.add('active');
+    });
+  });
+
+  // Image Modal Functionality
+  const modal = document.getElementById('image-modal');
+  const modalImage = document.getElementById('modal-image');
+  const modalTitle = document.getElementById('modal-title');
+  const modalDescription = document.getElementById('modal-description');
+  const closeModal = document.getElementById('close-modal');
+
+  // Open modal when clicking on gallery images
+  document.querySelectorAll('.gallery-item img').forEach(img => {
+    img.addEventListener('click', () => {
+      modalImage.src = img.src;
+      modalImage.alt = img.alt;
+      modalTitle.textContent = img.getAttribute('data-caption');
+      modalDescription.textContent = img.getAttribute('data-animdesc');
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  // Close modal
+  closeModal.addEventListener('click', () => {
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+  });
+
+  // Close modal when clicking outside
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+  });
+
+  // Close modal with Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+      modal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+  });
+
+  // Animated modal for image descriptions
+  const animModal = document.getElementById('anim-modal');
+  const animModalText = document.getElementById('anim-modal-text');
+  const closeAnimModal = document.getElementById('close-anim-modal');
+  document.querySelectorAll('.gallery-item img').forEach(img => {
+    img.addEventListener('click', () => {
+      animModalText.textContent = img.getAttribute('data-animdesc');
+      animModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+  closeAnimModal.addEventListener('click', () => {
+    animModal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+  });
+  animModal.addEventListener('click', (e) => {
+    if (e.target === animModal) {
+      animModal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !animModal.classList.contains('hidden')) {
+      animModal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+  });
+});
+</script>
+
+<!-- Amenities Section (next) -->
+<section class="py-20 bg-white" id="amenities">
+  <div class="container mx-auto px-4">
+    <h2 class="text-5xl font-bold mb-16 text-center text-gray-800" style="font-family: 'Playfair Display', serif;">Luxury Amenities</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <!-- Indoor Amenities -->
+      <div class="bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up">
+        <div class="w-16 h-16 bg-blue-400 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold mb-4 text-gray-800 text-center">Indoor</h3>
+        <ul class="text-gray-700 space-y-2">
+          <li>✔️ 4 Luxury Bedrooms</li>
+          <li>✔️ Air Conditioning</li>
+          <li>✔️ Gourmet Kitchen</li>
+          <li>✔️ Living Room</li>
+          <li>✔️ Dining Area</li>
+          <li>✔️ Towels & Toiletries</li>
+        </ul>
+      </div>
+      <!-- Outdoor Amenities -->
+      <div class="bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="100">
+        <div class="w-16 h-16 bg-blue-400 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold mb-4 text-gray-800 text-center">Kitchen</h3>
+        <ul class="text-gray-700 space-y-2">
+          <li>✔️ Refrigerator</li>
+          <li>✔️ Microwave</li>
+          <li>✔️ Dishes and Silverware</li>
+          <li>✔️ Electric Kettle</li>
+          <li>✔️ Meal Plans</li>
+          <li>✔️ Barbeque</li>
+        </ul>
+      </div>
+      <!-- Entertainment Amenities -->
+      <div class="bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="200">
+        <div class="w-16 h-16 bg-blue-400 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold mb-4 text-gray-800 text-center">Entertainment</h3>
+        <ul class="text-gray-700 space-y-2">
+          <li>✔️ Smart TV</li>
+          <li>✔️ Music System</li>
+          <li>✔️ Board Games</li>
+          <li>✔️ Wi-Fi</li>
+          <li>✔️ Terrace Sitout</li>
+          <li>✔️ Carrom</li>
+        </ul>
+      </div>
+      <!-- Wellness Amenities -->
+      <div class="bg-gradient-to-br from-gray-50 to-white rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2" data-aos="fade-up" data-aos-delay="300">
+        <div class="w-16 h-16 bg-blue-400 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-8 h-8 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-2xl font-bold mb-4 text-gray-800 text-center">Outdoor</h3>
+        <ul class="text-gray-700 space-y-2">
+          <li>✔️ Private Pool</li>
+          <li>✔️ Garden Lawn</li>
+          <li>✔️ Security</li>
+          <li>✔️ Pool Deck</li>
+          <li>✔️ Parking</li>
+          <li>✔️ Power Backup</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing & Packages Section -->
+<section class="py-20 bg-gradient-to-r from-gray-100 to-gray-200" id="pricing">
+  <div class="container mx-auto px-4">
+    <h2 class="text-5xl font-bold mb-16 text-center text-gray-800" style="font-family: 'Playfair Display', serif;">Pricing & Packages</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+      <!-- Weekend Package -->
+      <div class="bg-white rounded-3xl shadow-2xl p-10 flex flex-col items-center hover:shadow-3xl transition-all duration-300" data-aos="fade-up">
+        <h3 class="text-3xl font-bold mb-4 text-gray-800">Weekend Escape</h3>
+        <div class="text-4xl font-extrabold text-blue-500 mb-2">₹{{ weekend_price|int|format_number }}<span class="text-lg font-normal text-gray-500">/night</span></div>
+        <ul class="text-gray-700 text-lg mb-8 space-y-2 text-left">
+          <li>✔️ 4 Luxury Bedrooms</li>
+          <li>✔️ Private Infinity Pool</li>
+          <li>✔️ Gourmet Kitchen</li>
+          <li>✔️ Free Wi-Fi & Entertainment</li>
+          <li>✔️ 24/7 Concierge</li>
+        </ul>
+        <a href="/booking" class="bg-blue-900 text-white px-8 py-4 rounded-full font-bold hover:bg-blue-800 transition-colors text-lg">Book Now</a>
+      </div>
+      <!-- Weekday Package -->
+      <div class="bg-white rounded-3xl shadow-2xl p-10 flex flex-col items-center border-4 border-blue-400 scale-105 z-10 hover:shadow-3xl transition-all duration-300" data-aos="fade-up" data-aos-delay="100">
+        <h3 class="text-3xl font-bold mb-4 text-gray-800">Weekday Retreat</h3>
+        <div class="text-4xl font-extrabold text-blue-500 mb-2">₹{{ weekday_price|int|format_number }}<span class="text-lg font-normal text-gray-500">/night</span></div>
+        <ul class="text-gray-700 text-lg mb-8 space-y-2 text-left">
+          <li>  ✔️ 4 Luxury Bedrooms</li>
+          <li>  ✔️ Private Pool</li>
+          <li>✔️ Gourmet Kitchen</li>
+          <li>✔️ Free Wi-Fi & Entertainment</li>
+          <li>✔️ 24/7 Concierge</li>
+        </ul>
+        <a href="/booking" class="bg-blue-900 text-white px-8 py-4 rounded-full font-bold hover:bg-blue-800 transition-colors text-lg">Book Now</a>
+      </div>
+      <!-- Extended Stay Package -->
+      <div class="bg-white rounded-3xl shadow-2xl p-10 flex flex-col items-center hover:shadow-3xl transition-all duration-300" data-aos="fade-up" data-aos-delay="200">
+        <h3 class="text-3xl font-bold mb-4 text-gray-800">Extended Stay</h3>
+        <div class="text-4xl font-extrabold text-blue-500 mb-2">₹{{ extended_stay_price|int|format_number }}<span class="text-lg font-normal text-gray-500">/night</span></div>
+        <ul class="text-gray-700 text-lg mb-8 space-y-2 text-left">
+          <li>✔️ 4 Luxury Bedrooms</li>
+          <li>✔️ Private Pool</li>
+          <li>✔️ Gourmet Kitchen</li>
+          <li>✔️ Free Wi-Fi & Entertainment</li>
+          <li>✔️ 24/7 Concierge</li>
+          <li>✔️ Special Long-Stay Discounts</li>
+        </ul>
+        <a href="/booking" class="bg-blue-900 text-white px-8 py-4 rounded-full font-bold hover:bg-blue-800 transition-colors text-lg">Book Now</a>
+      </div>
+    </div>
+    <!-- Trust Signals Section -->
+    <div class="mt-12 bg-white rounded-2xl shadow-lg p-8">
+      <h3 class="text-2xl font-bold mb-6 text-center text-gray-800">Why Choose The Royal Chalet?</h3>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h4 class="font-semibold text-gray-800 mb-2">Secure Booking</h4>
+          <p class="text-sm text-gray-600">SSL encrypted payments</p>
+        </div>
+        <div class="text-center">
+          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+            </svg>
+          </div>
+          <h4 class="font-semibold text-gray-800 mb-2">Multiple Payment Options</h4>
+          <p class="text-sm text-gray-600">UPI, Cards, Net Banking</p>
+        </div>
+        <div class="text-center">
+          <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h4 class="font-semibold text-gray-800 mb-2">Free Cancellation</h4>
+          <p class="text-sm text-gray-600">7 days before check-in</p>
+        </div>
+        <div class="text-center">
+          <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z"></path>
+            </svg>
+          </div>
+          <h4 class="font-semibold text-gray-800 mb-2">24/7 Support</h4>
+          <p class="text-sm text-gray-600">Always here to help</p>
+        </div>
+      </div>
+    </div>
+    
+    <p class="text-center text-gray-600 mt-10">Flexible check-in/check-out available on request.</p>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-20 bg-white" id="faq">
+  <div class="container mx-auto px-4">
+    <h2 class="text-5xl font-bold mb-16 text-center text-gray-800" style="font-family: 'Playfair Display', serif;">Frequently Asked Questions</h2>
+    <div class="max-w-4xl mx-auto space-y-6">
+      <!-- FAQ Item 1 -->
+      <div class="bg-gray-50 rounded-2xl p-6" data-aos="fade-up">
+        <h3 class="text-xl font-bold mb-3 text-gray-800">What is the check-in and check-out time?</h3>
+        <p class="text-gray-700">Check-in time is {{ villa_settings.get('check_in_time', '14:00') | format_time }} and check-out time is {{ villa_settings.get('check_out_time', '11:00') | format_time }}. Early check-in and late check-out can be arranged based on availability.(at extra cost)</p>
+      </div>
+      <!-- FAQ Item 2 -->
+      <div class="bg-gray-50 rounded-2xl p-6" data-aos="fade-up" data-aos-delay="100">
+        <h3 class="text-xl font-bold mb-3 text-gray-800">What is included in the villa rental?</h3>
+        <p class="text-gray-700">Your rental includes the entire villa, all amenities, Wi-Fi, parking, and 24/7 support. Additional services like cleaning and meals can be arranged.(at extra cost)</p>
+      </div>
+      <!-- FAQ Item 3 -->
+      <div class="bg-gray-50 rounded-2xl p-6" data-aos="fade-up" data-aos-delay="200">
+        <h3 class="text-xl font-bold mb-3 text-gray-800">What is the cancellation policy?</h3>
+        <p class="text-gray-700">Free cancellation up to 7 days before check-in. Cancellations within 7 days are subject to a 50% charge. No refunds for same-day cancellations.</p>
+      </div>
+      <!-- FAQ Item 4 -->
+      <div class="bg-gray-50 rounded-2xl p-6" data-aos="fade-up" data-aos-delay="300">
+        <h3 class="text-xl font-bold mb-3 text-gray-800">Do you provide meals or cooking facilities?</h3>
+        <p class="text-gray-700">The villa has a fully-equipped gourmet kitchen. We can arrange for a private chef or meal delivery services upon request.(at extra cost)</p>
+      </div>
+      <!-- FAQ Item 5 -->
+      <div class="bg-gray-50 rounded-2xl p-6" data-aos="fade-up" data-aos-delay="400">
+        <h3 class="text-xl font-bold mb-3 text-gray-800">Is the villa suitable for children?</h3>
+        <p class="text-gray-700">Yes! The villa is family-friendly with safety features, spacious rooms, and the infinity pool has a shallow area for children.</p>
+      </div>
+      <!-- FAQ Item 6 -->
+      <div class="bg-gray-50 rounded-2xl p-6" data-aos="fade-up" data-aos-delay="500">
+        <h3 class="text-xl font-bold mb-3 text-gray-800">What should I bring for my stay?</h3>
+        <p class="text-gray-700">We provide all essentials including towels, linens, and basic toiletries. Just bring your personal items and clothes. Everything else is taken care of!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact section removed as requested -->
+
+<!-- Floating Booking Widget and CTA Button removed as requested -->
+
+<script>
+// Quick Book widget functionality has been removed as requested
+
+// Special Offer Modal Functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const viewOfferButton = document.getElementById('view-offer-details');
+  const offerModal = document.getElementById('offer-details-modal');
+  const closeOfferModal = document.getElementById('close-offer-modal');
+  
+  if (viewOfferButton && offerModal && closeOfferModal) {
+    // Open modal when View Details button is clicked
+    viewOfferButton.addEventListener('click', () => {
+      offerModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    });
+    
+    // Close modal when close button is clicked
+    closeOfferModal.addEventListener('click', () => {
+      offerModal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    });
+    
+    // Close modal when clicking outside the modal content
+    offerModal.addEventListener('click', (e) => {
+      if (e.target === offerModal) {
+        offerModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+    });
+  }
+  
+  // Countdown Timer Functionality
+  const countdownDays = document.getElementById('countdown-days');
+  const countdownHours = document.getElementById('countdown-hours');
+  const countdownMinutes = document.getElementById('countdown-minutes');
+  const countdownSeconds = document.getElementById('countdown-seconds');
+  
+  if (countdownDays && countdownHours && countdownMinutes && countdownSeconds) {
+    // Set the offer end date - August 31st of current year
+    const currentYear = new Date().getFullYear();
+    const endDate = new Date(`August 31, ${currentYear} 23:59:59`).getTime();
+    
+    // If the date has already passed this year, set it for next year
+    const now = new Date().getTime();
+    const targetDate = now > endDate ? new Date(`August 31, ${currentYear + 1} 23:59:59`).getTime() : endDate;
+    
+    // Update the countdown every second
+    const countdownTimer = setInterval(function() {
+      // Get current date and time
+      const now = new Date().getTime();
+      
+      // Calculate the time remaining
+      const distance = targetDate - now;
+      
+      // Calculate days, hours, minutes, and seconds
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      
+      // Display the result with leading zeros
+      countdownDays.textContent = days < 10 ? `0${days}` : days;
+      countdownHours.textContent = hours < 10 ? `0${hours}` : hours;
+      countdownMinutes.textContent = minutes < 10 ? `0${minutes}` : minutes;
+      countdownSeconds.textContent = seconds < 10 ? `0${seconds}` : seconds;
+      
+      // If the countdown is finished, display a message
+      if (distance < 0) {
+        clearInterval(countdownTimer);
+        countdownDays.textContent = '00';
+        countdownHours.textContent = '00';
+        countdownMinutes.textContent = '00';
+        countdownSeconds.textContent = '00';
+      }
+    }, 1000);
+  }
+  
+  // Quick Booking Form Date Validation and Price Calculation
+  const quickCheckIn = document.getElementById('quick-check-in');
+  const quickCheckOut = document.getElementById('quick-check-out');
+  const quickGuests = document.getElementById('quick-guests');
+  const priceEstimateContainer = document.getElementById('price-estimate-container');
+  const totalNightsElement = document.getElementById('total-nights');
+  const numGuestsElement = document.getElementById('num-guests');
+  const pricePerNightElement = document.getElementById('price-per-night');
+  const totalPriceElement = document.getElementById('total-price');
+  const weekendRateInfo = document.getElementById('weekend-rate-info');
+  const discountInfo = document.getElementById('discount-info');
+  
+  if (quickCheckIn && quickCheckOut) {
+    // Set min date to today for check-in
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    // Format dates as YYYY-MM-DD for input[type="date"]
+    const formatDate = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
+    // Set minimum dates
+    quickCheckIn.min = formatDate(today);
+    quickCheckOut.min = formatDate(tomorrow);
+    
+    // Format currency with commas for Indian currency format
+    const formatIndianCurrency = (num) => {
+      return num.toLocaleString('en-IN');
+    };
+    
+    // Function to calculate price
+    const calculatePrice = () => {
+      if (quickCheckIn.value && quickCheckOut.value) {
+        const checkInDate = new Date(quickCheckIn.value);
+        const checkOutDate = new Date(quickCheckOut.value);
+        const numGuests = parseInt(quickGuests.value);
+        
+        // Calculate number of nights
+        const timeDiff = checkOutDate.getTime() - checkInDate.getTime();
+        const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        
+        if (nights > 0) {
+          // Base price per night
+          const basePricePerNight = 15000; // ₹15,000 per night
+          let totalPrice = basePricePerNight * nights;
+          
+          // Check for weekend nights (Friday or Saturday)
+          let weekendNights = 0;
+          for (let i = 0; i < nights; i++) {
+            const currentDate = new Date(checkInDate);
+            currentDate.setDate(currentDate.getDate() + i);
+            const day = currentDate.getDay();
+            if (day === 5 || day === 6) { // Friday or Saturday
+              weekendNights++;
+            }
+          }
+          
+          // Apply weekend rate if applicable (20% higher for weekend nights)
+          if (weekendNights > 0) {
+            const weekendSurcharge = basePricePerNight * 0.2 * weekendNights;
+            totalPrice += weekendSurcharge;
+            
+            // Show weekend rate info
+            if (weekendRateInfo) {
+              weekendRateInfo.style.display = 'flex';
+              weekendRateInfo.querySelector('span:last-child').textContent = 
+                `+20% (${weekendNights} night${weekendNights > 1 ? 's' : ''})`;
+            }
+          } else if (weekendRateInfo) {
+            weekendRateInfo.style.display = 'none';
+          }
+          
+          // Apply discount for longer stays
+          let discountPercent = 0;
+          if (nights >= 7) {
+            // 15% discount for stays of 7+ nights
+            discountPercent = 15;
+            totalPrice = totalPrice * 0.85;
+          } else if (nights >= 3) {
+            // 10% discount for stays of 3-6 nights
+            discountPercent = 10;
+            totalPrice = totalPrice * 0.9;
+          }
+          
+          // Show/hide discount info
+          if (discountInfo) {
+            if (discountPercent > 0) {
+              discountInfo.style.display = 'flex';
+              discountInfo.querySelector('span:last-child').textContent = `-${discountPercent}%`;
+            } else {
+              discountInfo.style.display = 'none';
+            }
+          }
+          
+          // Update the price estimate elements
+          totalNightsElement.textContent = nights;
+          if (numGuestsElement) numGuestsElement.textContent = numGuests;
+          pricePerNightElement.textContent = formatIndianCurrency(basePricePerNight);
+          totalPriceElement.textContent = formatIndianCurrency(Math.round(totalPrice));
+          
+          // Show the price estimate container with a subtle animation
+          if (priceEstimateContainer.classList.contains('hidden')) {
+            priceEstimateContainer.classList.remove('hidden');
+            priceEstimateContainer.style.opacity = '0';
+            priceEstimateContainer.style.transform = 'translateY(10px)';
+            priceEstimateContainer.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            
+            // Trigger reflow
+            void priceEstimateContainer.offsetWidth;
+            
+            // Apply animation
+            priceEstimateContainer.style.opacity = '1';
+            priceEstimateContainer.style.transform = 'translateY(0)';
+          }
+        }
+      }
+    };
+    
+    // Update check-out min date when check-in changes
+    quickCheckIn.addEventListener('change', function() {
+      const checkInDate = new Date(this.value);
+      const nextDay = new Date(checkInDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      
+      quickCheckOut.min = formatDate(nextDay);
+      
+      // If current check-out date is before new min date, update it
+      if (new Date(quickCheckOut.value) <= checkInDate) {
+        quickCheckOut.value = formatDate(nextDay);
+      }
+      
+      // Calculate and display price estimate
+      calculatePrice();
+    });
+    
+    // Calculate price when check-out date changes
+    quickCheckOut.addEventListener('change', calculatePrice);
+    
+    // Calculate price when number of guests changes
+    if (quickGuests) {
+      quickGuests.addEventListener('change', calculatePrice);
+    }
+    
+    // Add subtle hover effect to the booking button
+    const bookingButton = document.querySelector('#quick-booking-form button[type="submit"]');
+    if (bookingButton) {
+      bookingButton.addEventListener('mouseover', function() {
+        this.style.transform = 'scale(1.02) translateY(-2px)';
+      });
+      
+      bookingButton.addEventListener('mouseout', function() {
+        this.style.transform = '';
+      });
+    }
+  }
+});
+</script>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Image slider functionality
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.slider-dot');
+    let currentSlide = 0;
+    
+    // Function to change slide
+    function showSlide(index) {
+      // Hide all slides
+      slides.forEach(slide => {
+        slide.classList.remove('active');
+      });
+      
+      // Remove active class from all dots
+      dots.forEach(dot => {
+        dot.classList.remove('active');
+      });
+      
+      // Show the selected slide
+      slides[index].classList.add('active');
+      dots[index].classList.add('active');
+      currentSlide = index;
+    }
+    
+    // Auto slide change
+    setInterval(() => {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }, 5000);
+    
+    // Click event for dots
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        showSlide(index);
+      });
+    });
+  });
+</script>
+{% endblock %}

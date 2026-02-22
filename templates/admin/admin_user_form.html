@@ -1,0 +1,67 @@
+{% extends 'admin/admin_base.html' %}
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center" style="background-image: url('{{ url_for('static', filename='Villa From Outside1.jpg') }}'); background-size: cover; background-position: center; background-attachment: fixed;">
+  <div class="relative z-10 w-full max-w-3xl bg-white/30 rounded-3xl shadow-2xl p-8 mb-8 backdrop-blur-lg border border-yellow-100 mt-12">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-3xl font-extrabold text-yellow-400 tracking-wide" style="font-family: 'Playfair Display', serif; letter-spacing: 2px;">Add New User</h2>
+      
+      <a href="{{ url_for('admin_users') }}" class="px-4 py-2 bg-white/80 text-yellow-700 rounded-lg hover:bg-white transition-all duration-300 flex items-center shadow-md">
+        <i class="fas fa-arrow-left mr-2"></i> Back to Users
+      </a>
+    </div>
+    
+    <div class="bg-white/60 rounded-xl p-6 shadow-md">
+      <form method="POST" class="space-y-6">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
+        <!-- Username -->
+        <div class="space-y-2">
+          <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+          <input type="text" id="username" name="username" required 
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400">
+        </div>
+        
+        <!-- Email -->
+        <div class="space-y-2">
+          <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+          <input type="email" id="email" name="email" required 
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400">
+        </div>
+        
+        <!-- Password -->
+        <div class="space-y-2">
+          <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+          <input type="password" id="password" name="password" required 
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400">
+        </div>
+        
+        <!-- Phone -->
+        <div class="space-y-2">
+          <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number (Optional)</label>
+          <input type="tel" id="phone" name="phone" 
+                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400">
+        </div>
+        
+        <!-- Address -->
+        <div class="space-y-2">
+          <label for="address" class="block text-sm font-medium text-gray-700">Address (Optional)</label>
+          <textarea id="address" name="address" rows="3" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"></textarea>
+        </div>
+        
+        <!-- Admin Status -->
+        <div class="flex items-center">
+          <input type="checkbox" id="is_admin" name="is_admin" class="h-4 w-4 text-yellow-500 focus:ring-yellow-400 border-gray-300 rounded">
+          <label for="is_admin" class="ml-2 block text-sm text-gray-700">Make this user an administrator</label>
+        </div>
+        
+        <div class="pt-4">
+          <button type="submit" class="w-full px-4 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-all duration-300 flex items-center justify-center shadow-md">
+            <i class="fas fa-user-plus mr-2"></i> Create User
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

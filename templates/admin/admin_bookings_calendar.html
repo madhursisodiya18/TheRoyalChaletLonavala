@@ -1,0 +1,354 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center bg-cover bg-center bg-fixed" style="background-image: url('{{ url_for('static', filename='Villa From Outside1.jpg') }}');">
+  <div class="relative z-10 w-full max-w-6xl bg-white/40 dark:bg-gray-900/60 rounded-3xl shadow-2xl p-8 mb-8 backdrop-blur-lg border border-blue-200/50 dark:border-blue-800/50 mt-12 transition-colors duration-300">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+      <h2 class="text-4xl font-extrabold text-admin-primary dark:text-blue-400 tracking-wide" style="font-family: 'Playfair Display', serif; letter-spacing: 2px;">Booking Calendar</h2>
+      <div class="flex flex-wrap gap-2">
+        <a href="/admin/bookings" class="px-4 py-2 bg-admin-primary text-white rounded-lg hover:bg-blue-800 shadow font-semibold flex items-center transition-all duration-300 transform hover:translate-y-[-2px]">
+          <i class="fas fa-list mr-2"></i> List View
+        </a>
+        <a href="/admin/bookings/export-csv" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow font-semibold flex items-center transition-all duration-300 transform hover:translate-y-[-2px]">
+          <i class="fas fa-file-csv mr-2"></i> Export CSV
+        </a>
+        <button id="printCalendar" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 shadow font-semibold flex items-center transition-all duration-300 transform hover:translate-y-[-2px]">
+          <i class="fas fa-print mr-2"></i> Print
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-xl p-6 border border-blue-100 dark:border-blue-900/30">
+      <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div class="flex flex-wrap gap-2">
+          <button id="prev" class="px-3 py-2 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800/70 transition-colors shadow-sm flex items-center">
+            <i class="fas fa-chevron-left mr-1"></i> Previous
+          </button>
+          <button id="next" class="px-3 py-2 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800/70 transition-colors shadow-sm flex items-center">
+            Next <i class="fas fa-chevron-right ml-1"></i>
+          </button>
+          <button id="today" class="px-3 py-2 bg-admin-primary text-white rounded-lg hover:bg-blue-800 transition-colors shadow-sm flex items-center">
+            <i class="fas fa-calendar-day mr-1"></i> Today
+          </button>
+        </div>
+        <h2 id="currentViewTitle" class="text-2xl font-bold text-admin-primary dark:text-blue-400" style="font-family: 'Playfair Display', serif;">August 2023</h2>
+        <div class="flex flex-wrap gap-2">
+          <button id="monthView" class="px-3 py-2 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800/70 transition-colors shadow-sm flex items-center">
+            <i class="fas fa-calendar-alt mr-1"></i> Month
+          </button>
+          <button id="weekView" class="px-3 py-2 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800/70 transition-colors shadow-sm flex items-center">
+            <i class="fas fa-calendar-week mr-1"></i> Week
+          </button>
+          <button id="dayView" class="px-3 py-2 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800/70 transition-colors shadow-sm flex items-center">
+            <i class="fas fa-calendar-day mr-1"></i> Day
+          </button>
+        </div>
+      </div>
+      
+      <div id="calendar" class="fc fc-media-screen fc-direction-ltr fc-theme-standard bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-blue-100 dark:border-blue-900/30" style="height: 650px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Booking Details Modal -->
+<div id="bookingModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 max-w-lg w-full border border-blue-200 dark:border-blue-800">
+    <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+      <h3 class="text-2xl font-bold text-admin-primary dark:text-blue-400" style="font-family: 'Playfair Display', serif;">Booking Details</h3>
+      <button id="closeModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div id="bookingDetails" class="space-y-4">
+      <!-- Booking details will be populated here -->
+    </div>
+    <div class="flex justify-end mt-6 space-x-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <button id="confirmBooking" class="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition-colors shadow flex items-center">
+        <i class="fas fa-check mr-2"></i> Confirm
+      </button>
+      <button id="cancelBooking" class="px-4 py-2 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition-colors shadow flex items-center">
+        <i class="fas fa-times mr-2"></i> Cancel
+      </button>
+      <button id="closeModalBtn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors shadow flex items-center">
+        <i class="fas fa-times-circle mr-2"></i> Close
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Include FullCalendar library -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.js"></script>
+
+<style>
+  /* Custom FullCalendar styling */
+  .fc-theme-standard .fc-scrollgrid {
+    border-color: rgba(59, 130, 246, 0.2);
+  }
+  
+  .fc-theme-standard th {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #1e40af;
+    font-weight: 600;
+  }
+  
+  .dark .fc-theme-standard th {
+    background-color: rgba(30, 64, 175, 0.3);
+    color: #93c5fd;
+  }
+  
+  .fc-daygrid-day-number {
+    color: #1e40af;
+    font-weight: 500;
+  }
+  
+  .dark .fc-daygrid-day-number {
+    color: #93c5fd;
+  }
+  
+  .fc-event {
+    border-radius: 6px;
+    border: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+  }
+  
+  .fc-event:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .fc-day-today {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+  }
+  
+  .dark .fc-day-today {
+    background-color: rgba(30, 64, 175, 0.2) !important;
+  }
+  
+  .fc-button-active {
+    background-color: #1e40af !important;
+    border-color: #1e40af !important;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize calendar
+    const calendarEl = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      headerToolbar: false, // We're using our custom header
+      selectable: true,
+      editable: false,
+      dayMaxEvents: true,
+      events: JSON.parse('{{ calendar_events|tojson|safe }}'),
+      eventClassNames: function(arg) {
+        // Add custom classes based on booking status
+        const status = arg.event.extendedProps.status;
+        if (status === 'confirmed') {
+          return ['bg-green-500', 'border-green-600'];
+        } else if (status === 'pending') {
+          return ['bg-yellow-500', 'border-yellow-600'];
+        } else if (status === 'cancelled') {
+          return ['bg-red-500', 'border-red-600'];
+        }
+        return ['bg-blue-500', 'border-blue-600'];
+      },
+      eventClick: function(info) {
+        showBookingDetails(info.event.id);
+      }
+    });
+    calendar.render();
+    
+    // Update the title
+    updateTitle();
+    
+    // Navigation buttons
+    document.getElementById('prev').addEventListener('click', function() {
+      calendar.prev();
+      updateTitle();
+    });
+    
+    document.getElementById('next').addEventListener('click', function() {
+      calendar.next();
+      updateTitle();
+    });
+    
+    document.getElementById('today').addEventListener('click', function() {
+      calendar.today();
+      updateTitle();
+    });
+    
+    // View buttons
+    document.getElementById('monthView').addEventListener('click', function() {
+      calendar.changeView('dayGridMonth');
+      updateTitle();
+      setActiveViewButton('monthView');
+    });
+    
+    document.getElementById('weekView').addEventListener('click', function() {
+      calendar.changeView('timeGridWeek');
+      updateTitle();
+      setActiveViewButton('weekView');
+    });
+    
+    document.getElementById('dayView').addEventListener('click', function() {
+      calendar.changeView('timeGridDay');
+      updateTitle();
+      setActiveViewButton('dayView');
+    });
+    
+    // Set active view button
+    function setActiveViewButton(activeId) {
+      const viewButtons = ['monthView', 'weekView', 'dayView'];
+      viewButtons.forEach(id => {
+        const button = document.getElementById(id);
+        if (id === activeId) {
+          button.classList.remove('bg-blue-100', 'dark:bg-blue-900/50', 'text-blue-800', 'dark:text-blue-200');
+          button.classList.add('bg-admin-primary', 'text-white');
+        } else {
+          button.classList.add('bg-blue-100', 'dark:bg-blue-900/50', 'text-blue-800', 'dark:text-blue-200');
+          button.classList.remove('bg-admin-primary', 'text-white');
+        }
+      });
+    }
+    
+    // Set month view as active by default
+    setActiveViewButton('monthView');
+    
+    // Update title based on current view
+    function updateTitle() {
+      const viewTitle = document.getElementById('currentViewTitle');
+      const date = calendar.getDate();
+      const view = calendar.view;
+      
+      if (view.type === 'dayGridMonth') {
+        viewTitle.textContent = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+      } else if (view.type === 'timeGridWeek') {
+        const start = calendar.view.activeStart;
+        const end = calendar.view.activeEnd;
+        const startMonth = start.toLocaleString('default', { month: 'short' });
+        const endMonth = end.toLocaleString('default', { month: 'short' });
+        const startDay = start.getDate();
+        const endDay = new Date(end.getTime() - 86400000).getDate(); // Subtract one day
+        const year = start.getFullYear();
+        
+        if (startMonth === endMonth) {
+          viewTitle.textContent = `${startMonth} ${startDay}-${endDay}, ${year}`;
+        } else {
+          viewTitle.textContent = `${startMonth} ${startDay} - ${endMonth} ${endDay}, ${year}`;
+        }
+      } else if (view.type === 'timeGridDay') {
+        viewTitle.textContent = date.toLocaleString('default', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      }
+    }
+    
+    // Modal functionality
+    const modal = document.getElementById('bookingModal');
+    const closeModal = document.getElementById('closeModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    
+    closeModal.addEventListener('click', function() {
+      modal.classList.add('hidden');
+    });
+    
+    closeModalBtn.addEventListener('click', function() {
+      modal.classList.add('hidden');
+    });
+    
+    // Show booking details
+    function showBookingDetails(bookingId) {
+      // In a real implementation, you would fetch the booking details from the server
+      // For now, we'll just show a placeholder
+      const bookingDetails = document.getElementById('bookingDetails');
+      bookingDetails.innerHTML = `
+        <div class="animate-pulse">
+          <p class="text-gray-600 dark:text-gray-400">Loading booking #${bookingId}...</p>
+          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mt-2"></div>
+          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mt-2"></div>
+          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mt-2"></div>
+        </div>
+      `;
+      
+      modal.classList.remove('hidden');
+      
+      // Simulate loading data
+      setTimeout(function() {
+        // In a real implementation, this would be the data from your API
+        bookingDetails.innerHTML = `
+          <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-4 border border-blue-100 dark:border-blue-800">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Booking ID</p>
+                <p class="font-medium text-gray-900 dark:text-white">#${bookingId}</p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Status</p>
+                <p class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                  Confirmed
+                </p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Guest Name</p>
+                <p class="font-medium text-gray-900 dark:text-white">John Doe</p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</p>
+                <p class="font-medium text-gray-900 dark:text-white">john.doe@example.com</p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</p>
+                <p class="font-medium text-gray-900 dark:text-white">+1 234 567 8900</p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Guests</p>
+                <p class="font-medium text-gray-900 dark:text-white">4 Adults, 2 Children</p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Check-in</p>
+                <p class="font-medium text-gray-900 dark:text-white">Aug 15, 2023</p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Check-out</p>
+                <p class="font-medium text-gray-900 dark:text-white">Aug 20, 2023</p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Nights</p>
+                <p class="font-medium text-gray-900 dark:text-white">5</p>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Price</p>
+                <p class="font-medium text-gray-900 dark:text-white">$1,250.00</p>
+              </div>
+            </div>
+            <div class="mt-4">
+              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Special Requests</p>
+              <p class="text-gray-900 dark:text-white">We would like to have a late check-out if possible. Also, we have a small dog with us.</p>
+            </div>
+          </div>
+        `;
+      }, 1000);
+    }
+    
+    // Print calendar functionality
+    document.getElementById('printCalendar').addEventListener('click', function() {
+      window.print();
+    });
+    
+    // Confirm booking functionality
+    document.getElementById('confirmBooking').addEventListener('click', function() {
+      alert('Booking confirmed successfully!');
+      modal.classList.add('hidden');
+    });
+    
+    // Cancel booking functionality
+    document.getElementById('cancelBooking').addEventListener('click', function() {
+      if (confirm('Are you sure you want to cancel this booking?')) {
+        alert('Booking cancelled successfully!');
+        modal.classList.add('hidden');
+      }
+    });
+  });
+</script>
+{% endblock %}

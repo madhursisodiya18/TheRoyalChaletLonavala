@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment - The Royal Chalet{% endblock %}
+
+{% block content %}
+<div class="payment-container bg-gray-50 min-h-screen py-12">
+    <div class="container mx-auto px-4">
+        <!-- Elegant Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-playfair text-blue-900 mb-4">Complete Your Payment</h1>
+            <div class="w-24 h-1 bg-amber-500 mx-auto mb-6"></div>
+            <p class="text-gray-600 max-w-2xl mx-auto">You're just one step away from confirming your luxury stay at The Royal Chalet.</p>
+        </div>
+
+        <div class="max-w-5xl mx-auto">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+                <!-- Booking Summary -->
+                <div class="p-8 border-b border-gray-200">
+                    <h2 class="text-2xl font-semibold text-blue-800 mb-6">Booking Summary</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <div class="mb-4">
+                                <h3 class="text-lg font-medium text-gray-700 mb-2">Stay Details</h3>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <p class="text-sm text-gray-500">Check-in</p>
+                                            <p class="font-medium">{{ booking.check_in.strftime('%d %b %Y') }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500">Check-out</p>
+                                            <p class="font-medium">{{ booking.check_out.strftime('%d %b %Y') }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500">Nights</p>
+                                            <p class="font-medium">{{ (booking.check_out - booking.check_in).days }}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-500">Guests</p>
+                                            <p class="font-medium">{{ booking.adults }} Adult{% if booking.adults > 1 %}s{% endif %}, {{ booking.children }} Child{% if booking.children != 1 %}ren{% endif %}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-700 mb-2">Villa Details</h3>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <p class="font-medium text-blue-800">{{ booking.villa_type }}</p>
+                                    <p class="text-gray-600 mt-1">Luxury accommodation with premium amenities</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-700 mb-2">Price Breakdown</h3>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Base Price</span>
+                                        <span>₹{{ booking.base_price|format_number }}</span>
+                                    </div>
+                                    
+                                    {% if booking.meal_plan %}
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">{{ booking.meal_plan }}</span>
+                                        <span>₹{{ booking.meal_cost|format_number }}</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if booking.amenities_cost > 0 %}
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Additional Amenities</span>
+                                        <span>₹{{ booking.amenities_cost|format_number }}</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Subtotal</span>
+                                        <span>₹{{ booking.subtotal|format_number }}</span>
+                                    </div>
+                                    
+                                    <!-- Removed GST display: premium policy is no taxes shown -->
+                                    
+                                    <div class="border-t border-gray-200 pt-2 mt-2">
+                                        <div class="flex justify-between font-bold text-blue-900">
+                                            <span>Total</span>
+                                            <span>₹{{ booking.total_price|format_number }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payment Options -->
+                <div class="p-8">
+                    <h2 class="text-2xl font-semibold text-blue-800 mb-6">Payment Method</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Payment Form -->
+                        <div>
+                            <form id="payment-form" method="POST" action="{{ url_for('process_payment', booking_id=booking.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                
+                                <div class="mb-6">
+                                    <div class="flex items-center mb-4">
+                                        <input type="radio" id="payment_card" name="payment_method" value="card" class="mr-2" checked>
+                                        <label for="payment_card" class="flex items-center">
+                                            <span class="mr-2">Credit/Debit Card</span>
+                                            <div class="flex space-x-1">
+                                                <i class="fab fa-cc-visa text-blue-700 text-xl"></i>
+                                                <i class="fab fa-cc-mastercard text-red-500 text-xl"></i>
+                                                <i class="fab fa-cc-amex text-blue-500 text-xl"></i>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div id="card-payment-form" class="bg-gray-50 p-4 rounded-lg">
+                                        <div class="mb-4">
+                                            <label for="card_name" class="block text-sm font-medium text-gray-700 mb-1">Name on Card</label>
+                                            <input type="text" id="card_name" name="card_name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                                        </div>
+                                        
+                                        <div class="mb-4">
+                                            <label for="card_number" class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                                            <input type="text" id="card_number" name="card_number" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="XXXX XXXX XXXX XXXX" required>
+                                        </div>
+                                        
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div class="mb-4">
+                                                <label for="expiry_date" class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+                                                <input type="text" id="expiry_date" name="expiry_date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="MM/YY" required>
+                                            </div>
+                                            
+                                            <div class="mb-4">
+                                                <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                                                <input type="text" id="cvv" name="cvv" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="XXX" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <div class="flex items-center mb-4">
+                                        <input type="radio" id="payment_upi" name="payment_method" value="upi" class="mr-2">
+                                        <label for="payment_upi" class="flex items-center">
+                                            <span class="mr-2">UPI</span>
+                                            <div class="flex space-x-2">
+                                                <img src="{{ url_for('static', filename='phonepe.png') }}" alt="PhonePe" class="h-6">
+                                                <img src="{{ url_for('static', filename='Google pay.jpg') }}" alt="Google Pay" class="h-6">
+                                                <img src="{{ url_for('static', filename='paytm.png') }}" alt="Paytm" class="h-6">
+                                            </div>
+                                        </label>
+                                    </div>
+                                    
+                                    <div id="upi-payment-form" class="bg-gray-50 p-4 rounded-lg hidden">
+                                        <div class="mb-4">
+                                            <label for="upi_id" class="block text-sm font-medium text-gray-700 mb-1">UPI ID</label>
+                                            <input type="text" id="upi_id" name="upi_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="username@upi">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="terms" name="terms" class="mr-2" required>
+                                        <label for="terms" class="text-sm text-gray-700">
+                                            I agree to the <a href="#" class="text-blue-600 hover:underline">Terms and Conditions</a> and <a href="#" class="text-blue-600 hover:underline">Cancellation Policy</a>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="w-full px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors">
+                                    Pay ₹{{ booking.total_price|format_number }}
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Payment Info -->
+                        <div class="bg-blue-50 p-6 rounded-xl">
+                            <h3 class="text-xl font-semibold text-blue-800 mb-4">Payment Information</h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="font-medium text-blue-700 mb-2">Secure Payment</h4>
+                                    <p class="text-gray-600 text-sm">All payments are encrypted and processed securely. We do not store your card details.</p>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-medium text-blue-700 mb-2">Cancellation Policy</h4>
+                                    <p class="text-gray-600 text-sm">Free cancellation up to 48 hours before check-in. Cancellations made within 48 hours of check-in are subject to a one-night charge.</p>
+                                </div>
+                                
+                                <div>
+                                    <h4 class="font-medium text-blue-700 mb-2">Payment Options</h4>
+                                    <p class="text-gray-600 text-sm">We accept all major credit/debit cards and UPI payments. International cards may incur additional charges from your bank.</p>
+                                </div>
+                                
+                                <div class="border-t border-blue-100 pt-4">
+                                    <h4 class="font-medium text-blue-700 mb-2">Need Help?</h4>
+                                    <p class="text-gray-600 text-sm mb-2">If you have any questions or need assistance with your payment, please contact our support team.</p>
+                                    <a href="{{ url_for('contact') }}" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">Contact Support</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <a href="{{ url_for('index') }}" class="text-blue-600 hover:text-blue-800">
+                    <i class="fas fa-arrow-left mr-2"></i>Return to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentCard = document.getElementById('payment_card');
+        const paymentUpi = document.getElementById('payment_upi');
+        const cardForm = document.getElementById('card-payment-form');
+        const upiForm = document.getElementById('upi-payment-form');
+        
+        // Toggle payment forms
+        paymentCard.addEventListener('change', function() {
+            if (this.checked) {
+                cardForm.classList.remove('hidden');
+                upiForm.classList.add('hidden');
+            }
+        });
+        
+        paymentUpi.addEventListener('change', function() {
+            if (this.checked) {
+                upiForm.classList.remove('hidden');
+                cardForm.classList.add('hidden');
+            }
+        });
+        
+        // Card number formatting
+        const cardNumber = document.getElementById('card_number');
+        cardNumber.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 16) value = value.slice(0, 16);
+            
+            // Add spaces every 4 digits
+            let formattedValue = '';
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formattedValue += ' ';
+                }
+                formattedValue += value[i];
+            }
+            
+            e.target.value = formattedValue;
+        });
+        
+        // Expiry date formatting
+        const expiryDate = document.getElementById('expiry_date');
+        expiryDate.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 4) value = value.slice(0, 4);
+            
+            if (value.length > 2) {
+                value = value.slice(0, 2) + '/' + value.slice(2);
+            }
+            
+            e.target.value = value;
+        });
+        
+        // CVV formatting
+        const cvv = document.getElementById('cvv');
+        cvv.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 3) value = value.slice(0, 3);
+            e.target.value = value;
+        });
+    });
+</script>
+{% endblock %}

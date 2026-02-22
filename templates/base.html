@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Royal Chalet{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Raleway:wght@300;400;500;600;700&family=Quicksand:wght@400;500;600;700&family=Nunito:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.min.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() { AOS.init(); });
+    </script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                50: '#f0fdf4',
+                100: '#dcfce7',
+                200: '#bbf7d0',
+                300: '#86efac',
+                400: '#4ade80',
+                500: '#22c55e',
+                600: '#16a34a',
+                700: '#15803d',
+                800: '#166534',
+                900: '#14532d',
+              },
+              secondary: {
+                50: '#f0fdf4',
+                100: '#dcfce7',
+                200: '#bbf7d0',
+                300: '#86efac',
+                400: '#4ade80',
+                500: '#22c55e',
+                600: '#16a34a',
+                700: '#15803d',
+                800: '#166534',
+                900: '#14532d',
+              },
+            },
+            fontFamily: {
+              sans: ['Poppins', 'sans-serif'],
+              serif: ['Raleway', 'serif'],
+              display: ['Quicksand', 'sans-serif'],
+              luxury: ['Nunito', 'sans-serif'],
+              elegant: ['Roboto', 'sans-serif'],
+              body: ['Open Sans', 'sans-serif'],
+              cursive: ['Quicksand', 'sans-serif'],
+            },
+            boxShadow: {
+              '3xl': '0 35px 60px -15px rgba(0, 0, 0, 0.3)',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      /* Custom styles */
+      body {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+        color: #333;
+      }
+      
+      h1, h2, h3, h4, h5, h6 {
+        font-family: 'Playfair Display', serif;
+        font-weight: 600;
+        line-height: 1.3;
+      }
+      
+      h1 {
+        font-size: 2.5rem;
+      }
+      
+      h2 {
+        font-size: 2rem;
+      }
+      
+      h3 {
+        font-size: 1.75rem;
+      }
+      
+      h4 {
+        font-size: 1.5rem;
+      }
+      
+      p {
+        margin-bottom: 1rem;
+      }
+      
+      .elegant-title {
+        font-family: 'Great Vibes', cursive;
+      }
+      
+      .btn {
+        font-weight: 500;
+        letter-spacing: 0.5px;
+      }
+      
+      .loading-indicator {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+      }
+      
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* Header Styles */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 1000;
+        background-color: rgb(238, 236, 236);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        height: 70px;
+      }
+      
+      /* Card styling */
+      .card {
+        transition: all 0.3s ease;
+      }
+      
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      }
+      
+      /* Global Font and Color Styles */
+      body {
+        font-family: 'Cinzel', serif;
+      }
+      
+      .btn-primary {
+        background-color: #3d965e !important;
+        border-color: #15803d !important;
+      }
+      
+      .btn-primary:hover {
+        background-color: #15803d !important;
+      }
+      
+      .text-primary {
+        color: #031309 !important;
+      }
+      
+      .bg-primary {
+        background-color: #16a34a !important;
+      }
+      
+      .border-primary {
+        border-color: #16a34a !important;
+      }
+      
+      .content-wrapper {
+        padding-top: 90px; /* Increased to prevent content from being hidden under header */
+      }
+      
+      @font-face {
+        font-family: 'Brush Script MT';
+        src: local('Brush Script MT'), local('Great Vibes'), local('Allura');
+        font-display: swap;
+      }
+      
+      .nav-link {
+        position: relative;
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+        color: #011003;
+        transition: all 0.3s ease;
+        border-radius: 0.375rem;
+        font-size: 0.95rem;
+      }
+      
+      .nav-link:hover {
+        color: #0bde59;
+        background-color: rgba(251, 191, 36, 0.1);
+      }
+      
+      .nav-link.active {
+        color: #06bf4a;
+        background-color: rgba(48, 37, 9, 0.2);
+      }
+      
+      .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        border-radius: 4px;
+        color: white;
+        font-weight: bold;
+        z-index: 10000;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 0.3s, transform 0.3s;
+      }
+      
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      
+      .toast.success {
+        background-color: #0bdb3b;
+      }
+      
+      .toast.error {
+        background-color: #dc3545;
+      }
+      
+      .toast.info {
+        background-color: #17a2b8;
+      }
+      
+      .toast.warning {
+        background-color: #ffc107;
+        color: #212529;
+      }
+      
+      /* Hero Slider Styles */
+      .hero-slider {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      
+      .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+        z-index: 1;
+      }
+      
+      .slide.active {
+        opacity: 1;
+        z-index: 2;
+      }
+      
+      .slider-dot {
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .slider-dot.active {
+        background-color: rgb(4, 0, 0);
+        transform: scale(1.5);
+      }
+    </style>
+    {% block styles %}{% endblock %}
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen flex flex-col transition-colors duration-300">
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="loading-indicator hidden">
+      <div class="spinner"></div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+      <span id="toast-message"></span>
+    </div>
+    
+    <!-- Header Styles -->
+    <style>
+      /* Navigation Styles */
+      .header-nav {
+        height: 80px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Logo Styles */
+      .logo-container {
+        height: 80px;
+        width: auto;
+        transition: transform 0.3s ease;
+      }
+      
+      .logo-container:hover {
+        transform: scale(1.05);
+      }
+      
+      /* Navigation Link Styles */
+      .nav-item {
+        position: relative;
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+        font-size: 15px;
+        color: #4b5563;
+        transition: all 0.3s ease;
+        margin: 0 0.25rem;
+      }
+      
+      .nav-item:hover, .nav-item.active {
+        color: #d97706;
+      }
+      
+      .nav-item::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: 0;
+        left: 0;
+        background-color: #d97706;
+        transition: width 0.3s ease;
+      }
+      
+      .nav-item:hover::after, .nav-item.active::after {
+        width: 100%;
+      }
+      
+      /* Icon Button Styles */
+      .icon-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #f9fafb;
+        color: #4b5563;
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin: 0 0.25rem;
+      }
+      
+      .icon-button:hover {
+        background-color: #f3f4f6;
+        color: #d97706;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Auth Button Styles */
+      .auth-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1.25rem;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      
+      .auth-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      
+      .login-button {
+        background-color: #d97706;
+        color: white;
+      }
+      
+      .login-button:hover {
+        background-color: #b45309;
+      }
+      
+      .register-button {
+        background-color: white;
+        color: #d97706;
+        border: 1px solid #d97706;
+      }
+      
+      .register-button:hover {
+        background-color: #fef3c7;
+      }
+      
+      /* User Profile Button */
+      .profile-button {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        background-color: white;
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      
+      .profile-button:hover {
+        border-color: #d97706;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      
+      /* Notification Badge */
+      .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        border-radius: 9999px;
+        background-color: #ef4444;
+        color: white;
+        font-size: 10px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+    
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-gray-900 fixed w-full top-0 z-[1000] transition-all duration-300 border-b border-gray-200 dark:border-gray-800 header-nav">
+      <div class="container mx-auto px-4 md:px-6">
+        <div class="flex justify-between items-center h-full">
+          <!-- Logo -->
+          <a href="{{ url_for('index') }}" class="flex items-center">
+            <div class="logo-container">
+              <img src="{{ url_for('static', filename='Rc.png') }}" 
+                 alt="Royal Chalet Logo"
+                 class="h-full w-auto object-contain">
+            </div>
+          </a>
+          
+          <!-- Desktop Navigation -->
+          <div class="hidden lg:flex items-center">
+            <div class="flex">
+              <a href="{{ url_for('index') }}" class="nav-item flex items-center {% if request.path == url_for('index') %}active{% endif %}">
+                <i class="fas fa-home mr-2 text-amber-600"></i>Home
+              </a>
+              <a href="{{ url_for('menu') }}" class="nav-item flex items-center {% if request.path == url_for('menu') %}active{% endif %}">
+                <i class="fas fa-utensils mr-2 text-amber-600"></i>Food Menu
+              </a>
+              <a href="{{ url_for('booking') }}" class="nav-item flex items-center {% if request.path == url_for('booking') %}active{% endif %}">
+                <i class="fas fa-calendar-check mr-2 text-amber-600"></i>Booking
+              </a>
+              <a href="{{ url_for('contact') }}" class="nav-item flex items-center {% if request.path == url_for('contact') %}active{% endif %}">
+                <i class="fas fa-envelope mr-2 text-amber-600"></i>Contact Us
+              </a>
+            </div>
+            
+            <div class="ml-6 flex items-center">
+              <!-- Notification Icon -->
+              <a href="{{ url_for('notifications_page') }}" class="icon-button relative {% if request.path == url_for('notifications_page') %}bg-amber-100 text-amber-600{% endif %}">
+                <i class="fas fa-bell"></i>
+                {% set unread_count = current_user.notifications|selectattr('is_read', 'equalto', false)|list|length if current_user.is_authenticated else 0 %}
+                {% if unread_count > 0 %}
+                <span class="notification-badge">{{ unread_count }}</span>
+                {% endif %}
+              </a>
+              
+              <!-- Cart Icon -->
+              <a href="{{ url_for('cart') }}" class="icon-button relative {% if request.path == url_for('cart') %}bg-amber-100 text-amber-600{% endif %}">
+                <i class="fas fa-shopping-cart"></i>
+              </a>
+              
+              <!-- Authentication -->
+              {% if current_user.is_authenticated %}
+                <div class="flex items-center ml-4">
+                  <!-- User Profile -->
+                  <a href="{{ url_for('profile') }}" class="profile-button">
+                    <i class="fas fa-user-circle text-amber-600 mr-2"></i>
+                    <span class="max-w-[120px] truncate font-medium">{{ current_user.username }}</span>
+                  </a>
+                  
+                  <!-- Admin Dashboard (if admin) -->
+                  {% if current_user.is_admin %}
+                    <a href="{{ url_for('admin_dashboard') }}" class="icon-button ml-2" title="Admin Dashboard">
+                      <i class="fas fa-cog"></i>
+                    </a>
+                  {% endif %}
+                  
+                  <!-- Logout -->
+                  <a href="{{ url_for('logout') }}" class="icon-button ml-2" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                  </a>
+                </div>
+              {% else %}
+                <div class="flex items-center ml-4">
+                  <a href="{{ url_for('login') }}" class="auth-button login-button">
+                    <i class="fas fa-sign-in-alt mr-2"></i> Login
+                  </a>
+                  <a href="{{ url_for('register') }}" class="auth-button register-button ml-2">
+                    <i class="fas fa-user-plus mr-2"></i> Register
+                  </a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <!-- Mobile Navigation Toggle -->
+          <div class="lg:hidden">
+            <button id="mobile-menu-button" class="icon-button">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+        
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="lg:hidden hidden fixed inset-0 z-[9998] bg-black/60 backdrop-blur-md">
+          <div class="absolute right-0 top-0 h-full w-4/5 max-w-sm bg-white dark:bg-gray-900 shadow-2xl transform transition-all duration-500 ease-in-out translate-x-full flex flex-col">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-amber-200 dark:border-gray-700">
+              <div class="flex items-center space-x-2">
+                <div class="bg-gradient-to-br from-amber-500 to-amber-700 p-1.5 rounded-lg shadow-md">
+                  <i class="fas fa-crown text-white text-lg"></i>
+                </div>
+                <span class="font-bold text-amber-700 dark:text-amber-400 text-2xl block leading-none" 
+                      style="font-family: 'Brush Script MT', 'Great Vibes', 'Allura', cursive;">
+                  The Royal Chalet
+                </span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="close-mobile-menu" class="p-2 text-gray-500 hover:text-amber-600 dark:text-gray-400 dark:hover:text-amber-400 focus:outline-none bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all duration-300">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto py-2">
+              <a href="{{ url_for('index') }}" class="mobile-nav-link {% if request.path == url_for('index') %}active{% endif %}">
+                <i class="fas fa-home mr-3 text-amber-600 dark:text-amber-400 w-5 text-center"></i>Home
+              </a>
+              <a href="{{ url_for('menu') }}" class="mobile-nav-link {% if request.path == url_for('menu') %}active{% endif %}">
+                <i class="fas fa-utensils mr-3 text-amber-600 dark:text-amber-400 w-5 text-center"></i>Food Menu
+              </a>
+              <a href="{{ url_for('booking') }}" class="mobile-nav-link {% if request.path == url_for('booking') %}active{% endif %}">
+                <i class="fas fa-calendar-check mr-3 text-amber-600 dark:text-amber-400 w-5 text-center"></i>Booking
+              </a>
+              <a href="{{ url_for('contact') }}" class="mobile-nav-link {% if request.path == url_for('contact') %}active{% endif %}">
+                <i class="fas fa-envelope mr-3 text-amber-600 dark:text-amber-400 w-5 text-center"></i>Contact Us
+              </a>
+              <a href="{{ url_for('notifications_page') }}" class="mobile-nav-link {% if request.path == url_for('notifications_page') %}active{% endif %}">
+                <i class="fas fa-bell mr-3 text-amber-600 dark:text-amber-400 w-5 text-center"></i>Notifications
+                {% set unread_count = current_user.notifications|selectattr('is_read', 'equalto', false)|list|length if current_user.is_authenticated else 0 %}
+                {% if unread_count > 0 %}
+                <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full ml-1 shadow-md">{{ unread_count }}</span>
+                {% endif %}
+              </a>
+              <a href="{{ url_for('gallery') }}" class="mobile-nav-link {% if request.path == url_for('gallery') %}active{% endif %}">
+                <i class="fas fa-images mr-3 text-amber-600 dark:text-amber-400 w-5 text-center"></i>Gallery
+              </a>
+              
+            
+            {% if current_user.is_authenticated %}
+              <div class="border-t border-amber-200 dark:border-gray-700 pt-3 mt-3">
+                <div class="px-2 py-2 bg-white dark:bg-gray-700 rounded-md mb-2 transition-colors duration-300">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Signed in as</p>
+                  <p class="font-medium text-amber-700 dark:text-amber-400 truncate text-base">{{ current_user.username }}</p>
+                </div>
+                <a href="{{ url_for('profile') }}" class="mobile-nav-link">
+                  <i class="fas fa-user mr-3 text-amber-600 dark:text-amber-400 w-5 text-center"></i> Profile
+                </a>
+                {% if current_user.is_admin %}
+                  <a href="{{ url_for('admin_dashboard') }}" class="mobile-nav-link font-semibold">
+                    <i class="fas fa-cog mr-3 text-amber-600 dark:text-amber-400 w-5 text-center"></i> ADMIN DASHBOARD
+                  </a>
+                {% endif %}
+                <div class="border-t border-amber-200 dark:border-gray-700 my-2"></div>
+                <a href="{{ url_for('logout') }}" class="text-red-600 hover:text-red-700 text-base font-medium py-2 flex items-center transition-all duration-300 rounded-md hover:bg-red-50 px-2">
+                  <i class="fas fa-sign-out-alt mr-3 w-5 text-center"></i> Logout
+                </a>
+              </div>
+            {% else %}
+              <div class="flex flex-col space-y-2 mt-2">
+                <a href="{{ url_for('login') }}" class="bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full px-4 py-2 flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 text-base">
+                  <i class="fas fa-sign-in-alt mr-2"></i> Login
+                </a>
+                <a href="{{ url_for('register') }}" class="bg-white dark:bg-gray-800 text-amber-600 dark:text-amber-400 border border-amber-500 dark:border-amber-400 px-4 py-2 rounded-full font-medium transition-all duration-300 shadow-md hover:shadow-lg transition-all duration-300 text-base hover:bg-amber-50 dark:hover:bg-gray-700">
+                  <i class="fas fa-user-plus mr-2"></i> Register
+                </a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </nav>
+    
+    <!-- Content Wrapper - Start -->
+    <div class="content-wrapper">
+    
+    <style>
+      .nav-link {
+        @apply text-gray-700 dark:text-gray-200 hover:text-amber-500 dark:hover:text-amber-300 text-base font-medium transition-all duration-300 flex items-center px-4 py-2 relative rounded-full hover:bg-amber-50 dark:hover:bg-amber-900/30;
+      }
+      .nav-link::after {
+        content: '';
+        @apply absolute bottom-0 left-1/2 w-1/2 h-0.5 bg-amber-500 transform -translate-x-1/2 scale-x-0 transition-all duration-300 origin-center;
+      }
+      .nav-link.active {
+        @apply text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30;
+      }
+      .nav-link.active::after {
+        @apply scale-x-100;
+      }
+      .mobile-nav-link {
+        @apply flex items-center text-gray-700 dark:text-gray-200 hover:text-amber-600 dark:hover:text-amber-400 py-2.5 px-2 rounded-lg transition-all duration-300 hover:bg-amber-50 dark:hover:bg-amber-900/30 text-base font-medium;
+      }
+      .mobile-nav-link.active {
+        @apply bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 font-medium;
+      }
+      
+      /* Improve menu item visibility in dark mode */
+      .menu-item {
+        @apply border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-all duration-300;
+      }
+      .menu-item-name {
+        @apply text-gray-800 dark:text-gray-100 font-medium;
+      }
+      .menu-item-price {
+        @apply text-amber-600 dark:text-amber-400 font-bold;
+      }
+      .menu-section-title {
+        @apply text-gray-800 dark:text-gray-100 font-bold;
+      }
+      .menu-subcategory {
+        @apply text-gray-700 dark:text-gray-200;
+      }
+      
+      /* Improve cart button visibility */
+      .add-to-cart-btn {
+        @apply bg-amber-500 hover:bg-amber-600 text-white dark:bg-amber-600 dark:hover:bg-amber-700 font-medium py-1 px-3 rounded-full transition-all duration-300;
+      }
+    </style>
+      </div>
+    </nav>
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="container mx-auto px-4 py-4">
+          {% for category, message in messages %}
+            <div class="p-4 mb-4 rounded-md {% if category == 'error' %}bg-red-100 text-red-700{% elif category == 'success' %}bg-green-100 text-green-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    
+    <!-- Main Content -->
+    <main class="flex-grow">
+      {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gradient-to-b from-blue-800 to-blue-900 dark:from-gray-800 dark:to-gray-900 text-white py-8 shadow-inner transition-colors duration-300 relative overflow-hidden">
+      <!-- Decorative elements -->
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400"></div>
+      <div class="absolute inset-0 bg-pattern opacity-5"></div>
+      
+      <div class="container mx-auto px-4 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- About Section -->
+          <div class="flex flex-col items-center md:items-start space-y-3">
+            <div class="flex items-center mb-1">
+              <img src="{{ url_for('static', filename='Rc.png') }}" 
+                 alt="The Royal Chalet Logo"
+                 class="h-12 w-auto rounded-lg shadow-md mix-blend-multiply mr-2">
+              <h3 class="text-xl font-bold text-white">
+                <span class="block" style="font-family: 'Brush Script MT', 'Great Vibes', 'Allura', cursive; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">
+                  The Royal Chalet
+                </span>
+              </h3>
+            </div>
+            <p class="text-blue-100 dark:text-gray-300 text-xs leading-relaxed text-center md:text-left">
+              Experience luxury and comfort in the heart of Lonavala. Our villa offers a perfect getaway with stunning views and premium amenities.
+            </p>
+            <div class="flex space-x-3 mt-2">
+              <a href="https://www.facebook.com/profile.php?id=100092981711228&mibextid=rS40aB7S9Ucbxw6v" target="_blank" rel="noopener noreferrer" 
+                 class="bg-blue-700 hover:bg-blue-600 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-1">
+                <i class="fab fa-facebook-f text-sm"></i>
+              </a>
+              <a href="https://www.instagram.com/villa_theroyalchalet?igsh=eWZlbTR0djFvbjIw" target="_blank" rel="noopener noreferrer" 
+                 class="bg-gradient-to-br from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-1">
+                <i class="fab fa-instagram text-sm"></i>
+              </a>
+              <a href="https://wa.me/917420080555" target="_blank" rel="noopener noreferrer" 
+                 class="bg-green-600 hover:bg-green-500 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-1">
+                <i class="fab fa-whatsapp text-sm"></i>
+              </a>
+            </div>
+          </div>
+          
+          <!-- Contact Info -->
+          <div class="flex flex-col items-center md:items-start">
+            <h3 class="text-lg font-semibold mb-3 flex items-center">
+              <span class="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center mr-2 shadow-sm">
+                <i class="fas fa-map-marker-alt text-white text-xs"></i>
+              </span>
+              Contact Information
+            </h3>
+            <div class="space-y-2 text-xs">
+              <p class="text-blue-100 dark:text-gray-300 flex items-start">
+                <i class="fas fa-map-marker-alt text-amber-400 mr-2 mt-1"></i>
+                <span>{{ villa_settings.get('contact_address', 'Lonavala, Pune, Maharashtra') }}</span>
+              </p>
+              <p class="text-blue-100 dark:text-gray-300 flex items-start">
+                <i class="fas fa-phone-alt text-amber-400 mr-2 mt-1"></i>
+                <span>{{ villa_settings.get('contact_phone', '+91 7420080555') }}</span>
+              </p>
+              <p class="text-blue-100 dark:text-gray-300 flex items-start">
+                <i class="fab fa-whatsapp text-amber-400 mr-2 mt-1"></i>
+                <span>{{ villa_settings.get('contact_whatsapp', '+91 7420080555') }}</span>
+              </p>
+              <p class="text-blue-100 dark:text-gray-300 flex items-start">
+                <i class="fas fa-envelope text-amber-400 mr-2 mt-1"></i>
+                <span>{{ villa_settings.get('contact_email', 'info@theroyalchalet.com') }}</span>
+              </p>
+              <p class="text-blue-100 dark:text-gray-300 flex items-start">
+                <i class="fas fa-clock text-amber-400 mr-2 mt-1"></i>
+                <span>Check-in: {{ villa_settings.get('check_in_time', '14:00') | format_time }} | Check-out: {{ villa_settings.get('check_out_time', '11:00') | format_time }}</span>
+              </p>
+            </div>
+          </div>
+          
+          <!-- Quick Links & Newsletter -->
+          <div class="flex flex-col">
+            <h3 class="text-lg font-semibold mb-3 flex items-center justify-center md:justify-start">
+              <span class="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center mr-2 shadow-sm">
+                <i class="fas fa-link text-white text-xs"></i>
+              </span>
+              Quick Links
+            </h3>
+            <div class="grid grid-cols-2 gap-x-3 gap-y-1 mb-4 text-xs">
+              <a href="{{ url_for('index') }}" class="text-blue-100 dark:text-gray-300 hover:text-amber-400 dark:hover:text-amber-400 transition-colors duration-300 flex items-center">
+                <i class="fas fa-chevron-right text-xs mr-1 text-amber-500"></i>Home
+              </a>
+              <a href="{{ url_for('menu') }}" class="text-blue-100 dark:text-gray-300 hover:text-amber-400 dark:hover:text-amber-400 transition-colors duration-300 flex items-center">
+                <i class="fas fa-chevron-right text-xs mr-1 text-amber-500"></i>Food Menu
+              </a>
+              <a href="{{ url_for('booking') }}" class="text-blue-100 dark:text-gray-300 hover:text-amber-400 dark:hover:text-amber-400 transition-colors duration-300 flex items-center">
+                <i class="fas fa-chevron-right text-xs mr-1 text-amber-500"></i>Book Now
+              </a>
+              <a href="{{ url_for('contact') }}" class="text-blue-100 dark:text-gray-300 hover:text-amber-400 dark:hover:text-amber-400 transition-colors duration-300 flex items-center">
+                <i class="fas fa-chevron-right text-xs mr-1 text-amber-500"></i>Contact
+              </a>
+             
+            </div>
+            
+            <div class="mt-2 flex justify-center md:justify-start">
+              <a href="{{ url_for('booking') }}" class="inline-block bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white px-4 py-2 rounded-full text-xs font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                <i class="fas fa-calendar-check mr-1"></i> Book Your Stay Now
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-4 pt-3 border-t border-blue-700/50 dark:border-gray-700/50 text-center">
+          <p class="text-blue-200 dark:text-gray-400 text-xs">&copy; {{ now.year }} The Royal Chalet. All rights reserved.</p>
+          <div class="mt-1 flex justify-center space-x-3">
+            <a href="#" class="text-blue-300 dark:text-gray-500 hover:text-amber-400 dark:hover:text-amber-400 text-xs transition-colors duration-300">Privacy Policy</a>
+            <span class="text-blue-700 dark:text-gray-600">|</span>
+            <a href="#" class="text-blue-300 dark:text-gray-500 hover:text-amber-400 dark:hover:text-amber-400 text-xs transition-colors duration-300">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    
+    <style>
+      .bg-pattern {
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+    </style>
+    
+    <!-- JavaScript for Mobile Menu Toggle -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const closeMobileMenu = document.getElementById('close-mobile-menu');
+        const mobileMenuContent = mobileMenu?.querySelector('div');
+        
+        if (mobileMenuButton && mobileMenu) {
+          mobileMenuButton.addEventListener('click', function() {
+            document.body.classList.add('overflow-hidden');
+            mobileMenu.classList.remove('hidden');
+            // Add a small delay to ensure the transition works
+            setTimeout(() => {
+              if (mobileMenuContent) {
+                mobileMenuContent.classList.add('translate-x-0');
+                mobileMenuContent.classList.remove('translate-x-full');
+              }
+            }, 10);
+          });
+          
+          // Close mobile menu when clicking the close button
+          if (closeMobileMenu) {
+            closeMobileMenu.addEventListener('click', closeMobileMenuFunction);
+          }
+          
+          // Close mobile menu when clicking outside
+          mobileMenu.addEventListener('click', function(e) {
+            if (e.target === mobileMenu) {
+              closeMobileMenuFunction();
+            }
+          });
+        }
+        
+        function closeMobileMenuFunction() {
+          if (mobileMenuContent) {
+            mobileMenuContent.classList.remove('translate-x-0');
+            mobileMenuContent.classList.add('translate-x-full');
+            
+            // Wait for the transition to finish before hiding the menu
+            setTimeout(() => {
+              mobileMenu.classList.add('hidden');
+              document.body.classList.remove('overflow-hidden');
+            }, 300);
+          }
+        }
+        
+        // Update cart count if element exists
+        const cartCountElement = document.getElementById('cart-count');
+        if (cartCountElement) {
+          try {
+            // Get cart count from localStorage instead of API call
+            const cart = JSON.parse(localStorage.getItem('foodCart')) || [];
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            if (count > 0) {
+              cartCountElement.textContent = count;
+              cartCountElement.classList.remove('hidden');
+            } else {
+              cartCountElement.classList.add('hidden');
+            }
+          } catch (error) {
+            console.error('Error getting cart count:', error);
+          }
+        }
+      });
+    </script>
+    
+    <!-- Add this in the head section -->
+    <script>
+      // Check for dark mode preference
+      if (localStorage.getItem('darkMode') === 'enabled' || 
+          (localStorage.getItem('darkMode') !== 'disabled' && 
+           window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
+    
+    <!-- Add this in the body for dark mode toggle -->
+    <button id="darkModeToggle" class="fixed bottom-4 right-4 z-50 p-2 bg-gray-200 dark:bg-gray-800 rounded-full shadow-lg">
+      <i class="fas fa-moon text-gray-800 dark:hidden"></i>
+      <i class="fas fa-sun text-yellow-400 hidden dark:block"></i>
+    </button>
+    
+    <!-- Add this script at the end of the body -->
+    <script>
+      // Dark mode toggle functionality
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      
+      darkModeToggle.addEventListener('click', () => {
+        if (document.documentElement.classList.contains('dark')) {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('darkMode', 'disabled');
+        } else {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('darkMode', 'enabled');
+        }
+      });
+    </script>
+    {% block scripts %}
+      <script src="{{ url_for('static', filename='js/main.min.js') }}"></script>
+    {% endblock %}
+    
+    <!-- Weather Widget JS -->
+    <script>
+      // Function to update the weather widget with real data
+      function updateWeatherWidget() {
+        const weatherWidget = document.querySelector('.weather-widget');
+        if (!weatherWidget) return; // Exit if widget doesn't exist on current page
+        
+        // Lonavala coordinates
+        const lat = 18.7546;
+        const lon = 73.4012;
+        
+        // OpenWeatherMap API key (replace with your actual API key)
+        const apiKey = '1d4ce67422dc07bc00d8926e5c375f73'; // Note: In production, this should be secured
+        
+        // Fetch weather data
+        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Weather data not available');
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Update widget with real data
+            const temp = Math.round(data.main.temp);
+            const condition = data.weather[0].main;
+            const humidity = data.main.humidity;
+            const windSpeed = Math.round(data.wind.speed * 3.6); // Convert m/s to km/h
+            
+            // Select elements to update
+            const tempElement = weatherWidget.querySelector('.weather-temp');
+            const conditionElement = weatherWidget.querySelector('.weather-condition');
+            const humidityElement = weatherWidget.querySelector('.weather-humidity');
+            const windElement = weatherWidget.querySelector('.weather-wind');
+            const iconElement = weatherWidget.querySelector('.weather-icon');
+            
+            // Update text content
+            if (tempElement) tempElement.textContent = `${temp}°C`;
+            if (conditionElement) conditionElement.textContent = condition;
+            if (humidityElement) humidityElement.textContent = `${humidity}%`;
+            if (windElement) windElement.textContent = `${windSpeed} km/h`;
+            
+            // Update icon based on weather condition
+            if (iconElement) {
+              let iconSvg = '';
+              let iconColor = 'text-amber-300';
+              let bgGradient = ['from-blue-500/30', 'to-purple-500/30'];
+              
+              // Simple weather icon mapping
+              switch(data.weather[0].main.toLowerCase()) {
+                case 'clear':
+                  iconSvg = '<svg class="w-10 h-10 ' + iconColor + '" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path></svg>';
+                  bgGradient = ['from-amber-500/30', 'to-orange-500/30'];
+                  break;
+                case 'clouds':
+                  iconColor = 'text-gray-300';
+                  iconSvg = '<svg class="w-10 h-10 ' + iconColor + '" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 16a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 16h-8z"></path></svg>';
+                  bgGradient = ['from-gray-500/30', 'to-blue-500/30'];
+                  break;
+                case 'rain':
+                  iconColor = 'text-blue-400';
+                  iconSvg = '<svg class="w-10 h-10 ' + iconColor + '" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 16a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 16h-8z"></path><path d="M9 17a1 1 0 11-2 0 1 1 0 012 0zm4 0a1 1 0 11-2 0 1 1 0 012 0zm-8-1a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>';
+                  bgGradient = ['from-blue-600/30', 'to-indigo-600/30'];
+                  break;
+                case 'thunderstorm':
+                  iconColor = 'text-yellow-400';
+                  iconSvg = '<svg class="w-10 h-10 ' + iconColor + '" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zm4.211-10.724a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z"></path></svg>';
+                  bgGradient = ['from-gray-700/30', 'to-purple-900/30'];
+                  break;
+                case 'snow':
+                  iconColor = 'text-blue-100';
+                  iconSvg = '<svg class="w-10 h-10 ' + iconColor + '" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v5.382l4.553-2.637a1 1 0 011.447.894l-4 2.309v4.642l3.553-2.637a1 1 0 011.447.894l-4 2.309v1.394a1 1 0 11-2 0v-1.394l-4-2.309a1 1 0 011.447-.894L13 13.618V8.976l-4-2.309a1 1 0 011.447-.894L15 8.382V3a1 1 0 011-1z"></path></svg>';
+                  bgGradient = ['from-blue-200/30', 'to-indigo-300/30'];
+                  break;
+                case 'mist':
+                case 'fog':
+                  iconColor = 'text-gray-400';
+                  iconSvg = '<svg class="w-10 h-10 ' + iconColor + '" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 19a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zM13 19a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1zM3 11a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 7a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"></path></svg>';
+                  bgGradient = ['from-gray-400/30', 'to-gray-600/30'];
+                  break;
+                default:
+                  iconColor = 'text-gray-400';
+                  iconSvg = '<svg class="w-10 h-10 ' + iconColor + '" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 16a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 16h-8z"></path></svg>';
+              }
+              
+              iconElement.innerHTML = iconSvg;
+              
+              // Update background gradient based on weather
+              const bgElement = weatherWidget.querySelector('.absolute.inset-0');
+              if (bgElement) {
+                // Remove all possible gradient classes
+                bgElement.classList.remove(
+                  'from-blue-500/30', 'to-purple-500/30',
+                  'from-amber-500/30', 'to-orange-500/30',
+                  'from-gray-500/30', 'to-blue-500/30',
+                  'from-blue-600/30', 'to-indigo-600/30',
+                  'from-gray-700/30', 'to-purple-900/30',
+                  'from-blue-200/30', 'to-indigo-300/30',
+                  'from-gray-400/30', 'to-gray-600/30'
+                );
+                // Add new gradient classes
+                bgElement.classList.add(bgGradient[0], bgGradient[1]);
+              }
+              
+              // Update icon container gradient based on weather
+              const iconContainer = iconElement;
+              if (iconContainer) {
+                iconContainer.classList.remove(
+                  'from-amber-500/40', 'to-amber-700/40',
+                  'from-blue-500/40', 'to-blue-700/40',
+                  'from-gray-500/40', 'to-gray-700/40'
+                );
+                
+                // Set gradient based on weather condition
+                if (data.weather[0].main.toLowerCase() === 'clear') {
+                  iconContainer.classList.add('from-amber-500/40', 'to-amber-700/40');
+                } else if (['rain', 'snow', 'mist', 'fog'].includes(data.weather[0].main.toLowerCase())) {
+                  iconContainer.classList.add('from-blue-500/40', 'to-blue-700/40');
+                } else {
+                  iconContainer.classList.add('from-gray-500/40', 'to-gray-700/40');
+                }
+              }
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching weather data:', error);
+            // Keep the default static values if API fails
+          });
+      }
+      
+      // Call the function when the page loads
+      document.addEventListener('DOMContentLoaded', function() {
+        // Only try to update if the widget exists on the page
+        if (document.querySelector('.weather-widget')) {
+          updateWeatherWidget();
+        }
+      });
+    </script>
+    </div> <!-- End of content-wrapper -->
+</body>
+</html>

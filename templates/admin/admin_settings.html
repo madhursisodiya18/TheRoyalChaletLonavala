@@ -1,0 +1,367 @@
+{% extends 'admin/admin_base.html' %}
+{% block content %}
+<div class="p-6 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
+    <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-3 rounded-lg shadow-lg mr-4">
+                <i class="fas fa-cog fa-2x fa-spin-hover"></i>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-blue-800 dark:text-blue-400">Villa Settings</h1>
+                <p class="text-gray-600 dark:text-gray-400">Configure your villa properties and system settings</p>
+            </div>
+        </div>
+        <div class="flex space-x-2">
+            <a href="/" class="px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-all duration-300 flex items-center shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                <i class="fas fa-eye mr-2"></i> View Website
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-blue-100 dark:border-blue-900 transition-all duration-300 hover:shadow-xl">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-t-lg">
+            <div class="flex items-center">
+                <i class="fas fa-sliders-h text-blue-600 dark:text-blue-400 text-xl mr-3"></i>
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white">General Settings</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Configure villa information and pricing</p>
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" class="space-y-8">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
+                <div class="flex items-center mb-6">
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg mr-4">
+                        <i class="fas fa-hotel text-xl"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white" style="font-family: 'Playfair Display', serif;">Villa Information</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Basic details about your property</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="group">
+                        <label for="villa_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-admin-primary dark:group-hover:text-blue-400 transition-colors duration-200">Villa Name</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-hotel"></i>
+                            </span>
+                            <input type="text" id="villa_name" name="villa_name" 
+                                    value="{{ settings.get('villa_name', 'The Royal Chalet') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-admin-primary dark:focus:ring-blue-400 shadow-sm hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200">
+                        </div>
+                    </div>
+                    
+                    <div class="group">
+                        <label for="villa_description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-admin-primary dark:group-hover:text-blue-400 transition-colors duration-200">Villa Description</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-align-left"></i>
+                            </span>
+                            <input type="text" id="villa_description" name="villa_description" 
+                                    value="{{ settings.get('villa_description', 'Luxury villa with modern amenities') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-admin-primary dark:focus:ring-blue-400 shadow-sm hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
+                <div class="flex items-center mb-6">
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg mr-4">
+                        <i class="fas fa-rupee-sign text-xl"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white" style="font-family: 'Playfair Display', serif;">Pricing</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Configure your villa rates</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-amber-300 dark:hover:border-amber-500 transform hover:translate-y-[-3px]">
+                        <label for="weekday_price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-200">Weekday Price (₹)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-calendar-week"></i>
+                            </span>
+                            <input type="number" id="weekday_price" name="weekday_price" 
+                                    value="{{ settings.get('weekday_price', '10000') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all duration-200">
+                        </div>
+                    </div>
+                    
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-amber-300 dark:hover:border-amber-500 transform hover:translate-y-[-3px]">
+                        <label for="weekend_price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-200">Weekend Price (₹)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-calendar-day"></i>
+                            </span>
+                            <input type="number" id="weekend_price" name="weekend_price" 
+                                    value="{{ settings.get('weekend_price', '15000') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all duration-200">
+                        </div>
+                    </div>
+                    
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-amber-300 dark:hover:border-amber-500 transform hover:translate-y-[-3px]">
+                        <label for="extended_stay_price" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-200">Extended Stay Price (₹)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                            <input type="number" id="extended_stay_price" name="extended_stay_price" 
+                                    value="{{ settings.get('extended_stay_price', '8500') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all duration-200">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-amber-300 dark:hover:border-amber-500 transform hover:translate-y-[-3px]">
+                        <label for="max_guests" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-200">Maximum Guests Capacity</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-users"></i>
+                            </span>
+                            <input type="number" id="max_guests" name="max_guests" 
+                                    value="{{ settings.get('max_guests', '20') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all duration-200">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Maximum number of guests allowed (current: 20)</p>
+                    </div>
+                    
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-amber-300 dark:hover:border-amber-500 transform hover:translate-y-[-3px]">
+                        <label for="base_guests" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-200">Base Rate Guests</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-user-friends"></i>
+                            </span>
+                            <input type="number" id="base_guests" name="base_guests" 
+                                    value="{{ settings.get('base_guests', '8') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all duration-200">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Number of guests included in base rate (current: 8)</p>
+                    </div>
+                    
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-amber-300 dark:hover:border-amber-500 transform hover:translate-y-[-3px]">
+                        <label for="additional_guest_fee" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-200">Additional Guest Fee (₹)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-rupee-sign"></i>
+                            </span>
+                            <input type="number" id="additional_guest_fee" name="additional_guest_fee" 
+                                    value="{{ settings.get('additional_guest_fee', '500') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400 transition-all duration-200">
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Fee per additional guest per night (current: ₹500)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
+                <div class="flex items-center mb-6">
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg mr-4">
+                        <i class="fas fa-address-card text-xl"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white" style="font-family: 'Playfair Display', serif;">Contact Information</h3>
+                        <p class="text-gray-600 dark:text-gray-400">How guests can reach you</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-green-300 dark:hover:border-green-500 transform hover:translate-y-[-3px]">
+                        <label for="contact_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200">Contact Email</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                            <input type="email" id="contact_email" name="contact_email" 
+                                    value="{{ settings.get('contact_email', 'info@royalchalet.com') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 transition-all duration-200">
+                        </div>
+                    </div>
+                    
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-green-300 dark:hover:border-green-500 transform hover:translate-y-[-3px]">
+                        <label for="contact_phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200">Contact Phone</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-phone-alt"></i>
+                            </span>
+                            <input type="tel" id="contact_phone" name="contact_phone" 
+                                    value="{{ settings.get('contact_phone', '+91 98765 43210') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 transition-all duration-200">
+                        </div>
+                    </div>
+
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-green-300 dark:hover:border-green-500 transform hover:translate-y-[-3px]">
+                        <label for="contact_whatsapp" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200">WhatsApp Number</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fab fa-whatsapp"></i>
+                            </span>
+                            <input type="tel" id="contact_whatsapp" name="contact_whatsapp" 
+                                    value="{{ settings.get('contact_whatsapp', '+91 96733 40163') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 transition-all duration-200">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-green-300 dark:hover:border-green-500 transform hover:translate-y-[-3px]">
+                        <label for="contact_address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200">Contact Address</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400 pt-3">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </span>
+                            <textarea id="contact_address" name="contact_address" rows="2"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 transition-all duration-200">{{ settings.get('contact_address', 'Lonavala, Pune, Maharashtra, India') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
+                <div class="flex items-center mb-6">
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-purple-600 to-purple-800 text-white shadow-lg mr-4">
+                        <i class="fas fa-clock text-xl"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white" style="font-family: 'Playfair Display', serif;">Check-in/Check-out Times</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Set your villa's schedule</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-purple-300 dark:hover:border-purple-500 transform hover:translate-y-[-3px]">
+                        <label for="check_in_time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-200">Check-in Time</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-sign-in-alt"></i>
+                            </span>
+                            <input type="time" id="check_in_time" name="check_in_time" 
+                                    value="{{ settings.get('check_in_time', '14:00') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 transition-all duration-200">
+                        </div>
+                    </div>
+                    
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-purple-300 dark:hover:border-purple-500 transform hover:translate-y-[-3px]">
+                        <label for="check_out_time" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-200">Check-out Time</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </span>
+                            <input type="time" id="check_out_time" name="check_out_time" 
+                                    value="{{ settings.get('check_out_time', '11:00') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 transition-all duration-200">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
+                <div class="flex items-center mb-6">
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg mr-4">
+                        <i class="fas fa-share-alt text-xl"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white" style="font-family: 'Playfair Display', serif;">Social Media</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Connect with your guests online</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-blue-300 dark:hover:border-blue-500 transform hover:translate-y-[-3px]">
+                        <label for="social_facebook" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">Facebook URL</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fab fa-facebook-f"></i>
+                            </span>
+                            <input type="url" id="social_facebook" name="social_facebook" 
+                                    value="{{ settings.get('social_facebook', 'https://facebook.com/royalchalet') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-all duration-200">
+                        </div>
+                    </div>
+                    
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-pink-300 dark:hover:border-pink-500 transform hover:translate-y-[-3px]">
+                        <label for="social_instagram" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors duration-200">Instagram URL</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fab fa-instagram"></i>
+                            </span>
+                            <input type="url" id="social_instagram" name="social_instagram" 
+                                    value="{{ settings.get('social_instagram', 'https://instagram.com/royalchalet') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 dark:focus:ring-pink-400 transition-all duration-200">
+                        </div>
+                    </div>
+                    
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-red-300 dark:hover:border-red-500 transform hover:translate-y-[-3px]">
+                        <label for="social_youtube" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors duration-200">YouTube URL</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fab fa-youtube"></i>
+                            </span>
+                            <input type="url" id="social_youtube" name="social_youtube" 
+                                    value="{{ settings.get('social_youtube', 'https://youtube.com/royalchalet') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400 transition-all duration-200">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
+                <div class="flex items-center mb-6">
+                    <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg mr-4">
+                        <i class="fas fa-ticket-alt text-xl"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800 dark:text-white" style="font-family: 'Playfair Display', serif;">Coupon Management</h3>
+                        <p class="text-gray-600 dark:text-gray-400">Create and manage discount coupons</p>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <a href="/admin/coupons" class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all duration-300">
+                        <i class="fas fa-ticket-alt mr-2"></i> Manage Coupons
+                    </a>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-purple-300 dark:hover:border-purple-500 transform hover:translate-y-[-3px]">
+                        <label for="default_discount_percent" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-200">Default Discount Percentage</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400">
+                                <i class="fas fa-percent"></i>
+                            </span>
+                            <input type="number" id="default_discount_percent" name="default_discount_percent" 
+                                    value="{{ settings.get('default_discount_percent', '10') }}"
+                                    class="w-full pl-10 px-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 transition-all duration-200">
+                        </div>
+                    </div>
+                    
+                    <div class="group bg-white dark:bg-gray-700 p-5 rounded-xl border border-gray-200 dark:border-gray-600 shadow-md hover:shadow-lg transition-all duration-200 hover:border-purple-300 dark:hover:border-purple-500 transform hover:translate-y-[-3px]">
+                        <label for="enable_coupons" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-200">Enable Coupon System</label>
+                        <div class="relative">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="enable_coupons" name="enable_coupons" value="1" class="sr-only peer" 
+                                        {% if settings.get('enable_coupons', 'false') == 'true' %}checked{% endif %}>
+                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-purple-600"></div>
+                                <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">{{ 'Enabled' if settings.get('enable_coupons', 'false') == 'true' else 'Disabled' }}</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end">
+                <button type="submit" class="px-6 py-3 bg-admin-primary text-white rounded-xl hover:bg-blue-800 shadow-lg font-semibold flex items-center transition-all duration-300 transform hover:translate-y-[-2px]">
+                    <i class="fas fa-save mr-2"></i>Save Settings
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,927 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-gradient-to-b from-blue-900 to-blue-700 min-h-screen py-12">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <!-- Booking Header -->
+    <div class="text-center mb-10">
+      <h1 class="text-4xl font-playfair font-bold text-white mb-2">Premium Villa Booking</h1>
+      <p class="text-lg text-blue-100 max-w-3xl mx-auto">Experience unparalleled luxury at The Royal Chalet. Reserve your exclusive getaway today.</p>
+      <div class="w-24 h-1 bg-amber-400 mx-auto mt-4 rounded-full"></div>
+    </div>
+
+    <!-- Booking Form -->
+    <div class="bg-white rounded-xl shadow-2xl overflow-hidden max-w-5xl mx-auto border border-amber-100">
+      <!-- Premium Banner -->
+      <div class="bg-gradient-to-r from-amber-600 to-amber-800 text-white p-4 shadow-md">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-xl font-semibold">Royal Chalet Experience</h3>
+            <p class="text-amber-100">Exclusive amenities and personalized service await you</p>
+          </div>
+          <div class="hidden md:block">
+            <span class="bg-white text-amber-800 px-3 py-1 rounded-full text-sm font-bold">Premium Booking</span>
+          </div>
+        </div>
+      </div>
+      <!-- Progress Steps -->
+      <div class="relative">
+        <div class="bg-blue-800 px-6 py-5">
+          <div class="flex justify-between">
+            <div class="flex items-center">
+              <div class="bg-white text-blue-800 w-10 h-10 rounded-full flex items-center justify-center font-bold mr-3 shadow-lg">1</div>
+              <span class="text-white font-medium text-lg">Select Dates</span>
+            </div>
+            <div class="flex items-center opacity-70">
+              <div class="bg-blue-200 text-blue-800 w-10 h-10 rounded-full flex items-center justify-center font-bold mr-3">2</div>
+              <span class="text-white font-medium text-lg">Customize Stay</span>
+            </div>
+            <div class="flex items-center opacity-70">
+              <div class="bg-blue-200 text-blue-800 w-10 h-10 rounded-full flex items-center justify-center font-bold mr-3">3</div>
+              <span class="text-white font-medium text-lg">Payment</span>
+            </div>
+          </div>
+          <div class="absolute left-0 right-0 h-1 bg-blue-200 top-10 z-0"></div>
+        </div>
+      </div>
+
+      <form id="booking-form" method="POST" action="{{ url_for('booking') }}" class="p-8">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
+        <!-- Date Selection -->
+        <div class="mb-10">
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+              <i class="fas fa-calendar-alt text-blue-800 text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-semibold text-gray-800">Select Your Dates</h2>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-gradient-to-r from-amber-50 to-amber-100 rounded-xl p-6 border border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-102">
+              <label for="check-in" class="block text-amber-800 font-medium mb-3 text-lg">Check-in Date</label>
+              <div class="relative">
+                <input type="text" id="check-in-display" class="w-full bg-white border-2 border-amber-300 rounded-full px-5 py-4 focus:outline-none focus:ring-2 focus:ring-amber-500 text-center font-medium text-gray-700 cursor-pointer" placeholder="Select check-in date" readonly>
+                <input type="hidden" id="check-in" name="check_in" required>
+                <div class="absolute right-5 top-4 text-amber-500">
+                  <i class="fas fa-calendar-alt text-xl"></i>
+                </div>
+              </div>
+              <p class="text-sm text-amber-700 mt-3 text-center">Check-in time: 1:00 PM</p>
+              
+              <!-- Custom Calendar Popup for Check-in -->
+              <div id="check-in-calendar" class="hidden absolute z-50 bg-white rounded-xl shadow-2xl p-4 border border-blue-200 mt-2 w-80">
+                <div class="calendar-header flex justify-between items-center mb-4">
+                  <button type="button" class="calendar-prev-month text-blue-700 hover:text-blue-900">
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                  <h4 class="calendar-month-year font-medium text-lg text-gray-800"></h4>
+                  <button type="button" class="calendar-next-month text-blue-700 hover:text-blue-900">
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+                <div class="calendar-weekdays grid grid-cols-7 gap-1 mb-2">
+                  <div class="text-center text-sm font-medium text-gray-600">Su</div>
+                  <div class="text-center text-sm font-medium text-gray-600">Mo</div>
+                  <div class="text-center text-sm font-medium text-gray-600">Tu</div>
+                  <div class="text-center text-sm font-medium text-gray-600">We</div>
+                  <div class="text-center text-sm font-medium text-gray-600">Th</div>
+                  <div class="text-center text-sm font-medium text-gray-600">Fr</div>
+                  <div class="text-center text-sm font-medium text-gray-600">Sa</div>
+                </div>
+                <div class="calendar-days grid grid-cols-7 gap-1"></div>
+              </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-102">
+              <label for="check-out" class="block text-blue-800 font-medium mb-3 text-lg">Check-out Date</label>
+              <div class="relative">
+                <input type="text" id="check-out-display" class="w-full bg-white border-2 border-blue-300 rounded-full px-5 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 text-center font-medium text-gray-700 cursor-pointer" placeholder="Select check-out date" readonly>
+                <input type="hidden" id="check-out" name="check_out" required>
+                <div class="absolute right-5 top-4 text-blue-500">
+                  <i class="fas fa-calendar-alt text-xl"></i>
+                </div>
+              </div>
+              <p class="text-sm text-blue-700 mt-3 text-center">Check-out time: 11:00 AM</p>
+              
+              <!-- Custom Calendar Popup for Check-out -->
+              <div id="check-out-calendar" class="hidden absolute z-50 bg-white rounded-xl shadow-2xl p-4 border border-blue-200 mt-2 w-80">
+                <div class="calendar-header flex justify-between items-center mb-4">
+                  <button type="button" class="calendar-prev-month text-blue-700 hover:text-blue-900">
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                  <h4 class="calendar-month-year font-medium text-lg text-gray-800"></h4>
+                  <button type="button" class="calendar-next-month text-blue-700 hover:text-blue-900">
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+                <div class="calendar-weekdays grid grid-cols-7 gap-1 mb-2">
+                  <div class="text-center text-sm font-medium text-gray-600">Su</div>
+                  <div class="text-center text-sm font-medium text-gray-600">Mo</div>
+                  <div class="text-center text-sm font-medium text-gray-600">Tu</div>
+                  <div class="text-center text-sm font-medium text-gray-600">We</div>
+                  <div class="text-center text-sm font-medium text-gray-600">Th</div>
+                  <div class="text-center text-sm font-medium text-gray-600">Fr</div>
+                  <div class="text-center text-sm font-medium text-gray-600">Sa</div>
+                </div>
+                <div class="calendar-days grid grid-cols-7 gap-1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guest Information -->
+        <div class="mb-10">
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+              <i class="fas fa-users text-blue-800 text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-semibold text-gray-800">Guest Information</h2>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+              <label for="adults" class="block text-gray-700 font-medium mb-3">Adults</label>
+              <div class="flex items-center">
+                <button type="button" class="bg-blue-100 text-blue-700 w-12 h-12 rounded-l-lg flex items-center justify-center guest-decrement hover:bg-blue-200 transition-colors">
+                  <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" id="adults" name="adults" value="2" min="1" max="10" class="w-full border-y border-gray-300 h-12 text-center focus:outline-none text-lg font-medium" readonly>
+                <button type="button" class="bg-blue-100 text-blue-700 w-12 h-12 rounded-r-lg flex items-center justify-center guest-increment hover:bg-blue-200 transition-colors">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+              <p class="text-sm text-gray-500 mt-2">Ages 13+</p>
+            </div>
+            
+            <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+              <label for="children" class="block text-gray-700 font-medium mb-3">Children</label>
+              <div class="flex items-center">
+                <button type="button" class="bg-blue-100 text-blue-700 w-12 h-12 rounded-l-lg flex items-center justify-center guest-decrement hover:bg-blue-200 transition-colors">
+                  <i class="fas fa-minus"></i>
+                </button>
+                <input type="number" id="children" name="children" value="0" min="0" max="6" class="w-full border-y border-gray-300 h-12 text-center focus:outline-none text-lg font-medium" readonly>
+                <button type="button" class="bg-blue-100 text-blue-700 w-12 h-12 rounded-r-lg flex items-center justify-center guest-increment hover:bg-blue-200 transition-colors">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+              <p class="text-sm text-gray-500 mt-2">Ages 0-12</p>
+            </div>
+          </div>
+          
+          <div class="mt-6">
+            <div class="bg-blue-50 rounded-lg p-5 border border-blue-100">
+              <div class="flex items-start">
+                <div class="text-blue-500 mr-3 mt-1">
+                  <i class="fas fa-info-circle text-xl"></i>
+                </div>
+                <div>
+                  <h4 class="font-medium text-blue-800 mb-1">Important Information</h4>
+                  <p class="text-sm text-gray-600">Our villa can accommodate up to 10 adults and 6 children. For larger groups, please contact us directly for special arrangements.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Premium Amenities -->
+        <div class="mb-10">
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mr-4">
+              <i class="fas fa-concierge-bell text-amber-800 text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-semibold text-amber-800">Premium Amenities</h2>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-amber-50 rounded-xl p-5 border border-amber-200 hover:shadow-lg transition-all duration-300 transform hover:scale-102">
+              <div class="flex items-center mb-3">
+                <input type="checkbox" id="private-chef" name="amenities[]" value="private-chef" class="w-5 h-5 text-amber-600 rounded focus:ring-amber-500">
+                <label for="private-chef" class="ml-3 text-gray-700 font-medium">Private Chef</label>
+                <span class="ml-auto text-amber-700 font-semibold">₹4,000/day</span>
+              </div>
+              <p class="text-sm text-gray-500 ml-8">Enjoy personalized gourmet meals prepared by our expert chef in the comfort of your villa.</p>
+            </div>
+            
+            <div class="bg-amber-50 rounded-xl p-5 border border-amber-200 hover:shadow-lg transition-all duration-300 transform hover:scale-102">
+              <div class="flex items-center mb-3">
+                <input type="checkbox" id="barbeque" name="amenities[]" value="barbeque" class="w-5 h-5 text-amber-600 rounded focus:ring-amber-500">
+                <label for="barbeque" class="ml-3 text-gray-700 font-medium">Barbeque</label>
+                <span class="ml-auto text-amber-700 font-semibold">₹1,000/person</span>
+              </div>
+              <p class="text-sm text-gray-500 ml-8">Outdoor BBQ experience with premium cuts and fresh ingredients for a memorable evening.</p>
+            </div>
+            
+            <div class="bg-amber-50 rounded-xl p-5 border border-amber-200 hover:shadow-lg transition-all duration-300 transform hover:scale-102">
+              <div class="flex items-center mb-3">
+                <input type="checkbox" id="flavored-smoked" name="amenities[]" value="flavored-smoked" class="w-5 h-5 text-amber-600 rounded focus:ring-amber-500">
+                <label for="flavored-smoked" class="ml-3 text-gray-700 font-medium">Flavored Smoked</label>
+                <span class="ml-auto text-amber-700 font-semibold">₹1,000/day</span>
+              </div>
+              <p class="text-sm text-gray-500 ml-8">Specialty smoked delicacies with unique flavor profiles for a distinctive culinary experience.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Meal Plan Options -->
+        <div class="mb-10">
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+              <i class="fas fa-utensils text-blue-800 text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-semibold text-gray-800">Meal Plan</h2>
+          </div>
+          
+          <div id="meal-plan-container" class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+            <div id="meal-plan-eligibility-message" class="hidden mb-6 p-4 bg-yellow-50 border border-yellow-300 rounded-lg">
+              <div class="flex">
+                <div class="text-yellow-700 mr-3">
+                  <i class="fas fa-exclamation-triangle text-xl"></i>
+                </div>
+                <p class="text-yellow-800">Meal plans are only available for bookings with 8 or more guests. Please adjust your guest count to access meal plan options.</p>
+              </div>
+            </div>
+            
+            <div id="meal-plan-options" class="space-y-5">
+              <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+                <div class="flex items-center mb-2">
+                  <input type="radio" id="no-meal" name="meal_plan" value="none" class="w-5 h-5 text-blue-600" checked>
+                  <label for="no-meal" class="ml-3 text-gray-800 font-medium text-lg">No Meal Plan</label>
+                </div>
+                <p class="text-gray-600 text-sm ml-8">Accommodation only, no meals included. Perfect if you prefer to dine out or cook yourself.</p>
+              </div>
+              
+              <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+                <div class="flex items-center mb-2">
+                  <input type="radio" id="breakfast" name="meal_plan" value="breakfast" class="w-5 h-5 text-blue-600">
+                  <label for="breakfast" class="ml-3 text-gray-800 font-medium text-lg">Breakfast Only</label>
+                  <span class="ml-auto text-blue-700 font-semibold">+ ₹300/person/day</span>
+                </div>
+                <p class="text-gray-600 text-sm ml-8">Daily breakfast with a selection of Indian and Continental options, served in your villa or at our dining area.</p>
+              </div>
+              
+              <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+                <div class="flex items-center mb-2">
+                  <input type="radio" id="half-board" name="meal_plan" value="half-board" class="w-5 h-5 text-blue-600">
+                  <label for="half-board" class="ml-3 text-gray-800 font-medium text-lg">Half Board</label>
+                  <span class="ml-auto text-blue-700 font-semibold">+ ₹1,200/person/day</span>
+                </div>
+                <p class="text-gray-600 text-sm ml-8">Daily breakfast and dinner with a variety of menu options, including regional specialties and international cuisine.</p>
+              </div>
+              
+              <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+                <div class="flex items-center mb-2">
+                  <input type="radio" id="full-board" name="meal_plan" value="full-board" class="w-5 h-5 text-blue-600">
+                  <label for="full-board" class="ml-3 text-gray-800 font-medium text-lg">Full Board</label>
+                  <span class="ml-auto text-blue-700 font-semibold">+ ₹1,800/person/day</span>
+                </div>
+                <p class="text-gray-600 text-sm ml-8">All meals included: breakfast, lunch, and dinner. Our chef will prepare a variety of dishes to satisfy your palate.</p>
+              </div>
+            </div>
+            
+            <div class="mt-6 pt-6 border-t border-gray-200">
+              <button type="button" id="view-meal-details" class="text-blue-600 hover:text-blue-800 font-medium flex items-center">
+                <i class="fas fa-utensils mr-2"></i> View Meal Plan Details
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Special Requests -->
+        <div class="mb-10">
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+              <i class="fas fa-comment-alt text-blue-800 text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-semibold text-gray-800">Special Requests</h2>
+          </div>
+          
+          <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+            <textarea name="special_requests" rows="4" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Any special requests or requirements? Let us know how we can make your stay more comfortable."></textarea>
+            <p class="text-sm text-gray-500 mt-2">Our team will do their best to accommodate your requests based on availability.</p>
+          </div>
+        </div>
+
+        <!-- Price Summary -->
+        <div class="mb-10">
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+              <i class="fas fa-receipt text-blue-800 text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-semibold text-gray-800">Price Summary</h2>
+          </div>
+          
+          <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200 shadow-sm">
+            <div class="space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-700">Base Price</span>
+                <span class="font-medium text-lg" id="base-price">₹0</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-700">Meal Plan</span>
+                <span class="font-medium text-lg" id="meal-price">₹0</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-700">Additional Amenities</span>
+                <span class="font-medium text-lg" id="amenities-price">₹0</span>
+              </div>
+              <div class="pt-3 mt-3 border-t border-blue-200 flex justify-between items-center">
+                <span class="text-xl font-bold text-blue-900">Total</span>
+                <span class="text-xl font-bold text-blue-800" id="total-price">₹0</span>
+              </div>
+              <div class="pt-3 mt-1">
+                <p class="text-sm text-gray-600">A 20% deposit is required to confirm your booking. The remaining balance will be due upon check-in.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Options -->
+        <div class="mb-10">
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-4">
+              <i class="fas fa-credit-card text-blue-800 text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-semibold text-gray-800">Payment Method</h2>
+          </div>
+          
+          <div class="bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
+            <div class="space-y-5">
+              <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+                <div class="flex items-center mb-2">
+                  <input type="radio" id="credit-card" name="payment_method" value="credit-card" class="w-5 h-5 text-blue-600" checked>
+                  <label for="credit-card" class="ml-3 text-gray-800 font-medium">Credit/Debit Card</label>
+                </div>
+                <div class="ml-8 mt-3 flex space-x-4">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" class="h-8 object-contain">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" class="h-8 object-contain">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/1200px-American_Express_logo_%282018%29.svg.png" alt="American Express" class="h-8 object-contain">
+                </div>
+              </div>
+              
+              <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+                <div class="flex items-center mb-2">
+                  <input type="radio" id="upi" name="payment_method" value="upi" class="w-5 h-5 text-blue-600">
+                  <label for="upi" class="ml-3 text-gray-800 font-medium">UPI Payment</label>
+                </div>
+                <div class="ml-8 mt-3 flex space-x-4">
+                  <img src="{{ url_for('static', filename='Google pay.jpg') }}" alt="Google Pay" class="h-8 object-contain">
+                  <img src="{{ url_for('static', filename='phonepe.png') }}" alt="PhonePe" class="h-8 object-contain">
+                  <img src="{{ url_for('static', filename='paytm.png') }}" alt="Paytm" class="h-8 object-contain">
+                </div>
+              </div>
+              
+              <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors">
+                <div class="flex items-center mb-2">
+                  <input type="radio" id="bank-transfer" name="payment_method" value="bank-transfer" class="w-5 h-5 text-blue-600">
+                  <label for="bank-transfer" class="ml-3 text-gray-800 font-medium">Bank Transfer</label>
+                </div>
+                <p class="text-gray-600 text-sm ml-8">Bank transfer details will be provided after booking confirmation.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="mb-10">
+          <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+            <div class="flex items-start">
+              <input type="checkbox" id="terms" name="terms" class="w-5 h-5 mt-1 text-blue-600 rounded focus:ring-blue-500" required>
+              <label for="terms" class="ml-3 text-gray-700">
+                I agree to the <a href="#" class="text-blue-600 hover:underline">Terms and Conditions</a> and <a href="#" class="text-blue-600 hover:underline">Cancellation Policy</a>. I understand that a 20% deposit is required to confirm my booking.
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center">
+          <button type="submit" class="bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-blue-900 text-white font-bold py-4 px-10 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 text-lg">
+            Confirm Booking <i class="fas fa-check-circle ml-2"></i>
+          </button>
+          <p class="text-sm text-gray-500 mt-3">You won't be charged yet</p>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Meal Plan Details Modal -->
+<div id="meal-plan-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex justify-between items-center">
+                <h3 class="text-2xl font-bold text-gray-800">Meal Plan Details</h3>
+                <button id="close-meal-modal" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <div class="p-6">
+            <!-- Breakfast Section -->
+            <div class="mb-8">
+                <h4 class="text-xl font-semibold text-blue-800 mb-4 flex items-center">
+                    <i class="fas fa-coffee mr-2"></i> Breakfast Options
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h5 class="font-medium text-gray-800 mb-2">Indian Breakfast</h5>
+                        <ul class="text-gray-600 space-y-1">
+                            <li>• Masala Dosa with Sambar and Chutney</li>
+                            <li>• Poha with Chutney</li>
+                            <li>• Aloo Paratha with Curd</li>
+                            <li>• Idli Sambar</li>
+                            <li>• Upma with Coconut Chutney</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h5 class="font-medium text-gray-800 mb-2">Continental Breakfast</h5>
+                        <ul class="text-gray-600 space-y-1">
+                            <li>• Bread Toast with Butter and Jam</li>
+                            <li>• Eggs to Order (Omelette, Scrambled, Boiled)</li>
+                            <li>• Fresh Fruit Platter</li>
+                            <li>• Cereal with Milk</li>
+                            <li>• Pancakes with Maple Syrup</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lunch Section -->
+            <div class="mb-8">
+                <h4 class="text-xl font-semibold text-blue-800 mb-4 flex items-center">
+                    <i class="fas fa-utensils mr-2"></i> Lunch Options
+                </h4>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h5 class="font-medium text-gray-800 mb-2">Daily Rotating Menu</h5>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>• Rice (Steamed/Jeera/Pulao)</li>
+                        <li>• Assorted Indian Breads (Roti/Naan/Paratha)</li>
+                        <li>• Dal of the Day</li>
+                        <li>• Two Vegetable Dishes</li>
+                        <li>• Chicken/Mutton/Fish Curry (Non-veg option)</li>
+                        <li>• Salad and Papad</li>
+                        <li>• Dessert of the Day</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Dinner Section -->
+            <div>
+                <h4 class="text-xl font-semibold text-blue-800 mb-4 flex items-center">
+                    <i class="fas fa-moon mr-2"></i> Dinner Options
+                </h4>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h5 class="font-medium text-gray-800 mb-2">Daily Rotating Menu</h5>
+                    <ul class="text-gray-600 space-y-1">
+                        <li>• Rice (Steamed/Biryani/Pulao)</li>
+                        <li>• Assorted Indian Breads (Roti/Naan/Paratha)</li>
+                        <li>• Dal of the Day</li>
+                        <li>• Two Vegetable Dishes</li>
+                        <li>• Paneer/Chicken/Mutton Specialty</li>
+                        <li>• Salad and Papad</li>
+                        <li>• Dessert of the Day</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="p-6 border-t border-gray-200 bg-gray-50">
+            <p class="text-gray-500 text-sm">* Menu items may vary based on seasonal availability. Special dietary requirements can be accommodated with prior notice.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Guest counter functionality
+    document.querySelectorAll('.guest-decrement').forEach(button => {
+        button.addEventListener('click', function() {
+            const input = this.nextElementSibling;
+            const currentValue = parseInt(input.value);
+            if (currentValue > parseInt(input.min)) {
+                input.value = currentValue - 1;
+                updatePriceSummary();
+            }
+        });
+    });
+    
+    document.querySelectorAll('.guest-increment').forEach(button => {
+        button.addEventListener('click', function() {
+            const input = this.previousElementSibling;
+            const currentValue = parseInt(input.value);
+            if (currentValue < parseInt(input.max)) {
+                input.value = currentValue + 1;
+                updatePriceSummary();
+            }
+        });
+    });
+    
+    // Date change handlers
+    document.getElementById('check-in').addEventListener('change', function() {
+        const checkInDate = new Date(this.value);
+        const checkOutInput = document.getElementById('check-out');
+        
+        // Set minimum check-out date to be the day after check-in
+        const minCheckOutDate = new Date(checkInDate);
+        minCheckOutDate.setDate(minCheckOutDate.getDate() + 1);
+        
+        checkOutInput.min = minCheckOutDate.toISOString().split('T')[0];
+        
+        // If current check-out date is before new min date, update it
+        if (new Date(checkOutInput.value) < minCheckOutDate) {
+            checkOutInput.value = minCheckOutDate.toISOString().split('T')[0];
+        }
+        
+        loadAvailabilityCalendar();
+        updatePriceSummary();
+    });
+    
+    document.getElementById('check-out').addEventListener('change', function() {
+        updatePriceSummary();
+    });
+    
+    // Villa type change handler
+    document.getElementById('villa-type').addEventListener('change', function() {
+        updatePriceSummary();
+    });
+    
+    // Meal plan change handler
+    document.querySelectorAll('input[name="meal_plan"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            updatePriceSummary();
+        });
+    });
+    
+    // Meal plan modal handlers
+    document.getElementById('view-meal-details').addEventListener('click', function() {
+        document.getElementById('meal-plan-modal').classList.remove('hidden');
+    });
+    
+    document.getElementById('close-meal-modal').addEventListener('click', function() {
+        document.getElementById('meal-plan-modal').classList.add('hidden');
+    });
+    
+    // Close modal when clicking outside
+    document.getElementById('meal-plan-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.add('hidden');
+        }
+    });
+    
+    // Load availability calendar
+    function loadAvailabilityCalendar() {
+        const checkInDate = document.getElementById('check-in').value;
+        
+        // In a real implementation, this would make an AJAX call to get availability data
+        // For now, we'll simulate it with a timeout
+        
+        const calendarContainer = document.getElementById('availability-calendar');
+        calendarContainer.innerHTML = '<div class="text-center py-8 text-gray-500"><i class="fas fa-spinner fa-spin text-2xl mb-3"></i><p>Loading availability calendar...</p></div>';
+        
+        setTimeout(() => {
+            renderCalendar(calendarContainer);
+        }, 1000);
+    }
+    
+    // Render a realistic calendar
+    function renderCalendar(container) {
+        const today = new Date();
+        const currentMonth = today.getMonth();
+        const currentYear = today.getFullYear();
+        
+        // Generate calendar HTML with improved styling
+        let calendarHTML = `
+            <div class="flex justify-between items-center mb-4">
+                <button id="prev-month" class="text-blue-600 hover:text-blue-800 flex items-center">
+                    <i class="fas fa-chevron-left mr-1"></i> Previous
+                </button>
+                <h3 class="text-xl font-semibold text-gray-800" id="calendar-title">${getMonthName(currentMonth)} ${currentYear}</h3>
+                <button id="next-month" class="text-blue-600 hover:text-blue-800 flex items-center">
+                    Next <i class="fas fa-chevron-right ml-1"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="calendar-months">
+                ${generateMonthCalendar(currentMonth, currentYear)}
+                ${generateMonthCalendar(currentMonth + 1, currentYear)}
+            </div>
+            <div class="mt-4 flex items-center justify-center space-x-6">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-green-100 border border-green-500 rounded mr-2"></div>
+                    <span class="text-sm text-gray-600">Available</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-yellow-100 border border-yellow-500 rounded mr-2"></div>
+                    <span class="text-sm text-gray-600">Limited</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-red-100 border border-red-500 rounded mr-2"></div>
+                    <span class="text-sm text-gray-600">Booked</span>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = calendarHTML;
+        
+        // Add event listeners for calendar navigation
+        document.getElementById('prev-month').addEventListener('click', function() {
+            navigateCalendar(-1);
+        });
+        
+        document.getElementById('next-month').addEventListener('click', function() {
+            navigateCalendar(1);
+        });
+    }
+    
+    // Helper function to get month name
+    function getMonthName(monthIndex) {
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                        'July', 'August', 'September', 'October', 'November', 'December'];
+        return months[monthIndex % 12];
+    }
+    
+    // Calendar navigation function
+    function navigateCalendar(direction) {
+        const titleEl = document.getElementById('calendar-title');
+        const [month, year] = titleEl.textContent.split(' ');
+        
+        let monthIndex = ['January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'].indexOf(month);
+        let yearNum = parseInt(year);
+        
+        monthIndex += direction;
+        
+        if (monthIndex > 11) {
+            monthIndex = 0;
+            yearNum++;
+        } else if (monthIndex < 0) {
+            monthIndex = 11;
+            yearNum--;
+        }
+        
+        titleEl.textContent = `${getMonthName(monthIndex)} ${yearNum}`;
+        
+        const calendarContainer = document.getElementById('calendar-months');
+        calendarContainer.innerHTML = `
+            ${generateMonthCalendar(monthIndex, yearNum)}
+            ${generateMonthCalendar((monthIndex + 1) % 12, monthIndex + 1 > 11 ? yearNum + 1 : yearNum)}
+        `;
+        
+        container.innerHTML = calendarHTML;
+    }
+    
+    // Generate a month calendar
+    function generateMonthCalendar(month, year) {
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        
+        // Handle year rollover
+        if (month > 11) {
+            month = month % 12;
+            year += Math.floor(month / 12);
+        }
+        
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        let html = `
+            <div>
+                <h4 class="text-center font-medium text-gray-800 mb-2">${monthNames[month]} ${year}</h4>
+                <div class="grid grid-cols-7 gap-1 text-center">
+                    <div class="text-xs font-medium text-gray-500">Su</div>
+                    <div class="text-xs font-medium text-gray-500">Mo</div>
+                    <div class="text-xs font-medium text-gray-500">Tu</div>
+                    <div class="text-xs font-medium text-gray-500">We</div>
+                    <div class="text-xs font-medium text-gray-500">Th</div>
+                    <div class="text-xs font-medium text-gray-500">Fr</div>
+                    <div class="text-xs font-medium text-gray-500">Sa</div>
+        `;
+        
+        // Empty cells for days before the first day of the month
+        for (let i = 0; i < firstDay; i++) {
+            html += '<div></div>';
+        }
+        
+        // Days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Skip past dates
+            if (date < today) {
+                html += `<div class="h-8 text-xs text-gray-400 flex items-center justify-center">${day}</div>`;
+                continue;
+            }
+            
+            // Randomly assign availability for demo purposes
+            const rand = Math.random();
+            let availabilityClass = '';
+            
+            if (rand < 0.2) {
+                availabilityClass = 'bg-red-100 border-red-500'; // Booked
+                html += `
+                    <div class="h-8 flex items-center justify-center">
+                        <span class="w-7 h-7 rounded-full ${availabilityClass} border flex items-center justify-center text-xs">${day}</span>
+                    </div>
+                `;
+            } else if (rand < 0.5) {
+                availabilityClass = 'bg-yellow-100 border-yellow-500'; // Limited
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                html += `
+                    <div class="h-8 flex items-center justify-center">
+                        <span class="w-7 h-7 rounded-full ${availabilityClass} border flex items-center justify-center text-xs cursor-pointer hover:border-blue-500" onclick="selectDate('${dateStr}')">${day}</span>
+                    </div>
+                `;
+            } else {
+                availabilityClass = 'bg-green-100 border-green-500'; // Available
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                html += `
+                    <div class="h-8 flex items-center justify-center">
+                        <span class="w-7 h-7 rounded-full ${availabilityClass} border flex items-center justify-center text-xs cursor-pointer hover:border-blue-500" onclick="selectDate('${dateStr}')">${day}</span>
+                    </div>
+                `;
+            }
+        }
+        
+        html += '</div></div>';
+        return html;
+    }
+    
+    // Function to handle date selection from calendar
+    function selectDate(dateStr) {
+        const selectedDate = new Date(dateStr);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // Set check-in date if it's in the future
+        if (selectedDate >= today) {
+            const checkInInput = document.getElementById('check-in');
+            checkInInput.value = dateStr;
+            
+            // Set check-out date to the day after check-in
+            const checkOutDate = new Date(selectedDate);
+            checkOutDate.setDate(checkOutDate.getDate() + 1);
+            
+            const checkOutInput = document.getElementById('check-out');
+            checkOutInput.value = checkOutDate.toISOString().split('T')[0];
+            
+            // Update price summary
+            updatePriceSummary();
+            
+            // Reload availability calendar
+            loadAvailabilityCalendar();
+        }
+    }
+    
+    // Update price summary based on selections
+    function updatePriceSummary() {
+        const checkInDate = new Date(document.getElementById('check-in').value);
+        const checkOutDate = new Date(document.getElementById('check-out').value);
+        
+        // Check if dates are valid
+        if (isNaN(checkInDate.getTime()) || isNaN(checkOutDate.getTime())) {
+            return; // Exit if dates are not valid
+        }
+        
+        // Calculate number of nights
+        const nights = Math.round((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
+        if (nights <= 0) return; // Exit if invalid date range
+        
+        // Base price (fixed at 15000 since villa type option was removed)
+        const basePrice = 15000;
+        
+        // Calculate total base price
+        const totalBasePrice = basePrice * nights;
+        
+        // Calculate meal plan cost
+        let mealPlanCost = 0;
+        const mealPlan = document.querySelector('input[name="meal_plan"]:checked').value;
+        const adults = parseInt(document.getElementById('adults').value);
+        const children = parseInt(document.getElementById('children').value);
+        const totalGuests = adults + children;
+        
+        // Check meal plan eligibility (only for 8+ guests)
+        const mealPlanEligible = totalGuests >= 8;
+        const mealPlanOptions = document.getElementById('meal-plan-options');
+        const mealPlanMessage = document.getElementById('meal-plan-eligibility-message');
+        
+        if (mealPlanEligible) {
+            mealPlanOptions.classList.remove('opacity-50', 'pointer-events-none');
+            mealPlanMessage.classList.add('hidden');
+            
+            switch (mealPlan) {
+                case 'breakfast':
+                    mealPlanCost = 300 * totalGuests * nights;
+                    break;
+                case 'half-board':
+                    mealPlanCost = 1200 * totalGuests * nights;
+                    break;
+                case 'full-board':
+                    mealPlanCost = 1800 * totalGuests * nights;
+                    break;
+            }
+        } else {
+            // Reset to "No Meal Plan" if not eligible
+            document.getElementById('no-meal').checked = true;
+            mealPlanOptions.classList.add('opacity-50', 'pointer-events-none');
+            mealPlanMessage.classList.remove('hidden');
+        }
+        
+        // Calculate amenities cost
+        let amenitiesCost = 0;
+        
+        // Private Chef (₹4,000/day)
+        if (document.getElementById('private-chef').checked) {
+            amenitiesCost += 4000 * nights;
+        }
+        
+        // Barbeque (₹1,000/person)
+        if (document.getElementById('barbeque').checked) {
+            amenitiesCost += 1000 * totalGuests;
+        }
+        
+        // Flavored Smoked (₹1,000/day)
+        if (document.getElementById('flavored-smoked').checked) {
+            amenitiesCost += 1000 * nights;
+        }
+        
+        // Calculate total
+        const total = totalBasePrice + mealPlanCost + amenitiesCost;
+        
+        // Update the price summary
+        document.getElementById('base-price').textContent = '₹' + totalBasePrice.toLocaleString();
+        document.getElementById('meal-price').textContent = '₹' + mealPlanCost.toLocaleString();
+        document.getElementById('amenities-price').textContent = '₹' + amenitiesCost.toLocaleString();
+        document.getElementById('total-price').textContent = '₹' + total.toLocaleString();
+    }
+    
+    // Initialize the form
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set up date inputs
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        const checkInInput = document.getElementById('check-in');
+        const checkOutInput = document.getElementById('check-out');
+        const checkInDisplay = document.getElementById('check-in-display');
+        const checkOutDisplay = document.getElementById('check-out-display');
+        
+        // Format dates for display
+        function formatDateForDisplay(date) {
+            const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+        
+        // Set initial dates
+        checkInInput.value = today.toISOString().split('T')[0];
+        checkOutInput.value = tomorrow.toISOString().split('T')[0];
+        checkInDisplay.value = formatDateForDisplay(today);
+        checkOutDisplay.value = formatDateForDisplay(tomorrow);
+        
+        // Set up date selection without opening calendar
+        checkInDisplay.addEventListener('click', function() {
+            // Instead of opening calendar, show date selection modal or increment date
+            const currentDate = new Date(checkInInput.value);
+            currentDate.setDate(currentDate.getDate() + 1);
+            
+            if (currentDate > new Date(checkOutInput.value)) {
+                const newCheckOutDate = new Date(currentDate);
+                newCheckOutDate.setDate(newCheckOutDate.getDate() + 1);
+                
+                checkOutInput.value = newCheckOutDate.toISOString().split('T')[0];
+                checkOutDisplay.value = formatDateForDisplay(newCheckOutDate);
+            }
+            
+            checkInInput.value = currentDate.toISOString().split('T')[0];
+            checkInDisplay.value = formatDateForDisplay(currentDate);
+            
+            updatePriceSummary();
+        });
+        
+        checkOutDisplay.addEventListener('click', function() {
+            // Instead of opening calendar, show date selection modal or increment date
+            const currentDate = new Date(checkOutInput.value);
+            currentDate.setDate(currentDate.getDate() + 1);
+            
+            checkOutInput.value = currentDate.toISOString().split('T')[0];
+            checkOutDisplay.value = formatDateForDisplay(currentDate);
+            
+            updatePriceSummary();
+        });
+        
+        // Set up amenities change handlers
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updatePriceSummary);
+        });
+        
+        // Initialize price summary
+        updatePriceSummary();
+    });
+    document.getElementById('check-in').value = today.toISOString().split('T')[0];
+    document.getElementById('check-out').value = tomorrow.toISOString().split('T')[0];
+    
+    loadAvailabilityCalendar();
+    updatePriceSummary();
+});
+</script>
+{% endblock %}

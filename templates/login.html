@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="relative min-h-screen flex items-center justify-center overflow-hidden" style="background-image: url('{{ url_for('static', filename='Villa From Outside1.jpg') }}'); background-size: cover; background-position: center; background-attachment: fixed;">
+  <!-- Animated background overlay -->
+  <div class="absolute inset-0 bg-gradient-to-br from-gray-900/80 to-blue-950/90 backdrop-blur-sm"></div>
+  
+  <!-- Floating particles effect -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="particle absolute w-2 h-2 bg-blue-400/30 rounded-full animate-pulse" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+    <div class="particle absolute w-1 h-1 bg-blue-300/40 rounded-full animate-pulse" style="top: 60%; left: 80%; animation-delay: 1s;"></div>
+    <div class="particle absolute w-3 h-3 bg-blue-500/20 rounded-full animate-pulse" style="top: 80%; left: 20%; animation-delay: 2s;"></div>
+    <div class="particle absolute w-1 h-1 bg-blue-400/30 rounded-full animate-pulse" style="top: 30%; left: 70%; animation-delay: 3s;"></div>
+  </div>
+
+  <div class="relative z-10 flex justify-center items-center min-h-screen w-full px-4">
+    <div class="w-full max-w-md">
+      <!-- Logo/Brand Section -->
+      <div class="text-center mb-8" data-aos="fade-down" data-aos-delay="200">
+        <div class="inline-block p-4 rounded-full bg-gradient-to-r from-blue-400/20 to-blue-600/20 backdrop-blur-sm border border-blue-400/30 mb-4">
+          <svg class="w-12 h-12 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+          </svg>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-2 bg-gradient-to-r from-blue-400 via-gray-300 to-blue-500 bg-clip-text text-transparent" style="font-family: 'Playfair Display', serif; letter-spacing: 2px;">The Royal Chalet</h1>
+        <p class="text-lg text-blue-100 tracking-wide font-medium" style="font-family: 'Montserrat', sans-serif;">Welcome Back</p>
+      </div>
+
+      <!-- Login Form -->
+      <form method="POST" class="backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl rounded-3xl p-8 w-full" data-aos="fade-up" data-aos-delay="400" style="font-family: 'Montserrat', sans-serif;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="mb-6 p-4 bg-red-500/20 border border-red-400/30 rounded-xl text-red-200 text-center backdrop-blur-sm">
+              <div class="flex items-center justify-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+                {{ messages[0] }}
+              </div>
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <div class="space-y-6">
+          <!-- Username/Email Field -->
+          <div class="group">
+            <label class="block mb-2 font-semibold text-white/90 text-sm uppercase tracking-wide" style="font-family: 'Montserrat', sans-serif;">Email or Username</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-blue-400/70 group-focus-within:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+              </div>
+              <input type="text" name="username" 
+                     class="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 transition-all duration-300 backdrop-blur-sm" 
+                     placeholder="Enter your email or username" 
+                     style="font-family: 'Montserrat', sans-serif;" required>
+            </div>
+          </div>
+
+          <!-- Password Field -->
+          <div class="group">
+            <label class="block mb-2 font-semibold text-white/90 text-sm uppercase tracking-wide" style="font-family: 'Montserrat', sans-serif;">Password</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-blue-400/70 group-focus-within:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+              </div>
+              <input type="password" name="password" 
+                     class="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400/50 transition-all duration-300 backdrop-blur-sm" 
+                     placeholder="Enter your password" 
+                     style="font-family: 'Montserrat', sans-serif;" required>
+            </div>
+          </div>
+
+          <!-- Remember Me Checkbox -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <input type="checkbox" name="remember" id="remember" class="h-4 w-4 text-purple-500 focus:ring-blue-400 border-white/30 rounded bg-white/10">
+              <label for="remember" class="ml-2 block text-sm text-white/90" style="font-family: 'Montserrat', sans-serif;">
+                Remember me
+              </label>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" 
+                  class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-4 rounded-xl hover:from-blue-400 hover:to-blue-500 transform hover:scale-105 transition-all duration-300 text-lg shadow-lg hover:shadow-xl" 
+                  style="font-family: 'Montserrat', sans-serif;">
+            <span class="flex items-center justify-center">
+              <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+              </svg>
+              Sign In
+            </span>
+          </button>
+        </div>
+
+        <!-- Register Link -->
+        <div class="mt-8 text-center">
+          <p class="text-blue-100/80" style="font-family: 'Montserrat', sans-serif;">
+            Don't have an account? 
+            <a href="/register" class="text-blue-400 hover:text-blue-300 font-semibold hover:underline transition-colors duration-300">Create Account</a>
+          </p>
+        </div>
+      </form>
+      <div class="mt-4 text-center">
+        <a href="/forgot-password" class="text-blue-400 hover:text-blue-300 hover:underline transition-colors duration-300">Forgot Password?</a>
+      </div>
+
+      <!-- Back to Home -->
+      <div class="text-center mt-6" data-aos="fade-up" data-aos-delay="600">
+        <a href="/" class="inline-flex items-center text-blue-100/70 hover:text-blue-400 transition-colors duration-300">
+          <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+          Back to Home
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  .particle {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.8s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<script>
+  // Add smooth scroll behavior
+  document.documentElement.style.scrollBehavior = 'smooth';
+  
+  // Form focus effects
+  document.querySelectorAll('input').forEach(input => {
+    input.addEventListener('focus', function() {
+      this.parentElement.classList.add('ring-2', 'ring-blue-400/50');
+    });
+    
+    input.addEventListener('blur', function() {
+      this.parentElement.classList.remove('ring-2', 'ring-blue-400/50');
+    });
+  });
+</script>
+{% endblock %}

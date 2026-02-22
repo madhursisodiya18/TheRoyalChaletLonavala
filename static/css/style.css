@@ -1,0 +1,102 @@
+body {
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    background: #f8f9fa;
+    padding-top: 70px; /* Add padding to account for the fixed navbar */
+}
+.navbar-brand {
+    font-size: 1.7rem;
+    letter-spacing: 1px;
+}
+
+/* Navigation */
+.navbar {
+  background-color: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  z-index: 1000 !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  transform: none !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.card {
+    border-radius: 1rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+}
+
+/* User dropdown menu */
+.dropdown-menu {
+    max-height: 300px;
+    overflow-y: hidden;
+}
+
+/* Fix for profile dropdown */
+.user-dropdown {
+    position: absolute;
+    right: 0;
+    max-height: 300px;
+    overflow: hidden;
+}
+.btn-primary, .bg-primary {
+    background: #175699 !important;
+    border: none;
+}
+.btn-primary:hover {
+    background: #1a2533 !important;
+}
+/* Food Menu Navigation */
+.food-menu-nav {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(59, 130, 246, 0.5) rgba(229, 231, 235, 0.5);
+    padding: 0.5rem 0;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.75rem;
+}
+
+.food-menu-nav::-webkit-scrollbar {
+    height: 6px;
+}
+
+.food-menu-nav::-webkit-scrollbar-track {
+    background: rgba(229, 231, 235, 0.5);
+    border-radius: 10px;
+}
+
+.food-menu-nav::-webkit-scrollbar-thumb {
+    background-color: rgba(59, 130, 246, 0.5);
+    border-radius: 10px;
+}
+
+.food-menu-nav .section-link {
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    min-width: 120px;
+    text-align: center;
+    justify-content: center;
+}
+
+.food-menu-nav .section-link.active {
+    background-color: #3b82f6;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.25);
+}
+
+footer {
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}

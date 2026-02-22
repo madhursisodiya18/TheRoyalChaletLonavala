@@ -1,0 +1,137 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Assign Section to Menu Item{% endblock %}
+
+{% block scripts %}
+<script>
+    // Auto-dismiss flash messages after 5 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const flashMessages = document.querySelectorAll('.flash-message');
+        
+        flashMessages.forEach(function(message) {
+            setTimeout(function() {
+                message.style.opacity = '0';
+                setTimeout(function() {
+                    message.style.display = 'none';
+                }, 500); // Wait for fade out animation to complete
+            }, 5000); // 5 seconds
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center" style="background-image: url('{{ url_for('static', filename='Villa From Outside1.jpg') }}'); background-size: cover; background-position: center;">
+    <div class="container mx-auto px-4 py-8 backdrop-blur-sm">
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white/90 rounded-t-lg shadow-lg p-6 border-b-4 border-amber-500">
+                <h2 class="text-3xl font-extrabold text-amber-500 tracking-wide" style="font-family: 'Playfair Display', serif; letter-spacing: 1px;">
+                    <i class="fas fa-folder-open mr-3"></i>Assign Section to Menu Item
+                </h2>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="mt-4">
+                        {% for category, message in messages %}
+                            <div class="flash-message mb-4 p-4 rounded-lg shadow-md transition-opacity duration-500 {{ 'bg-green-100 text-green-700 border-l-4 border-green-500' if category == 'success' else 'bg-red-100 text-red-700 border-l-4 border-red-500' }}">
+                                <div class="flex items-center">
+                                    <i class="{{ 'fas fa-check-circle' if category == 'success' else 'fas fa-exclamation-circle' }} mr-3 text-xl"></i>
+                                    <span>{{ message }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="bg-white/90 backdrop-blur-sm rounded-b-lg shadow-lg p-6 border border-amber-200">
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold text-amber-700 mb-4 flex items-center">
+                    <i class="fas fa-utensils mr-2"></i> Menu Item Details
+                </h2>
+                <div class="bg-amber-50 rounded-lg p-5 border border-amber-200 shadow-sm">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-sm font-medium text-amber-600"><i class="fas fa-tag mr-1"></i> Name:</span>
+                            <p class="text-lg font-semibold text-amber-900">{{ item.name }}</p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium text-amber-600"><i class="fas fa-rupee-sign mr-1"></i> Price:</span>
+                            <p class="text-lg font-semibold text-amber-900">₹{{ item.price }}</p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium text-amber-600"><i class="fas fa-folder mr-1"></i> Current Section:</span>
+                            <p class="text-lg font-semibold text-amber-900">{{ item.section or 'Not assigned' }}</p>
+                        </div>
+                        <div>
+                            <span class="text-sm font-medium text-amber-600"><i class="fas fa-tags mr-1"></i> Subcategory:</span>
+                            <p class="text-lg font-semibold text-amber-900">{{ item.subcategory or 'None' }}</p>
+                        </div>
+                    </div>
+                    {% if item.description %}
+                    <div class="mt-4">
+                        <span class="text-sm font-medium text-amber-600"><i class="fas fa-align-left mr-1"></i> Description:</span>
+                        <p class="text-amber-800 mt-1">{{ item.description }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <form method="POST" class="space-y-6">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div>
+                    <label for="section_id" class="block text-sm font-medium text-amber-700 mb-2 flex items-center">
+                        <i class="fas fa-folder-open mr-2"></i>Select Section *
+                    </label>
+                    <select id="section_id" name="section_id" required
+                            class="w-full px-4 py-3 border border-amber-300 rounded-lg shadow-sm focus:outline-none focus:ring-amber-500 focus:border-amber-500 bg-white/90">
+                        <option value="">Choose a section...</option>
+                        {% for section in sections %}
+                        <option value="{{ section.id }}" 
+                                {% if item.section_id == section.id %}selected{% endif %}>
+                            {{ section.display_name }} ({{ section.name }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <p class="text-xs text-amber-500 mt-1">Select the section where this item should appear</p>
+                </div>
+
+                <div class="flex justify-end space-x-4 pt-6 border-t border-amber-200">
+                    <a href="{{ url_for('admin_menu') }}" 
+                       class="px-5 py-2.5 bg-gray-100 text-amber-700 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all duration-200 flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Menu
+                    </a>
+                    <button type="submit" 
+                            class="px-5 py-2.5 bg-amber-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all duration-200 flex items-center">
+                        <i class="fas fa-folder-plus mr-2"></i>Assign Section
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {% if not sections %}
+        <div class="mt-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-yellow-800">No sections available</h3>
+                    <div class="mt-2 text-sm text-yellow-700">
+                        <p>You need to create sections first before you can assign menu items to them.</p>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{{ url_for('admin_add_section') }}" 
+                           class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                            <i class="fas fa-plus mr-2"></i>Create First Section
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

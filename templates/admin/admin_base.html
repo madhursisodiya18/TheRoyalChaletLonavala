@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Admin Panel - The Royal Chalet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@400;700&family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.min.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() { AOS.init(); });
+    </script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              'poppins': ['Poppins', 'sans-serif'],
+              'playfair': ['Playfair Display', 'serif'],
+            },
+            colors: {
+              'admin-primary': '#0f2557',   // Deeper navy blue
+              'admin-secondary': '#2563eb', // Richer medium blue
+              'admin-accent': '#0ea5e9'     // Teal accent instead of gold
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Poppins', 'Montserrat', 'Raleway', 'Playfair Display', sans-serif;
+        scroll-behavior: smooth;
+        padding: 0 !important;
+        margin: 0;
+        overflow-x: hidden;
+        background-color: #f8fafc;
+      }
+      
+      /* Professional header with rich colors */
+      header, .admin-header, nav, .navbar, .fixed-header {
+        position: static !important;
+        width: 100%;
+        z-index: 10;
+        background: linear-gradient(to right, #0f2557, #1e40af) !important;
+        padding: 0.75rem 0;
+      }
+      
+      .admin-logo {
+        height: 3.5rem;
+        width: auto;
+      }
+      
+      .admin-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+        border-bottom: 1px solid #0f2557 !important;
+      }
+      
+      /* Navigation links styling */
+      .nav-link, .nav-item a {
+        color: #f8fafc !important;
+        font-weight: 500 !important;
+        transition: all 0.3s ease;
+      }
+      
+      .nav-link:hover, .nav-item a:hover {
+        color: #0ea5e9 !important;
+        transform: translateY(-2px);
+      }
+      
+      /* Brand styling */
+      .brand-text {
+        color: #ffffff !important;
+        letter-spacing: 1px;
+      }
+      
+      .brand-subtext {
+        color: #bfdbfe !important;
+      }
+      
+      /* Icon styling */
+      .nav-icon {
+        color: #0ea5e9 !important;
+      }
+      
+      /* Button styling */
+      .header-button {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+      }
+      
+      .header-button:hover {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        transform: translateY(-1px);
+      }
+      
+      /* Force all dropdown menus to be hidden */
+      .dropdown-menu, .dropdown, .dropdown-content {
+        display: none !important;
+      }
+      
+      /* Sticky sidebar implementation */
+      .admin-sidebar {
+        position: sticky !important;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        background-color: #1e293b !important;
+        border-right: 1px solid #334155 !important;
+      }
+      
+      /* Fixed height containers */
+      .fixed-height-container {
+        height: 400px;
+        overflow-y: auto;
+        border-radius: 0.5rem;
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+      }
+      
+      /* Card-based layout */
+      .admin-card {
+        height: 200px;
+        overflow-y: auto;
+        margin-bottom: 1rem;
+        border-radius: 0.75rem;
+        background-color: #ffffff !important;
+        border: none !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+        transition: all 0.3s ease;
+      }
+      
+      .admin-card:hover {
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1) !important;
+        transform: translateY(-2px);
+      }
+      
+      /* Table styling */
+      table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        border-radius: 0.5rem;
+        overflow: hidden;
+      }
+      
+      th {
+        background-color: #f1f5f9 !important;
+        color: #1e3a8a !important;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+      }
+      
+      tr:nth-child(even) {
+        background-color: #f8fafc;
+      }
+      
+      tr:hover {
+        background-color: #f1f5f9;
+      }
+      
+      /* Button styling */
+      .btn-primary {
+        background-color: #0f2557 !important;
+        color: white !important;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+      
+      .btn-primary:hover {
+        background-color: #1e3a8a !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      
+      .btn-secondary {
+        background-color: #0ea5e9 !important;
+        color: white !important;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+      
+      .btn-secondary:hover {
+        background-color: #0284c7 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex flex-col">
+    <nav class="bg-gradient-to-r from-admin-primary to-blue-800 shadow-md py-3 transition-colors duration-300 sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <a href="/admin/dashboard" class="flex items-center gap-3 group">
+                <div class="relative">
+                    <i class="fas fa-crown text-sky-400 text-2xl transform group-hover:scale-110 transition-transform duration-300"></i>
+                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-sky-300 rounded-full animate-ping"></span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-xl font-bold text-white tracking-tight brand-text" style="font-family: 'Playfair Display', serif;">THE ROYAL CHALET</span>
+                    <span class="text-xs text-blue-200 font-semibold tracking-widest uppercase -mt-1 brand-subtext">Administration Panel</span>
+                </div>
+            </a>
+            
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center gap-2 bg-blue-900/40 rounded-lg px-3 py-1.5 shadow-sm backdrop-blur-sm">
+                <a href="/admin/dashboard" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
+                    <i class="fas fa-tachometer-alt text-sky-400 group-hover:text-sky-300 transition-colors duration-300 nav-icon"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/users" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
+                    <i class="fas fa-users text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
+                    <span>Users</span>
+                </a>
+                <a href="/admin/bookings" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
+                    <i class="fas fa-calendar-check text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
+                    <span>Bookings</span>
+                </a>
+                <a href="/admin/menu" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
+                    <i class="fas fa-utensils text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
+                    <span>Food Menu</span>
+                </a>
+                <a href="/admin/gallery" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
+                    <i class="fas fa-images text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
+                    <span>Gallery</span>
+                </a>
+                <a href="/admin/contacts" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
+                    <i class="fas fa-address-book text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
+                    <span>Contacts</span>
+                </a>
+                <a href="/admin/settings" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
+                    <i class="fas fa-cog text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="/" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
+                    <i class="fas fa-eye text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
+                    <span>View Site</span>
+                </a>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <a href="/profile" class="header-button px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm font-medium">
+                    <i class="fas fa-user-circle text-amber-400"></i>
+                    <span>{{ current_user.username }}</span>
+                </a>
+                <button id="theme-toggle" class="header-button p-2 rounded-full">
+                    <i class="fas fa-sun text-amber-400 dark:hidden" id="sunIcon"></i>
+                    <i class="fas fa-moon text-amber-300 hidden dark:block" id="moonIcon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+    <main class="flex-1 container mx-auto px-4 py-6 transition-colors duration-300 dark:text-gray-200">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="bg-gradient-to-r from-admin-primary to-blue-800 text-white py-4 px-6 transition-colors duration-300 border-t border-blue-800 dark:border-gray-800">
+        <div class="container mx-auto text-center">
+            <p>&copy; {{ now.year }} Royal Chalet Admin Panel. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+    // Dark mode toggle functionality
+    function setTheme(isDark) {
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+            document.getElementById('sunIcon').classList.add('hidden');
+            document.getElementById('moonIcon').classList.remove('hidden');
+            document.getElementById('mobileSunIcon').classList.add('hidden');
+            document.getElementById('mobileMoonIcon').classList.remove('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+            document.getElementById('sunIcon').classList.remove('hidden');
+            document.getElementById('moonIcon').classList.add('hidden');
+            document.getElementById('mobileSunIcon').classList.remove('hidden');
+            document.getElementById('mobileMoonIcon').classList.add('hidden');
+        }
+    }
+
+    // Check for saved theme preference or use OS preference
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        setTheme(true);
+    } else {
+        setTheme(false);
+    }
+
+    // Add event listeners for dark mode toggles
+    document.getElementById('darkModeToggle').addEventListener('click', function() {
+        const isDark = document.documentElement.classList.contains('dark');
+        setTheme(!isDark);
+    });
+
+    // Mobile dark mode toggle
+    document.getElementById('mobileDarkModeToggle').addEventListener('click', function() {
+        const isDark = document.documentElement.classList.contains('dark');
+        setTheme(!isDark);
+    });
+    
+    // Mobile menu toggle functionality
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const menuOpenIcon = document.getElementById('menuOpenIcon');
+    const menuCloseIcon = document.getElementById('menuCloseIcon');
+    
+    if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            menuOpenIcon.classList.toggle('hidden');
+            menuCloseIcon.classList.toggle('hidden');
+            
+            // Hide user dropdown when menu is toggled
+            const mobileUserDropdown = document.getElementById('mobileUserDropdown');
+            if (mobileUserDropdown && !mobileUserDropdown.classList.contains('hidden')) {
+                mobileUserDropdown.classList.add('hidden');
+            }
+        });
+    }
+    
+    // Mobile user dropdown toggle functionality
+    const mobileUserBtn = document.getElementById('mobileUserBtn');
+    const mobileUserDropdown = document.getElementById('mobileUserDropdown');
+    
+    if (mobileUserBtn && mobileUserDropdown) {
+        mobileUserBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent event bubbling
+            mobileUserDropdown.classList.toggle('hidden');
+            
+            // Hide mobile menu if it's open
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+                menuOpenIcon.classList.remove('hidden');
+                menuCloseIcon.classList.add('hidden');
+            }
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileUserBtn.contains(e.target) && !mobileUserDropdown.contains(e.target)) {
+                mobileUserDropdown.classList.add('hidden');
+            }
+        });
+    }
+</script>
+</body>
+</html>
+<script>
+  // Collapsible sections
+  document.addEventListener('DOMContentLoaded', function() {
+    const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
+    
+    collapsibleHeaders.forEach(header => {
+      header.addEventListener('click', function() {
+        const content = this.nextElementSibling;
+        content.classList.toggle('open');
+        
+        // Toggle icon
+        const icon = this.querySelector('i.fa-chevron-down, i.fa-chevron-up');
+        if (icon) {
+          icon.classList.toggle('fa-chevron-down');
+          icon.classList.toggle('fa-chevron-up');
+        }
+      });
+    });
+    
+    // Pagination functionality
+    const paginationLinks = document.querySelectorAll('.pagination-link');
+    const contentPages = document.querySelectorAll('.content-page');
+    
+    paginationLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const targetPage = this.getAttribute('data-page');
+        
+        // Hide all pages
+        contentPages.forEach(page => {
+          page.classList.add('hidden');
+        });
+        
+        // Show target page
+        document.querySelector(`.content-page[data-page="${targetPage}"]`).classList.remove('hidden');
+        
+        // Update active link
+        paginationLinks.forEach(link => {
+          link.classList.remove('bg-blue-600', 'text-white');
+          link.classList.add('bg-gray-200', 'text-gray-700');
+        });
+        
+        this.classList.remove('bg-gray-200', 'text-gray-700');
+        this.classList.add('bg-blue-600', 'text-white');
+      });
+    });
+  });
+</script>

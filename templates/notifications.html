@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-5xl mx-auto">
+        <!-- Page Header -->
+        <div class="mb-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 text-blue-800" style="font-family: 'Playfair Display', serif;">Your Notifications</h1>
+            <p class="text-gray-600 dark:text-gray-400 text-lg">Stay updated with your bookings, orders, and account activities</p>
+        </div>
+        
+        <!-- Notification Filters -->
+        <div class="mb-6 flex flex-wrap justify-center gap-4">
+            <button id="filter-all" class="px-4 py-2 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 transition active shadow-md">
+                <i class="fas fa-bell mr-2"></i>All Notifications
+            </button>
+            <button id="filter-unread" class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition shadow-md">
+                <i class="fas fa-envelope mr-2"></i>Unread
+            </button>
+            <button id="filter-booking" class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition shadow-md">
+                <i class="fas fa-calendar-check mr-2"></i>Bookings
+            </button>
+            <button id="filter-order" class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition shadow-md">
+                <i class="fas fa-utensils mr-2"></i>Orders
+            </button>
+            <button id="filter-account" class="px-4 py-2 rounded-full bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition shadow-md">
+                <i class="fas fa-user mr-2"></i>Account
+            </button>
+        </div>
+        
+        <!-- Mark All as Read Button -->
+        <div class="mb-6 flex justify-end">
+            <button id="mark-all-read" class="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 flex items-center gap-2 transition">
+                <i class="fas fa-check-double"></i> Mark all as read
+            </button>
+        </div>
+        
+        <!-- Notifications List -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+            {% if notifications %}
+                <div id="notifications-container" class="divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for notification in notifications %}
+                        <div class="notification-item p-5 hover:bg-gray-50 dark:hover:bg-gray-700 transition relative {% if not notification.is_read %}unread{% endif %}" 
+                             data-id="{{ notification.id }}" 
+                             data-type="{{ notification.type }}" 
+                             data-read="{{ notification.is_read }}">
+                            
+                            <!-- Unread indicator -->
+                            {% if not notification.is_read %}
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+                            {% endif %}
+                            
+                            <div class="flex items-start gap-4">
+                                <!-- Notification Icon -->
+                                <div class="flex-shrink-0">
+                                    {% if 'booking' in notification.title.lower() %}
+                                        <div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-600 dark:text-purple-300">
+                                            <i class="fas fa-calendar-check text-xl"></i>
+                                        </div>
+                                    {% elif 'order' in notification.title.lower() %}
+                                        <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center text-green-600 dark:text-green-300">
+                                            <i class="fas fa-utensils text-xl"></i>
+                                        </div>
+                                    {% elif 'payment' in notification.title.lower() %}
+                                        <div class="w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center text-yellow-600 dark:text-yellow-300">
+                                            <i class="fas fa-credit-card text-xl"></i>
+                                        </div>
+                                    {% else %}
+                                        <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300">
+                                            <i class="fas fa-bell text-xl"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Notification Content -->
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">{{ notification.title }}</h3>
+                                    <p class="text-gray-600 dark:text-gray-400 mb-2">{{ notification.message }}</p>
+                                    <div class="flex items-center text-sm text-gray-500 dark:text-gray-500">
+                                        <i class="far fa-clock mr-2"></i>
+                                        <span>{{ notification.created_at.strftime('%d %b %Y, %H:%M') }}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Mark as Read Button -->
+                                {% if not notification.is_read %}
+                                <button class="mark-read-btn flex-shrink-0 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition" data-id="{{ notification.id }}">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="p-8 text-center">
+                    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                        <i class="fas fa-bell-slash text-gray-400 dark:text-gray-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No notifications yet</h3>
+                    <p class="text-gray-500 dark:text-gray-400">When you receive notifications, they will appear here</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filter buttons functionality
+    const filterButtons = document.querySelectorAll('[id^="filter-"]');
+    const notificationItems = document.querySelectorAll('.notification-item');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            
+            // Add active class to clicked button
+            this.classList.add('active', 'bg-blue-600', 'text-white');
+            this.classList.remove('bg-gray-200', 'text-gray-700');
+            
+            // Get filter type
+            const filterType = this.id.replace('filter-', '');
+            
+            // Filter notifications
+            notificationItems.forEach(item => {
+                if (filterType === 'all') {
+                    item.style.display = 'block';
+                } else if (filterType === 'unread') {
+                    item.style.display = item.classList.contains('unread') ? 'block' : 'none';
+                } else if (filterType === 'booking') {
+                    const title = item.querySelector('h3').textContent.toLowerCase();
+                    item.style.display = title.includes('booking') ? 'block' : 'none';
+                } else if (filterType === 'order') {
+                    const title = item.querySelector('h3').textContent.toLowerCase();
+                    item.style.display = title.includes('order') ? 'block' : 'none';
+                } else if (filterType === 'account') {
+                    const title = item.querySelector('h3').textContent.toLowerCase();
+                    item.style.display = (!title.includes('booking') && !title.includes('order')) ? 'block' : 'none';
+                }
+            });
+        });
+    });
+    
+    // Mark as read functionality
+    const markReadButtons = document.querySelectorAll('.mark-read-btn');
+    
+    markReadButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const notificationId = this.getAttribute('data-id');
+            markNotificationAsRead(notificationId, this.closest('.notification-item'));
+        });
+    });
+    
+    // Mark all as read functionality
+    const markAllReadButton = document.getElementById('mark-all-read');
+    
+    if (markAllReadButton) {
+        markAllReadButton.addEventListener('click', function() {
+            const unreadItems = document.querySelectorAll('.notification-item.unread');
+            
+            unreadItems.forEach(item => {
+                const notificationId = item.getAttribute('data-id');
+                markNotificationAsRead(notificationId, item);
+            });
+        });
+    }
+    
+    // Function to mark notification as read
+    function markNotificationAsRead(notificationId, itemElement) {
+        fetch(`/api/mark-notification-read/${notificationId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove unread indicator
+                itemElement.classList.remove('unread');
+                const indicator = itemElement.querySelector('.bg-blue-500');
+                if (indicator) indicator.remove();
+                
+                // Remove mark as read button
+                const markReadBtn = itemElement.querySelector('.mark-read-btn');
+                if (markReadBtn) markReadBtn.remove();
+                
+                // Update data attribute
+                itemElement.setAttribute('data-read', 'True');
+            }
+        })
+        .catch(error => {
+            console.error('Error marking notification as read:', error);
+        });
+    }
+});
+</script>
+{% endblock %}

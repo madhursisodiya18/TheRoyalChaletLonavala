@@ -1,0 +1,1 @@
+This folder contains payment method icons and other images used in the payment process.

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .image-test { margin: 20px 0; padding: 10px; border: 1px solid #ccc; }
+        img { max-width: 300px; height: auto; margin: 10px; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Image Loading Test</h1>
+    
+    <div class="image-test">
+        <h3>Testing Villa Exterior Images:</h3>
+        <img src="/static/Villa From Outside1.jpg" alt="Villa 1" onload="this.parentElement.classList.add('success')" onerror="this.parentElement.classList.add('error')">
+        <img src="/static/Villa From Outside2.jpg" alt="Villa 2" onload="this.parentElement.classList.add('success')" onerror="this.parentElement.classList.add('error')">
+        <img src="/static/Villa From Outside.jpg" alt="Villa 3" onload="this.parentElement.classList.add('success')" onerror="this.parentElement.classList.add('error')">
+    </div>
+    
+    <div class="image-test">
+        <h3>Testing Bedroom Images:</h3>
+        <img src="/static/bedroom1.jpg" alt="Bedroom 1" onload="this.parentElement.classList.add('success')" onerror="this.parentElement.classList.add('error')">
+        <img src="/static/bedroom2.jpg" alt="Bedroom 2" onload="this.parentElement.classList.add('success')" onerror="this.parentElement.classList.add('error')">
+        <img src="/static/masterbedroom.jpg" alt="Master Bedroom" onload="this.parentElement.classList.add('success')" onerror="this.parentElement.classList.add('error')">
+    </div>
+    
+    <div class="image-test">
+        <h3>Testing Pool Images:</h3>
+        <img src="/static/Swiming pool 1.jpg" alt="Pool 1" onload="this.parentElement.classList.add('success')" onerror="this.parentElement.classList.add('error')">
+        <img src="/static/Swiming pool 2.jpg" alt="Pool 2" onload="this.parentElement.classList.add('success')" onerror="this.parentElement.classList.add('error')">
+        <img src="/static/Swiming pool 3.jpg" alt="Pool 3" onload="this.parentElement.classList.add('success')" onerror="this.parentElement.classList.add('error')">
+    </div>
+    
+    <div class="image-test">
+        <h3>Testing Hall Images:</h3>
+        <img src="/static/hall1.jpg" alt="Hall 1" onload="this.parentElement.classList.add('success')" onerror="this.parentElement.classList.add('error')">
+        <img src="/static/hall2.jpg" alt="Hall 2" onload="this.parentElement.classList.add('success')" onerror="this.parentElement.classList.add('error')">
+        <img src="/static/hall3.jpg" alt="Hall 3" onload="this.parentElement.classList.add('success')" onerror="this.parentElement.classList.add('error')">
+    </div>
+    
+    <div class="image-test">
+        <h3>Testing Kitchen Images:</h3>
+        <img src="/static/kitchen.jpg" alt="Kitchen" onload="this.parentElement.classList.add('success')" onerror="this.parentElement.classList.add('error')">
+        <img src="/static/outside kitchen.jpg" alt="Outside Kitchen" onload="this.parentElement.classList.add('success')" onerror="this.parentElement.classList.add('error')">
+    </div>
+    
+    <script>
+        // Add event listeners to show loading status
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                img.addEventListener('load', function() {
+                    console.log('Image loaded successfully:', this.src);
+                });
+                img.addEventListener('error', function() {
+                    console.error('Image failed to load:', this.src);
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Contact Us Section -->
+<section class="py-16 bg-gray-900 text-white">
+  <div class="container mx-auto px-4 text-center">
+    <h2 class="text-4xl font-bold mb-4">Contact Us</h2>
+    <p class="mb-8">Have questions or want to book directly? Reach out to us!</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+      <!-- Phone -->
+      <div class="text-center">
+        <h3 class="text-xl font-bold mb-2">Phone</h3>
+        <a href="tel:{{ villa_settings.get('contact_phone', '+91 96733 40163') }}" class="text-blue-400 hover:text-blue-300 text-lg">
+          {{ villa_settings.get('contact_phone', '+91 96733 40163') }}
+        </a>
+      </div>
+      
+      <!-- Email -->
+      <div class="text-center">
+        <h3 class="text-xl font-bold mb-2">Email</h3>
+        <a href="mailto:{{ villa_settings.get('contact_email', 'info@theroyalchalet.com') }}" class="text-blue-400 hover:text-blue-300 text-lg">
+          {{ villa_settings.get('contact_email', 'info@theroyalchalet.com') }}
+        </a>
+      </div>
+      
+      <!-- WhatsApp -->
+      <div class="text-center">
+        <h3 class="text-xl font-bold mb-2">WhatsApp</h3>
+        <a href="https://wa.me/{{ villa_settings.get('contact_whatsapp', '919673340163') }}?text=Hello%2C%20I%20am%20interested%20in%20booking%20The%20Royal%20Chalet." class="text-blue-400 hover:text-blue-300 text-lg">
+          Chat Now
+        </a>
+      </div>
+    </div>
+    
+    <p class="mt-8">{{ villa_settings.get('contact_address', 'Lonavala, Pune, Maharashtra, India') }}</p>
+    
+    <div class="mt-6">
+      <a href="{{ villa_settings.get('google_maps_link', 'https://maps.app.goo.gl/keAEvCm7eewRqUiL7') }}" target="_blank" class="inline-block bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full transition-all duration-300">
+        View on Google Maps
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

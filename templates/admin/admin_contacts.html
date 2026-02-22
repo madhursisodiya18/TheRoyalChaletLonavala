@@ -1,0 +1,372 @@
+{% extends 'admin/admin_base.html' %}
+{% block content %}
+<div class="min-h-screen flex flex-col items-center justify-center bg-cover bg-center bg-fixed" style="background-image: url('{{ url_for('static', filename='Villa From Outside1.jpg') }}');">
+  <div class="relative z-10 w-full max-w-6xl bg-white/40 dark:bg-gray-900/60 rounded-3xl shadow-2xl p-8 mb-8 backdrop-blur-lg border border-blue-200/50 dark:border-blue-800/50 mt-12 transition-colors duration-300">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+      <h2 class="text-4xl font-extrabold text-admin-primary dark:text-blue-400 tracking-wide" style="font-family: 'Playfair Display', serif; letter-spacing: 2px;">Contact Messages</h2>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+      <div class="bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg p-6 border border-blue-100 dark:border-blue-900/30 hover:shadow-xl transition-all duration-300 transform hover:translate-y-[-3px]">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white shadow-md">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Messages</p>
+            <p id="total-contacts" class="text-2xl font-semibold text-admin-primary dark:text-blue-400">{{ stats.total }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg p-6 border border-blue-100 dark:border-blue-900/30 hover:shadow-xl transition-all duration-300 transform hover:translate-y-[-3px]">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 text-white shadow-md">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Unread</p>
+            <p id="unread-contacts" class="text-2xl font-semibold text-amber-600 dark:text-amber-400">{{ stats.unread }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg p-6 border border-blue-100 dark:border-blue-900/30 hover:shadow-xl transition-all duration-300 transform hover:translate-y-[-3px]">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-gradient-to-br from-green-500 to-green-700 text-white shadow-md">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Replied</p>
+            <p id="replied-contacts" class="text-2xl font-semibold text-green-600 dark:text-green-400">{{ stats.replied }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg p-6 border border-blue-100 dark:border-blue-900/30 hover:shadow-xl transition-all duration-300 transform hover:translate-y-[-3px]">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 text-white shadow-md">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Read</p>
+            <p id="read-contacts" class="text-2xl font-semibold text-blue-600 dark:text-blue-400">{{ stats.read }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-lg p-6 border border-blue-100 dark:border-blue-900/30 hover:shadow-xl transition-all duration-300 transform hover:translate-y-[-3px]">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-gradient-to-br from-purple-500 to-purple-700 text-white shadow-md">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Recent (7 days)</p>
+            <p id="recent-contacts" class="text-2xl font-semibold text-purple-600 dark:text-purple-400">{{ stats.recent }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages Table -->
+    <div class="bg-white/95 dark:bg-gray-800/95 rounded-xl shadow-xl overflow-hidden border border-blue-100 dark:border-blue-900/30">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
+            <tr>
+              <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Contact</th>
+              <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Subject</th>
+              <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Message</th>
+              <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Status</th>
+              <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Date</th>
+              <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white/80 dark:bg-gray-800/80 divide-y divide-gray-200 dark:divide-gray-700">
+            {% for contact in contacts %}
+            <tr class="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-150">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div>
+                  <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ contact.name }}</div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">{{ contact.email }}</div>
+                  {% if contact.phone %}
+                  <div class="text-sm text-gray-500 dark:text-gray-400">{{ contact.phone }}</div>
+                  {% endif %}
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-gray-100">{{ contact.subject }}</div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-sm text-gray-900 dark:text-gray-100 max-w-xs truncate">{{ contact.message[:100] }}{% if contact.message|length > 100 %}...{% endif %}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                {% if contact.status == 'unread' %}
+                  <span class="status-badge px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800">Unread</span>
+                {% elif contact.status == 'read' %}
+                  <span class="status-badge px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800">Read</span>
+                {% elif contact.status == 'replied' %}
+                  <span class="status-badge px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800">Replied</span>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                {{ contact.created_at.strftime('%d/%m/%Y %H:%M') }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex space-x-2">
+                  <button onclick="viewMessage({{ contact.id }})" 
+                          class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 shadow-sm hover:shadow flex items-center">
+                    <i class="fas fa-eye mr-1"></i> View
+                  </button>
+                  {% if contact.status == 'unread' %}
+                  <button onclick="markAsRead({{ contact.id }})" 
+                          class="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg transition-colors duration-200 shadow-sm hover:shadow flex items-center">
+                    <i class="fas fa-check mr-1"></i> Read
+                  </button>
+                  {% endif %}
+                  {% if contact.status != 'replied' %}
+                  <button onclick="replyToMessage({{ contact.id }})" 
+                          class="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors duration-200 shadow-sm hover:shadow flex items-center">
+                    <i class="fas fa-reply mr-1"></i> Reply
+                  </button>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Message Modal -->
+<div id="messageModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex justify-center items-center hidden">
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-blue-200 dark:border-blue-800">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-2xl font-bold text-admin-primary dark:text-blue-400" style="font-family: 'Playfair Display', serif;">Message Details</h2>
+        <button onclick="closeMessageModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div id="messageContent" class="mb-4 space-y-4">
+        <!-- Message content will be loaded here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reply Modal -->
+<div id="replyModal" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex justify-center items-center hidden">
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-blue-200 dark:border-blue-800">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-2xl font-bold text-admin-primary dark:text-blue-400" style="font-family: 'Playfair Display', serif;">Reply to Message</h2>
+        <button onclick="closeReplyModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="replyForm" method="POST" action="">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-6">
+          <label for="replyMessage" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Your Reply</label>
+          <textarea id="replyMessage" name="reply_message" rows="6" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-admin-primary focus:border-admin-primary bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" required placeholder="Type your reply here..."></textarea>
+        </div>
+        <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <button type="button" onclick="closeReplyModal()" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors shadow">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-admin-primary text-white rounded-lg hover:bg-blue-800 transition-colors shadow font-semibold flex items-center">
+            <i class="fas fa-paper-plane mr-2"></i>
+            Send Reply
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Notification Toast -->
+<div id="notification" class="fixed top-4 right-4 z-50 transform transition-transform duration-300 translate-x-full">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 border-l-4 border-admin-primary flex items-center">
+    <div class="text-admin-primary dark:text-blue-400 mr-3">
+      <i class="fas fa-info-circle text-xl"></i>
+    </div>
+    <div>
+      <h3 class="font-medium text-gray-900 dark:text-white">Notification</h3>
+      <p id="notificationMessage" class="text-sm text-gray-600 dark:text-gray-300"></p>
+    </div>
+    <button onclick="closeNotification()" class="ml-4 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</div>
+
+<script>
+  // View Message Function
+  function viewMessage(id) {
+    // In a real app, you would fetch the message details from the server
+    // For demo purposes, we'll just show a placeholder
+    const messageModal = document.getElementById('messageModal');
+    const messageContent = document.getElementById('messageContent');
+    
+    // Simulate loading message content
+    messageContent.innerHTML = `
+      <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-4 border border-blue-100 dark:border-blue-800">
+        <div class="flex items-center mb-3">
+          <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center text-blue-600 dark:text-blue-300 mr-3">
+            <i class="fas fa-user"></i>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900 dark:text-white">John Doe</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">john.doe@example.com</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">+1 234 567 8900</p>
+          </div>
+        </div>
+        <div class="mb-3">
+          <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Subject:</span>
+          <h4 class="font-medium text-gray-900 dark:text-white">Booking Inquiry</h4>
+        </div>
+        <div>
+          <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Message:</span>
+          <p class="text-gray-800 dark:text-gray-200 mt-1">
+            Hello, I'm interested in booking your villa for a family vacation next month. Could you please provide more information about availability and pricing? Also, do you offer any special packages for extended stays?
+          </p>
+        </div>
+        <div class="mt-4 text-xs text-gray-500 dark:text-gray-400 flex justify-between">
+          <span>Received: 15/06/2023 14:30</span>
+          <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full">Read</span>
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button onclick="replyToMessage(${id})" class="px-4 py-2 bg-admin-primary text-white rounded-lg hover:bg-blue-800 transition-colors shadow font-semibold flex items-center">
+          <i class="fas fa-reply mr-2"></i>
+          Reply
+        </button>
+      </div>
+    `;
+    
+    messageModal.classList.remove('hidden');
+    
+    // Mark as read if unread
+    const statusBadges = document.querySelectorAll('.status-badge');
+    statusBadges.forEach(badge => {
+      if (badge.textContent.trim() === 'Unread') {
+        badge.textContent = 'Read';
+        badge.classList.remove('bg-amber-100', 'dark:bg-amber-900/50', 'text-amber-800', 'dark:text-amber-200', 'border-amber-200', 'dark:border-amber-800');
+        badge.classList.add('bg-blue-100', 'dark:bg-blue-900/50', 'text-blue-800', 'dark:text-blue-200', 'border-blue-200', 'dark:border-blue-800');
+      }
+    });
+  }
+  
+  // Close Message Modal
+  function closeMessageModal() {
+    document.getElementById('messageModal').classList.add('hidden');
+  }
+  
+  // Mark as Read Function
+  function markAsRead(id) {
+    // In a real app, you would send a request to the server
+    // For demo purposes, we'll just update the UI
+    const statusBadges = document.querySelectorAll('.status-badge');
+    statusBadges.forEach(badge => {
+      if (badge.textContent.trim() === 'Unread') {
+        badge.textContent = 'Read';
+        badge.classList.remove('bg-amber-100', 'dark:bg-amber-900/50', 'text-amber-800', 'dark:text-amber-200', 'border-amber-200', 'dark:border-amber-800');
+        badge.classList.add('bg-blue-100', 'dark:bg-blue-900/50', 'text-blue-800', 'dark:text-blue-200', 'border-blue-200', 'dark:border-blue-800');
+      }
+    });
+    
+    // Update stats
+    const unreadCount = document.getElementById('unread-contacts');
+    const readCount = document.getElementById('read-contacts');
+    
+    if (unreadCount && readCount) {
+      unreadCount.textContent = parseInt(unreadCount.textContent) - 1;
+      readCount.textContent = parseInt(readCount.textContent) + 1;
+    }
+    
+    showNotification('Message marked as read');
+  }
+  
+  // Reply to Message Function
+  function replyToMessage(id) {
+    // In a real app, you would set up the form with the correct action URL
+    // For demo purposes, we'll just show the modal
+    const replyModal = document.getElementById('replyModal');
+    const replyForm = document.getElementById('replyForm');
+    
+    replyForm.action = `/admin/contacts/${id}/reply`;
+    replyModal.classList.remove('hidden');
+    
+    // Close the message modal if it's open
+    closeMessageModal();
+  }
+  
+  // Close Reply Modal
+  function closeReplyModal() {
+    document.getElementById('replyModal').classList.add('hidden');
+  }
+  
+  // Show Notification
+  function showNotification(message) {
+    const notification = document.getElementById('notification');
+    const notificationMessage = document.getElementById('notificationMessage');
+    
+    notificationMessage.textContent = message;
+    notification.classList.remove('translate-x-full');
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      closeNotification();
+    }, 3000);
+  }
+  
+  // Close Notification
+  function closeNotification() {
+    const notification = document.getElementById('notification');
+    notification.classList.add('translate-x-full');
+  }
+  
+  // Form submission
+  document.getElementById('replyForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // In a real app, you would submit the form via AJAX
+    // For demo purposes, we'll just show a notification
+    closeReplyModal();
+    showNotification('Reply sent successfully');
+    
+    // Update status to replied
+    const statusBadges = document.querySelectorAll('.status-badge');
+    statusBadges.forEach(badge => {
+      if (badge.textContent.trim() === 'Read') {
+        badge.textContent = 'Replied';
+        badge.classList.remove('bg-blue-100', 'dark:bg-blue-900/50', 'text-blue-800', 'dark:text-blue-200', 'border-blue-200', 'dark:border-blue-800');
+        badge.classList.add('bg-green-100', 'dark:bg-green-900/50', 'text-green-800', 'dark:text-green-200', 'border-green-200', 'dark:border-green-800');
+      }
+    });
+    
+    // Update stats
+    const readCount = document.getElementById('read-contacts');
+    const repliedCount = document.getElementById('replied-contacts');
+    
+    if (readCount && repliedCount) {
+      readCount.textContent = parseInt(readCount.textContent) - 1;
+      repliedCount.textContent = parseInt(repliedCount.textContent) + 1;
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block title %}Cart - The Royal Chalet{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                Your Cart
+            </h1>
+
+            <div id="cart-items-container" class="mb-8">
+                <!-- Empty cart message (shown by default, hidden when items are added) -->
+                <div id="empty-cart-message" class="text-center py-8">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <p class="text-gray-600 dark:text-gray-300 text-lg">Your cart is empty</p>
+                    <a href="/menu" class="mt-4 inline-block px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">
+                        Browse Menu
+                    </a>
+                </div>
+
+                <!-- Cart items list (hidden by default, shown when items are added) -->
+                <div id="cart-items-list" class="hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Item</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantity</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Total</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cart-table-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <!-- Cart items will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order summary (hidden by default, shown when items are added) -->
+            <div id="order-summary" class="hidden bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-4">Order Summary</h2>
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-600 dark:text-gray-300">Subtotal:</span>
+                    <span id="subtotal" class="font-medium text-gray-800 dark:text-white">₹0.00</span>
+                </div>
+                <div class="flex justify-between mb-2">
+                    <span class="text-gray-600 dark:text-gray-300">Tax (5%):</span>
+                    <span id="tax" class="font-medium text-gray-800 dark:text-white">₹0.00</span>
+                </div>
+                <div class="border-t border-gray-200 dark:border-gray-600 my-2 pt-2 flex justify-between">
+                    <span class="text-lg font-bold text-gray-800 dark:text-white">Total:</span>
+                    <span id="total" class="text-lg font-bold text-gray-800 dark:text-white">₹0.00</span>
+                </div>
+
+                <div class="mt-6">
+                    <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-3">Special Instructions</h3>
+                    <textarea id="special-instructions" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white" rows="3" placeholder="Any special requests or dietary requirements?"></textarea>
+                </div>
+
+                <div class="mt-6">
+                    <h3 class="text-lg font-medium text-gray-800 dark:text-white mb-3">Select Booking</h3>
+                    <select id="booking-select" class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white">
+                        <option value="">-- Select a booking --</option>
+                        <!-- Booking options will be populated by JavaScript -->
+                    </select>
+                    <p id="no-booking-message" class="hidden mt-2 text-amber-500">You don't have any active bookings. Food can only be ordered with an active booking.</p>
+                </div>
+
+                <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                    <button id="clear-cart-btn" class="px-6 py-3 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition duration-300 flex-1 sm:flex-none">
+                        <i class="fas fa-trash-alt mr-2"></i>Clear Cart
+                    </button>
+                    <button id="checkout-btn" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition duration-300 flex-1 disabled:opacity-50 disabled:cursor-not-allowed shadow-md">
+                        <i class="fas fa-shopping-cart mr-2"></i>Proceed to Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize cart from localStorage or create empty cart
+        let cart = JSON.parse(localStorage.getItem('foodCart')) || [];
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        const emptyCartMessage = document.getElementById('empty-cart-message');
+        const cartItemsList = document.getElementById('cart-items-list');
+        const cartTableBody = document.getElementById('cart-table-body');
+        const orderSummary = document.getElementById('order-summary');
+        const subtotalElement = document.getElementById('subtotal');
+        const taxElement = document.getElementById('tax');
+        const totalElement = document.getElementById('total');
+        const clearCartBtn = document.getElementById('clear-cart-btn');
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const bookingSelect = document.getElementById('booking-select');
+        const noBookingMessage = document.getElementById('no-booking-message');
+        const specialInstructions = document.getElementById('special-instructions');
+        
+        // Update cart count in the navigation
+        function updateCartCount() {
+            const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+            const desktopCartCount = document.querySelector('.desktop-cart-count');
+            const mobileCartCount = document.querySelector('.mobile-cart-count');
+            
+            if (desktopCartCount) {
+                desktopCartCount.textContent = cartCount;
+                desktopCartCount.classList.toggle('hidden', cartCount === 0);
+            }
+            
+            if (mobileCartCount) {
+                mobileCartCount.textContent = cartCount;
+                mobileCartCount.classList.toggle('hidden', cartCount === 0);
+            }
+        }
+        
+        // Calculate and update order summary
+        function updateOrderSummary() {
+            const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+            const tax = subtotal * 0.05; // 5% tax
+            const total = subtotal + tax;
+            
+            subtotalElement.textContent = `₹${subtotal.toFixed(2)}`;
+            taxElement.textContent = `₹${tax.toFixed(2)}`;
+            totalElement.textContent = `₹${total.toFixed(2)}`;
+        }
+        
+        // Render cart items
+        function renderCart() {
+            if (cart.length === 0) {
+                emptyCartMessage.classList.remove('hidden');
+                cartItemsList.classList.add('hidden');
+                orderSummary.classList.add('hidden');
+                return;
+            }
+            
+            emptyCartMessage.classList.add('hidden');
+            cartItemsList.classList.remove('hidden');
+            orderSummary.classList.remove('hidden');
+            
+            // Clear existing items
+            cartTableBody.innerHTML = '';
+            
+            // Add each item to the table
+            cart.forEach((item, index) => {
+                const row = document.createElement('tr');
+                const itemTotal = item.price * item.quantity;
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">${item.name}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900 dark:text-white">₹${item.price.toFixed(2)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <button class="decrement-btn px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded-l" data-index="${index}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                                </svg>
+                            </button>
+                            <span class="px-4 py-1 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white">${item.quantity}</span>
+                            <button class="increment-btn px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded-r" data-index="${index}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900 dark:text-white">₹${itemTotal.toFixed(2)}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="remove-item-btn text-red-600 hover:text-red-900" data-index="${index}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </td>
+                `;
+                
+                cartTableBody.appendChild(row);
+            });
+            
+            updateOrderSummary();
+        }
+        
+        // Fetch user's active bookings
+        function fetchBookings() {
+            fetch('/api/user/active-bookings')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.bookings && data.bookings.length > 0) {
+                        bookingSelect.innerHTML = '<option value="">-- Select a booking --</option>';
+                        data.bookings.forEach(booking => {
+                            const option = document.createElement('option');
+                            option.value = booking.id;
+                            option.textContent = `${booking.room_type} - Check-in: ${booking.check_in_date}`;
+                            bookingSelect.appendChild(option);
+                        });
+                        noBookingMessage.classList.add('hidden');
+                        checkoutBtn.disabled = false;
+                    } else {
+                        noBookingMessage.classList.remove('hidden');
+                        checkoutBtn.disabled = true;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching bookings:', error);
+                    noBookingMessage.classList.remove('hidden');
+                    checkoutBtn.disabled = true;
+                });
+        }
+        
+        // Event listener for increment button
+        cartTableBody.addEventListener('click', function(e) {
+            if (e.target.closest('.increment-btn')) {
+                const button = e.target.closest('.increment-btn');
+                const index = parseInt(button.dataset.index);
+                cart[index].quantity += 1;
+                localStorage.setItem('foodCart', JSON.stringify(cart));
+                renderCart();
+                updateCartCount();
+            }
+        });
+        
+        // Event listener for decrement button
+        cartTableBody.addEventListener('click', function(e) {
+            if (e.target.closest('.decrement-btn')) {
+                const button = e.target.closest('.decrement-btn');
+                const index = parseInt(button.dataset.index);
+                if (cart[index].quantity > 1) {
+                    cart[index].quantity -= 1;
+                    localStorage.setItem('foodCart', JSON.stringify(cart));
+                    renderCart();
+                    updateCartCount();
+                }
+            }
+        });
+        
+        // Event listener for remove item button
+        cartTableBody.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-item-btn')) {
+                const button = e.target.closest('.remove-item-btn');
+                const index = parseInt(button.dataset.index);
+                cart.splice(index, 1);
+                localStorage.setItem('foodCart', JSON.stringify(cart));
+                renderCart();
+                updateCartCount();
+            }
+        });
+        
+        // Event listener for clear cart button
+        clearCartBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear your cart?')) {
+                cart = [];
+                localStorage.setItem('foodCart', JSON.stringify(cart));
+                renderCart();
+                updateCartCount();
+            }
+        });
+        
+        // Event listener for checkout button
+        checkoutBtn.addEventListener('click', function() {
+            const bookingId = bookingSelect.value;
+            if (!bookingId) {
+                alert('Please select a booking to continue.');
+                return;
+            }
+            
+            const orderData = {
+                booking_id: bookingId,
+                items: cart.map(item => ({
+                    id: item.id,
+                    quantity: item.quantity
+                })),
+                special_instructions: specialInstructions.value
+            };
+            
+            fetch('/api/order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Clear cart after successful order
+                    cart = [];
+                    localStorage.setItem('foodCart', JSON.stringify(cart));
+                    
+                    // Show success message and redirect to order confirmation
+                    alert('Your order has been placed successfully!');
+                    window.location.href = `/order/${data.order_id}`;
+                } else {
+                    alert(data.message || 'There was an error processing your order. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('There was an error processing your order. Please try again.');
+            });
+        });
+        
+        // Initialize the page
+        renderCart();
+        updateCartCount();
+        fetchBookings();
+    });
+</script>
+{% endblock %}
