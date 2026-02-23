@@ -8,6 +8,12 @@
       <h1 class="text-4xl font-playfair font-bold text-white mb-2">Premium Villa Booking</h1>
       <p class="text-lg text-blue-100 max-w-3xl mx-auto">Experience unparalleled luxury at The Royal Chalet. Reserve your exclusive getaway today.</p>
       <div class="w-24 h-1 bg-amber-400 mx-auto mt-4 rounded-full"></div>
+      <div class="mt-6">
+        <a href="{{ villa_settings.get('social_youtube', '#') }}" target="_blank" class="inline-flex items-center px-5 py-3 bg-red-600 hover:bg-red-700 text-white rounded-full text-sm font-semibold shadow-lg transition-all duration-300">
+          <i class="fab fa-youtube mr-2"></i>
+          Watch Virtual Tour
+        </a>
+      </div>
     </div>
 
     <!-- Booking Form -->
@@ -34,11 +40,15 @@
             </div>
             <div class="flex items-center opacity-70">
               <div class="bg-blue-200 text-blue-800 w-10 h-10 rounded-full flex items-center justify-center font-bold mr-3">2</div>
-              <span class="text-white font-medium text-lg">Customize Stay</span>
+              <span class="text-white font-medium text-lg">Guests & Villa</span>
             </div>
             <div class="flex items-center opacity-70">
               <div class="bg-blue-200 text-blue-800 w-10 h-10 rounded-full flex items-center justify-center font-bold mr-3">3</div>
-              <span class="text-white font-medium text-lg">Payment</span>
+              <span class="text-white font-medium text-lg">Customize Stay</span>
+            </div>
+            <div class="flex items-center opacity-70">
+              <div class="bg-blue-200 text-blue-800 w-10 h-10 rounded-full flex items-center justify-center font-bold mr-3">4</div>
+              <span class="text-white font-medium text-lg">Review & Payment</span>
             </div>
           </div>
           <div class="absolute left-0 right-0 h-1 bg-blue-200 top-10 z-0"></div>
@@ -914,14 +924,10 @@ document.addEventListener('DOMContentLoaded', function() {
             checkbox.addEventListener('change', updatePriceSummary);
         });
         
-        // Initialize price summary
+        // Initialize availability calendar and price summary
+        loadAvailabilityCalendar();
         updatePriceSummary();
     });
-    document.getElementById('check-in').value = today.toISOString().split('T')[0];
-    document.getElementById('check-out').value = tomorrow.toISOString().split('T')[0];
-    
-    loadAvailabilityCalendar();
-    updatePriceSummary();
 });
 </script>
 {% endblock %}

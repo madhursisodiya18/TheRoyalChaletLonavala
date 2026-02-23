@@ -139,3 +139,22 @@ with app.app_context():
             print("is_veg column already exists in food_menu table")
     except Exception as e:
         print(f"Error updating food_menu table: {e}")
+
+    try:
+        inspector = db.inspect(db.engine)
+        columns = [col['name'] for col in inspector.get_columns('booking')]
+        with db.engine.connect() as conn:
+            if 'booking_id' not in columns:
+                conn.execute(text("ALTER TABLE booking ADD COLUMN booking_id VARCHAR(50)"))
+            if 'user_name' not in columns:
+                conn.execute(text("ALTER TABLE booking ADD COLUMN user_name VARCHAR(100)"))
+            if 'email' not in columns:
+                conn.execute(text("ALTER TABLE booking ADD COLUMN email VARCHAR(120)"))
+            if 'phone' not in columns:
+                conn.execute(text("ALTER TABLE booking ADD COLUMN phone VARCHAR(20)"))
+            if 'address' not in columns:
+                conn.execute(text("ALTER TABLE booking ADD COLUMN address TEXT"))
+            conn.commit()
+        print("Booking table updated with new columns if they were missing")
+    except Exception as e:
+        print(f"Error updating booking table: {e}")

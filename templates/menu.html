@@ -1,1972 +1,418 @@
 {% extends "base.html" %}
 {% block title %}Food Menu — The Royal Chalet{% endblock %}
 
-{% block styles %}
-<style>
-  /* Menu Card Styling */
-  .menu-container {
-    background-color: #fff;
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f3f4f6' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  }
-  
-  .menu-header {
-    background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(209, 213, 219, 0.5);
-  }
-  
-  .menu-title {
-    font-family: 'Playfair Display', serif;
-    letter-spacing: -0.025em;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-  }
-  
-  .menu-subtitle {
-    font-family: 'Montserrat', sans-serif;
-    letter-spacing: 0.05em;
-  }
-  
-  .menu-divider {
-    height: 3px;
-    background: linear-gradient(90deg, #d97706, #fbbf24, #d97706);
-    border-radius: 3px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  }
-  
-  .category-nav {
-    position: sticky;
-    top: 80px;
-    z-index: 100;
-    background: rgba(255,255,255,0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    border: 1px solid rgba(209, 213, 219, 0.5);
-    overflow: hidden;
-  }
-  
-  .category-button {
-    position: relative;
-    transition: all 0.3s ease;
-    overflow: hidden;
-    z-index: 1;
-  }
-  
-  .category-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
-    z-index: -1;
-  }
-  
-  .category-button:hover {
-    transform: translateY(-2px);
-  }
-  
-  .menu-section {
-    scroll-margin-top: 150px;
-    border-radius: 16px;
-    background: white;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    border: 1px solid rgba(209, 213, 219, 0.5);
-    overflow: hidden;
-  }
-  
-  .section-header {
-    background: linear-gradient(135deg, #d97706, #fbbf24);
-    padding: 1rem 1.5rem;
-    color: white;
-    font-weight: 600;
-    letter-spacing: 0.025em;
-    border-bottom: 1px solid rgba(209, 213, 219, 0.5);
-  }
-  
-  .menu-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-  }
-  
-  .menu-table th {
-    background-color: #f9fafb;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    color: #6b7280;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  
-  .menu-table td {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #f3f4f6;
-  }
-  
-  .menu-table tr:hover {
-    background-color: #f9fafb;
-  }
-  
-  .menu-table tr:last-child td {
-    border-bottom: none;
-  }
-  
-  .add-button {
-    padding: 0.375rem 0.75rem;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    font-size: 0.875rem;
-    transition: all 0.2s ease;
-  }
-  
-  .add-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  
-  .veg-button {
-    background-color: #10b981;
-    color: white;
-  }
-  
-  .veg-button:hover {
-    background-color: #059669;
-  }
-  
-  .non-veg-button {
-    background-color: #ef4444;
-    color: white;
-  }
-  
-  .non-veg-button:hover {
-    background-color: #dc2626;
-  }
-  
-  .price-tag {
-    font-weight: 600;
-    font-family: 'Montserrat', sans-serif;
-  }
-  
-  .veg-price {
-    color: #10b981;
-  }
-  
-  .non-veg-price {
-    color: #ef4444;
-  }
-  
-  .item-name {
-    font-weight: 500;
-    color: #1f2937;
-  }
-  
-  /* Scrollbar styling */
-  .category-scroll::-webkit-scrollbar {
-    height: 4px;
-  }
-  
-  .category-scroll::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
-  }
-  
-  .category-scroll::-webkit-scrollbar-thumb {
-    background: #d97706;
-    border-radius: 10px;
-  }
-  
-  .category-scroll::-webkit-scrollbar-thumb:hover {
-    background: #b45309;
-  }
-</style>
-{% endblock %}
-
 {% block content %}
-<section class="menu-container min-h-screen py-8">
-  <!-- Menu Header -->
-  <div class="menu-header py-8 mb-8">
-    <div class="container mx-auto px-4 md:px-6 text-center">
-      <h1 class="menu-title text-4xl md:text-6xl font-bold text-amber-700 mb-2">Our Culinary Delights</h1>
-      <p class="menu-subtitle text-gray-600 mt-3 text-xl italic">Exquisite flavors at The Royal Chalet</p>
-      <div class="menu-divider w-32 mx-auto mt-4"></div>
-    </div>
-  </div>
+<div class="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50 text-gray-900 py-12">
+  <div class="max-w-6xl mx-auto px-4">
+    <header class="mb-10">
+      <p class="text-xs uppercase tracking-[0.3em] text-amber-500 mb-2">Royal Chalet</p>
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+        <div>
+          <h1 class="text-3xl md:text-4xl font-semibold tracking-tight text-gray-900">Curated Food Menu</h1>
+          <p class="text-sm md:text-base text-gray-600 mt-2 max-w-xl">Freshly prepared, villa-style dining, managed by our in-house kitchen team.</p>
+        </div>
+        <div class="text-xs text-right text-gray-500">
+          <p>Kitchen: 8:00 AM – 10:30 PM</p>
+          <p class="mt-1">Order time: minimum 45 minutes</p>
+        </div>
+      </div>
+    </header>
 
-  <!-- Category Navigation -->
-  <div class="container mx-auto px-4 md:px-6 mb-8">
-    <div class="category-nav p-4">
-      <div class="category-scroll overflow-x-auto pb-2">
-        <div class="flex space-x-2 min-w-max">
-          <a href="#breakfast" class="category-button px-4 py-2 bg-amber-600 text-white rounded-full hover:bg-amber-700 transition-all shadow-md flex items-center">
-            <i class="fas fa-coffee mr-2"></i> Breakfast
-          </a>
-          <a href="#sandwiches" class="category-button px-4 py-2 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-all shadow-md flex items-center">
-            <i class="fas fa-bread-slice mr-2"></i> Sandwiches
-          </a>
-          <a href="#hot-beverages" class="category-button px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-all shadow-md flex items-center">
-            <i class="fas fa-mug-hot mr-2"></i> Hot Drinks
-          </a>
-          <a href="#soups" class="category-button px-4 py-2 bg-teal-600 text-white rounded-full hover:bg-teal-700 transition-all shadow-md flex items-center">
-            <i class="fas fa-soup mr-2"></i> Soups
-          </a>
-          <a href="#starters" class="category-button px-4 py-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition-all shadow-md flex items-center">
-            <i class="fas fa-drumstick-bite mr-2"></i> Starters
-          </a>
-          <a href="#main-course" class="category-button px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all shadow-md flex items-center">
-            <i class="fas fa-hamburger mr-2"></i> Main Course
-          </a>
-          <a href="#roti-paratha" class="category-button px-4 py-2 bg-yellow-600 text-white rounded-full hover:bg-yellow-700 transition-all shadow-md flex items-center">
-            <i class="fas fa-bread-slice mr-2"></i> Breads
-          </a>
-          <a href="#rice-biryani" class="category-button px-4 py-2 bg-green-600 text-white rounded-full hover:bg-green-700 transition-all shadow-md flex items-center">
-            <i class="fas fa-seedling mr-2"></i> Rice & Biryani
-          </a>
-          <a href="#desserts" class="category-button px-4 py-2 bg-amber-600 text-white rounded-full hover:bg-amber-700 transition-all shadow-md flex items-center">
-            <i class="fas fa-ice-cream mr-2"></i> Desserts
-          </a>
-          <a href="#meal-packages" class="category-button px-4 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all shadow-md flex items-center">
-            <i class="fas fa-box-open mr-2"></i> Packages
-          </a>
-        </div>
+    <div class="flex flex-col md:flex-row md:items-center gap-3 mb-8">
+      <div class="relative flex-1">
+        <input
+          id="menu-search"
+          type="text"
+          class="w-full bg-white border border-gray-200 rounded-full px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400/70 focus:border-amber-400/40"
+          placeholder="Search for a dish, ingredient or category"
+        />
+        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
+          <i class="fas fa-search"></i>
+        </span>
+      </div>
+      <div class="flex items-center gap-2 text-[11px]">
+        <button
+          type="button"
+          class="menu-filter-btn px-3 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 shadow-sm"
+          data-filter="all"
+        >
+          All
+        </button>
+        <button
+          type="button"
+          class="menu-filter-btn px-3 py-1.5 rounded-full border border-emerald-500/60 bg-emerald-50 text-emerald-700"
+          data-filter="veg"
+        >
+          Veg
+        </button>
+        <button
+          type="button"
+          class="menu-filter-btn px-3 py-1.5 rounded-full border border-rose-500/60 bg-rose-50 text-rose-700"
+          data-filter="nonveg"
+        >
+          Non-Veg
+        </button>
       </div>
     </div>
-  </div>
 
-  
-  <div id="breakfast" class="mb-12 scroll-mt-32">
-    <div class="flex items-center gap-2 mb-6">
-      <i class="fas fa-coffee text-amber-600 text-2xl"></i>
-      <h2 class="text-2xl md:text-3xl font-bold text-amber-700">Breakfast</h2>
-    </div>
-    
-    <div class="flex flex-col md:flex-row gap-6">
-      <!-- Vegetarian Breakfast -->
-      <div class="w-full md:w-1/2">
-        <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-2 rounded-lg shadow-md">
-          <i class="fas fa-leaf mr-2"></i> Vegetarian Breakfast
-        </h3>
-        <div class="bg-white rounded-lg shadow-md border border-gray-100">
-          <table class="menu-table">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th class="text-right">Price</th>
-                <th class="text-right">Order</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for item in a_la_carte.breakfast %}
-                <tr>
-                  <td>
-                    <span class="item-name">{{ item.name }}</span>
-                  </td>
-                  <td class="text-right">
-                    <span class="price-tag veg-price">₹{{ '%0.0f'|format(item.price) }}</span>
-                  </td>
-                  <td class="text-right">
-                    <button
-                      class="add-button veg-button"
-                      data-id="{{ item.id }}"
-                      data-name="{{ item.name }}"
-                      data-price="{{ item.price }}"
-                      data-type="item"
-                    >
-                      Add
-                    </button>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-sm font-semibold text-gray-800">Browse by category</h2>
+        <p class="text-[10px] text-gray-500 hidden sm:block">Scroll sideways to see all sections</p>
       </div>
-      
-      <!-- Non-Vegetarian Breakfast -->
-      <div class="w-full md:w-1/2">
-        <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-amber-600 to-amber-500 text-white px-4 py-2 rounded-lg shadow-md">
-          <i class="fas fa-egg mr-2"></i> Non-Vegetarian Breakfast
-        </h3>
-        <div class="bg-white rounded-lg shadow-md border border-gray-100">
-          <table class="menu-table">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th class="text-right">Price</th>
-                <th class="text-right">Order</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for item in a_la_carte.breakfast_eggs %}
-                <tr>
-                  <td>
-                    <span class="item-name">{{ item.name }}</span>
-                  </td>
-                  <td class="text-right">
-                    <span class="price-tag non-veg-price">₹{{ '%0.0f'|format(item.price) }}</span>
-                  </td>
-                  <td class="text-right">
-                    <button
-                      class="add-button non-veg-button"
-                      data-id="{{ item.id }}"
-                      data-name="{{ item.name }}"
-                      data-price="{{ item.price }}"
-                      data-type="item"
-                    >
-                      Add
-                    </button>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div id="sandwiches" class="mb-12 scroll-mt-32">
-    <div class="flex items-center gap-2 mb-6">
-      <i class="fas fa-bread-slice text-orange-600 text-2xl"></i>
-      <h2 class="text-2xl md:text-3xl font-bold text-orange-700">Sandwiches</h2>
-    </div>
-    
-    <div class="flex flex-col md:flex-row gap-6">
-      <!-- Vegetarian Sandwiches -->
-      <div class="w-full md:w-1/2">
-        <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-2 rounded-lg shadow-md">
-          <i class="fas fa-leaf mr-2"></i> Vegetarian Sandwiches
-        </h3>
-        <div class="bg-white rounded-lg shadow-md border border-gray-100">
-          <table class="menu-table">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th class="text-right">Price</th>
-                <th class="text-right">Order</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for item in a_la_carte.sandwiches %}
-                <tr>
-                  <td>
-                    <span class="item-name">{{ item.name }}</span>
-                  </td>
-                  <td class="text-right">
-                    <span class="price-tag veg-price">₹{{ '%0.0f'|format(item.price) }}</span>
-                  </td>
-                  <td class="text-right">
-                    <button
-                      class="add-button veg-button"
-                      data-id="{{ item.id }}"
-                      data-name="{{ item.name }}"
-                      data-price="{{ item.price }}"
-                      data-type="item"
-                    >
-                      Add
-                    </button>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
-      <!-- Egg Sandwiches -->
-      <div class="w-full md:w-1/2">
-        <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-orange-600 to-orange-500 text-white px-4 py-2 rounded-lg shadow-md">
-          <i class="fas fa-egg mr-2"></i> Egg Sandwiches
-        </h3>
-        <div class="bg-white rounded-lg shadow-md border border-gray-100">
-          <table class="menu-table">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th class="text-right">Price</th>
-                <th class="text-right">Order</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for item in a_la_carte.egg_sandwiches %}
-                <tr>
-                  <td>
-                    <span class="item-name">{{ item.name }}</span>
-                  </td>
-                  <td class="text-right">
-                    <span class="price-tag non-veg-price">₹{{ '%0.0f'|format(item.price) }}</span>
-                  </td>
-                  <td class="text-right">
-                    <button
-                      class="add-button non-veg-button"
-                      data-id="{{ item.id }}"
-                      data-name="{{ item.name }}"
-                      data-price="{{ item.price }}"
-                      data-type="item"
-                    >
-                      Add
-                    </button>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div id="hot-beverages" class="mb-12 scroll-mt-32">
-    <div class="flex items-center gap-2 mb-6">
-      <i class="fas fa-mug-hot text-blue-600 text-2xl"></i>
-      <h2 class="text-2xl font-bold text-blue-700">Hot Beverages</h2>
-    </div>
-    
-    <div class="w-full">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-blue-600 to-blue-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-mug-hot mr-2"></i> Hot Beverages
-      </h3>
-      <div class="bg-white rounded-lg shadow-md border border-gray-100">
-        <table class="menu-table">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th class="text-right">Price</th>
-              <th class="text-right">Order</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in a_la_carte.beverages %}
-              <tr>
-                <td>
-                  <span class="item-name">{{ item.name }}</span>
-                </td>
-                <td class="text-right">
-                  <span class="price-tag veg-price">₹{{ '%0.0f'|format(item.price) }}</span>
-                </td>
-                <td class="text-right">
-                  <button
-                    class="add-button veg-button"
-                    data-id="{{ item.id }}"
-                    data-name="{{ item.name }}"
-                    data-price="{{ item.price }}"
-                    data-type="item"
-                  >
-                    Add
-                  </button>
-                </td>
-              </tr>
+      <div class="relative">
+        <div class="pointer-events-none absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-amber-50 to-transparent hidden sm:block"></div>
+        <div class="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-amber-50 to-transparent hidden sm:block"></div>
+        <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+          <div class="inline-flex gap-3 pr-6">
+            {% for section in sections %}
+            <a
+              href="#section-{{ section.id }}"
+              class="group flex-shrink-0 px-4 py-2 rounded-full border border-gray-200 bg-white text-[11px] font-medium text-gray-700 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700 transition-all shadow-sm hover:shadow-md"
+            >
+              <span class="truncate max-w-[120px] block group-hover:tracking-wide">
+                {{ section.display_name }}
+              </span>
+            </a>
             {% endfor %}
-          </tbody>
-        </table>
+          </div>
+        </div>
       </div>
+    </div>
+
+    <div class="space-y-5" id="menu-sections">
+      {% for section in sections %}
+      <section
+        id="section-{{ section.id }}"
+        class="rounded-2xl border border-gray-200 bg-white/90 overflow-hidden shadow-md"
+      >
+        <button
+          type="button"
+          class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 section-toggle"
+          data-section-id="{{ section.id }}"
+        >
+          <div class="flex items-center gap-3">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+              {% if section.icon %}
+              <i class="{{ section.icon }}"></i>
+              {% else %}
+              <i class="fas fa-utensils"></i>
+              {% endif %}
+            </div>
+            <div class="text-left">
+              <p class="text-sm md:text-base font-medium text-gray-900">{{ section.display_name }}</p>
+              {% if section.description %}
+              <p class="text-[11px] text-gray-500">{{ section.description }}</p>
+              {% endif %}
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="inline-flex items-center text-[11px] bg-gray-100 text-gray-700 px-2 py-1 rounded-full border border-gray-200">
+              <i class="fas fa-utensils mr-1"></i>
+              {{ items_by_section[section.id] | length }} items
+            </span>
+            <i class="fas fa-chevron-down text-slate-400 transition-transform section-toggle-icon{% if loop.first %} rotate-180{% endif %}"></i>
+          </div>
+        </button>
+        <div class="section-body px-3 pb-4 pt-3{% if not loop.first %} hidden{% endif %}">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for item in items_by_section[section.id] %}
+            <article
+              class="menu-item-card border border-gray-200 rounded-xl p-3 bg-white hover:border-amber-400/70 hover:shadow-md transition"
+              data-veg="{{ 1 if item.is_veg else 0 }}"
+              data-name="{{ (item.name ~ ' ' ~ (item.description or ''))|lower }}"
+            >
+              <div class="flex justify-between items-start gap-3">
+                <div>
+                  <p class="text-sm font-medium text-gray-900">{{ item.name }}</p>
+                  {% if item.description %}
+                  <p class="text-[11px] text-gray-500 mt-1 line-clamp-2">{{ item.description }}</p>
+                  {% endif %}
+                </div>
+                <div class="text-right">
+                  <p class="text-sm font-semibold {% if item.is_veg %}text-emerald-600{% else %}text-rose-600{% endif %}">
+                    ₹{{ '%0.0f'|format(item.price) }}
+                  </p>
+                  <p class="mt-1 text-[10px] inline-flex items-center px-2 py-0.5 rounded-full border {% if item.is_veg %}border-emerald-500/60 text-emerald-700 bg-emerald-50{% else %}border-rose-500/60 text-rose-700 bg-rose-50{% endif %}">
+                    {% if item.is_veg %}
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1"></span> Veg
+                    {% else %}
+                    <span class="w-2 h-2 rounded-full bg-rose-500 mr-1"></span> Non-Veg
+                    {% endif %}
+                  </p>
+                </div>
+              </div>
+              <button
+                class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-400 text-gray-900 rounded-full text-xs font-medium hover:from-amber-400 hover:to-amber-300 transition add-to-cart-btn"
+                data-id="menu-{{ item.id }}"
+                data-name="{{ item.name }}"
+                data-price="{{ item.price }}"
+                data-type="item"
+              >
+                <i class="fas fa-cart-plus mr-2"></i> Add to Order
+              </button>
+            </article>
+            {% else %}
+            <p class="text-[12px] text-gray-500 italic col-span-full">No items available in this category right now.</p>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+      {% endfor %}
     </div>
   </div>
-  
-  <div id="soups" class="mb-12 scroll-mt-32">
-    <div class="flex items-center gap-2 mb-6">
-      <i class="fas fa-soup text-teal-600 text-2xl"></i>
-      <h2 class="text-2xl md:text-3xl font-bold text-teal-700">Soups</h2>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-leaf mr-2"></i> Vegetarian Soups
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {% for item in a_la_carte.veg_soups %}
-          <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-              <p class="font-semibold text-gray-900">{{ item.name }}</p>
-              <span class="text-green-700 font-bold">₹{{ '%0.0f'|format(item.price) }}</span>
-            </div>
-            <button
-              class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-              data-id="{{ item.id }}"
-              data-name="{{ item.name }}"
-              data-price="{{ item.price }}"
-              data-type="item"
-            >
-              <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-            </button>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-rose-600 to-rose-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-drumstick-bite mr-2"></i> Non-Vegetarian Soups
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {% for item in a_la_carte.non_veg_soups %}
-          <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-              <p class="font-semibold text-gray-900">{{ item.name }}</p>
-              <span class="text-rose-700 font-bold">₹{{ '%0.0f'|format(item.price) }}</span>
-            </div>
-            <button
-              class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-              data-id="{{ item.id }}"
-              data-name="{{ item.name }}"
-              data-price="{{ item.price }}"
-              data-type="item"
-            >
-              <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-            </button>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-  
-  <div id="starters" class="mb-12 scroll-mt-32">
-    <div class="flex items-center gap-2 mb-6">
-      <i class="fas fa-drumstick-bite text-purple-600 text-2xl"></i>
-      <h2 class="text-2xl font-bold text-purple-700">Starters</h2>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-leaf mr-2"></i> Chinese Starters - Vegetarian
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {% for item in a_la_carte.veg_starters %}
-          <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-              <p class="font-semibold text-gray-900">{{ item.name }}</p>
-              <span class="text-green-700 font-bold">₹{{ '%0.0f'|format(item.price) }}</span>
-            </div>
-            <button
-              class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-              data-id="{{ item.id }}"
-              data-name="{{ item.name }}"
-              data-price="{{ item.price }}"
-              data-type="item"
-            >
-              <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-            </button>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-rose-600 to-rose-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-drumstick-bite mr-2"></i> Chinese Starters - Non-Vegetarian
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {% for item in a_la_carte.non_veg_starters %}
-          <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-              <p class="font-semibold text-gray-900">{{ item.name }}</p>
-              <span class="text-rose-700 font-bold">₹{{ '%0.0f'|format(item.price) }}</span>
-            </div>
-            <button
-              class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-              data-id="{{ item.id }}"
-              data-name="{{ item.name }}"
-              data-price="{{ item.price }}"
-              data-type="item"
-            >
-              <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-            </button>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-fire mr-2"></i> Tandoor Starters - Vegetarian
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {% for item in a_la_carte.tandoor_veg %}
-          <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-              <p class="font-semibold text-gray-900">{{ item.name }}</p>
-              <span class="text-green-700 font-bold">₹{{ '%0.0f'|format(item.price) }}</span>
-            </div>
-            <button
-              class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-              data-id="{{ item.id }}"
-              data-name="{{ item.name }}"
-              data-price="{{ item.price }}"
-              data-type="item"
-            >
-              <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-            </button>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-rose-600 to-rose-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-fire mr-2"></i> Tandoor Starters - Non-Vegetarian
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {% for item in a_la_carte.tandoor_non_veg %}
-          <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-              <p class="font-semibold text-gray-900">{{ item.name }}</p>
-              <span class="text-rose-700 font-bold">₹{{ '%0.0f'|format(item.price) }}</span>
-            </div>
-            <button
-              class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-              data-id="{{ item.id }}"
-              data-name="{{ item.name }}"
-              data-price="{{ item.price }}"
-              data-type="item"
-            >
-              <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-            </button>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-
-  <div id="main-course" class="mb-12 scroll-mt-32">
-    <div class="flex items-center gap-2 mb-6">
-      <i class="fas fa-utensils text-red-600 text-2xl"></i>
-      <h2 class="text-2xl font-bold text-red-700">Main Course</h2>
-    </div>
-
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-leaf mr-2"></i> Chinese Main Course - Vegetarian
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {% for item in a_la_carte.chinese_veg %}
-          <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-              <p class="font-semibold text-gray-900">{{ item.name }}</p>
-              <span class="text-green-700 font-bold">₹{{ '%0.0f'|format(item.price) }}</span>
-            </div>
-            <button
-              class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-              data-id="{{ item.id }}"
-              data-name="{{ item.name }}"
-              data-price="{{ item.price }}"
-              data-type="item"
-            >
-              <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-            </button>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-rose-600 to-rose-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-drumstick-bite mr-2"></i> Chinese Main Course - Non-Vegetarian
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {% for item in a_la_carte.chinese_non_veg %}
-          <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-              <p class="font-semibold text-gray-900">{{ item.name }}</p>
-              <span class="text-rose-700 font-bold">₹{{ '%0.0f'|format(item.price) }}</span>
-            </div>
-            <button
-              class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-              data-id="{{ item.id }}"
-              data-name="{{ item.name }}"
-              data-price="{{ item.price }}"
-              data-type="item"
-            >
-              <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-            </button>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-yellow-600 to-yellow-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-bowl-food mr-2"></i> Dal
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {% for item in a_la_carte.dal %}
-          <div class="border border-yellow-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-              <p class="font-semibold text-gray-900">{{ item.name }}</p>
-              <span class="text-yellow-700 font-bold">₹{{ '%0.0f'|format(item.price) }}</span>
-            </div>
-            <button
-              class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-yellow-600 to-yellow-500 text-white rounded-md hover:from-yellow-700 hover:to-yellow-600 transition add-to-cart-btn"
-              data-id="{{ item.id }}"
-              data-name="{{ item.name }}"
-              data-price="{{ item.price }}"
-              data-type="item"
-            >
-              <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-            </button>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-leaf mr-2"></i> Indian Main Course - Vegetarian
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {% for item in a_la_carte.indian_veg %}
-          <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-              <p class="font-semibold text-gray-900">{{ item.name }}</p>
-              <span class="text-green-700 font-bold">₹{{ '%0.0f'|format(item.price) }}</span>
-            </div>
-            <button
-              class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-              data-id="{{ item.id }}"
-              data-name="{{ item.name }}"
-              data-price="{{ item.price }}"
-              data-type="item"
-            >
-              <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-            </button>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-red-600 to-red-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-drumstick-bite mr-2"></i> Indian Main Course - Non-Vegetarian
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Butter Chicken With Bone (Full)</p>
-            <span class="text-rose-700 font-bold">₹850</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="butter_chicken_full"
-            data-name="Butter Chicken With Bone (Full)"
-            data-price="850"
-            data-type="item"
-          >
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Butter Chicken With Bone (Half)</p>
-            <span class="text-rose-700 font-bold">₹550</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="butter_chicken_half"
-            data-name="Butter Chicken With Bone (Half)"
-            data-price="550"
-            data-type="item"
-          >
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Butter Chicken Boneless (10 Pieces)</p>
-            <span class="text-rose-700 font-bold">₹550</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="butter_chicken_boneless"
-            data-name="Butter Chicken Boneless (10 Pieces)"
-            data-price="550"
-            data-type="item"
-          >
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Chicken Handi (Full)</p>
-            <span class="text-rose-700 font-bold">₹999</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="chicken_handi_full"
-            data-name="Chicken Handi (Full)"
-            data-price="999"
-            data-type="item"
-          >
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Chicken Handi (Half)</p>
-            <span class="text-rose-700 font-bold">₹450</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="chicken_handi_half"
-            data-name="Chicken Handi (Half)"
-            data-price="450"
-            data-type="item"
-          >
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Palak Chicken</p>
-            <span class="text-rose-700 font-bold">₹320</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="palak_chicken"
-            data-name="Palak Chicken"
-            data-price="320"
-            data-type="item"
-          >
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Chicken Kadhai</p>
-            <span class="text-rose-700 font-bold">₹320</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="chicken_kadhai"
-            data-name="Chicken Kadhai"
-            data-price="320"
-            data-type="item"
-          >
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Chicken Masala</p>
-            <span class="text-rose-700 font-bold">₹320</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="chicken_masala"
-            data-name="Chicken Masala"
-            data-price="320"
-            data-type="item"
-          >
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Butter Chicken (Regular)</p>
-            <span class="text-rose-700 font-bold">₹350</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="butter_chicken"
-            data-name="Butter Chicken (Regular)"
-            data-price="350"
-            data-type="item"
-          >
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Chicken Tikka Masala</p>
-            <span class="text-rose-700 font-bold">₹350</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="chicken_tikka_masala"
-            data-name="Chicken Tikka Masala"
-            data-price="350"
-            data-type="item"
-          >
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Kadhai Chicken (Regular)</p>
-            <span class="text-rose-700 font-bold">₹350</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="kadhai_chicken_regular"
-            data-name="Kadhai Chicken (Regular)"
-            data-price="350"
-            data-type="item"
-          >
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Chicken Curry</p>
-            <span class="text-rose-700 font-bold">₹320</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="chicken_curry"
-            data-name="Chicken Curry"
-            data-price="320"
-            data-type="item"
-          >
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="roti-paratha" class="mb-12 scroll-mt-32">
-        <div class="flex items-center gap-2 mb-6">
-            <i class="fas fa-bread-slice text-amber-600 text-2xl"></i>
-            <h2 class="text-2xl font-bold text-amber-700">Rotis And Parathas</h2>
-        </div>
-        
-        <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-amber-600 to-amber-500 text-white px-4 py-2 rounded-lg shadow-md">
-            <i class="fas fa-bread-slice mr-2"></i> Indian Breads
-        </h3>
-        
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Plain Chapati</p>
-                <span class="text-amber-700 font-bold text-xl">₹30</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-                    data-id="plain_chapati" data-name="Plain Chapati" data-price="30" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Butter Chapati</p>
-                <span class="text-amber-700 font-bold text-xl">₹35</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-                    data-id="butter_chapati" data-name="Butter Chapati" data-price="35" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Tandoori Roti</p>
-                <span class="text-amber-700 font-bold text-xl">₹40</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-                    data-id="tandoori_roti" data-name="Tandoori Roti" data-price="40" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Butter Tandoori Roti</p>
-                <span class="text-amber-700 font-bold text-xl">₹45</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-                    data-id="butter_tandoori_roti" data-name="Butter Tandoori Roti" data-price="45" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Plain Naan</p>
-                <span class="text-amber-700 font-bold text-xl">₹60</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-                    data-id="plain_naan" data-name="Plain Naan" data-price="60" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Lacha Paratha</p>
-                <span class="text-amber-700 font-bold text-xl">₹60</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-                    data-id="lacha_paratha" data-name="Lacha Paratha" data-price="60" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Butter Naan</p>
-                <span class="text-amber-700 font-bold text-xl">₹70</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-                    data-id="butter_naan" data-name="Butter Naan" data-price="70" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Plain Garlic Naan</p>
-                <span class="text-amber-700 font-bold text-xl">₹70</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-                    data-id="plain_garlic_naan" data-name="Plain Garlic Naan" data-price="70" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Butter Garlic Naan</p>
-                <span class="text-amber-700 font-bold text-xl">₹80</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-                    data-id="butter_garlic_naan" data-name="Butter Garlic Naan" data-price="80" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Cheese Garlic Naan</p>
-                <span class="text-amber-700 font-bold text-xl">₹90</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-                    data-id="cheese_garlic_naan" data-name="Cheese Garlic Naan" data-price="90" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-        </div>
-    </div>
-
-  <div id="rice-biryani" class="mb-12 scroll-mt-32">
-    <div class="flex items-center gap-2 mb-6">
-      <i class="fas fa-seedling text-green-600 text-2xl"></i>
-      <h2 class="text-2xl font-bold text-green-700">Rice & Dum Biryani</h2>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-leaf mr-2"></i> Rice & Biryani - Vegetarian
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Steam Rice</p>
-            <span class="text-green-700 font-bold">₹110</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-            data-id="steam_rice" data-name="Steam Rice" data-price="110" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Jeera Rice</p>
-            <span class="text-green-700 font-bold">₹150</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-            data-id="jeera_rice" data-name="Jeera Rice" data-price="150" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Dal Khichadi</p>
-            <span class="text-green-700 font-bold">₹180</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-            data-id="dal_khichadi" data-name="Dal Khichadi" data-price="180" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Masala Dal Khichadi</p>
-            <span class="text-green-700 font-bold">₹220</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-            data-id="masala_dal_khichadi" data-name="Masala Dal Khichadi" data-price="220" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Veg Dum Biryani</p>
-            <span class="text-green-700 font-bold">₹250</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-            data-id="veg_dum_biryani" data-name="Veg Dum Biryani" data-price="250" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Per Kg Veg Biryani</p>
-            <span class="text-green-700 font-bold">₹850</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-            data-id="per_kg_veg_biryani" data-name="Per Kg Veg Biryani" data-price="850" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-rose-600 to-rose-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-drumstick-bite mr-2"></i> Rice & Biryani - Non-Vegetarian
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Chicken Dum Biryani</p>
-            <span class="text-rose-700 font-bold">₹350</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="chicken_dum_biryani" data-name="Chicken Dum Biryani" data-price="350" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Egg Dum Biryani</p>
-            <span class="text-rose-700 font-bold">₹250</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="egg_dum_biryani" data-name="Egg Dum Biryani" data-price="250" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Mutton Dum Biryani</p>
-            <span class="text-rose-700 font-bold">₹450</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="mutton_dum_biryani" data-name="Mutton Dum Biryani" data-price="450" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Per Kg Biryani (Chicken)</p>
-            <span class="text-rose-700 font-bold">₹1100</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="per_kg_chicken_biryani" data-name="Per Kg Biryani (Chicken)" data-price="1100" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-rose-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Per Kg Biryani (Mutton)</p>
-            <span class="text-rose-700 font-bold">₹1800</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="per_kg_mutton_biryani" data-name="Per Kg Biryani (Mutton)" data-price="1800" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="papad-salad" class="mb-12 scroll-mt-32">
-        <div class="flex items-center gap-2 mb-6">
-            <i class="fas fa-leaf text-cyan-600 text-2xl"></i>
-            <h2 class="text-2xl font-bold text-cyan-700">Papad & Salad</h2>
-        </div>
-        
-        <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-2 rounded-lg shadow-md">
-            <i class="fas fa-leaf mr-2"></i> Sides and Salads
-        </h3>
-        
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Roasted Papad</p>
-                <span class="text-green-700 font-bold text-xl">₹20</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-                    data-id="roasted_papad" data-name="Roasted Papad" data-price="20" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Masala Papad</p>
-                <span class="text-green-700 font-bold text-xl">₹40</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-                    data-id="masala_papad" data-name="Masala Papad" data-price="40" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Fried Papad</p>
-                <span class="text-green-700 font-bold text-xl">₹30</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-                    data-id="fried_papad_item" data-name="Fried Papad" data-price="30" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Stick Salad</p>
-                <span class="text-green-700 font-bold text-xl">₹110</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-                    data-id="stick_salad" data-name="Stick Salad" data-price="110" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Tossed Salad</p>
-                <span class="text-green-700 font-bold text-xl">₹110</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-                    data-id="tossed_salad" data-name="Tossed Salad" data-price="110" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Kachumber Salad</p>
-                <span class="text-green-700 font-bold text-xl">₹110</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-                    data-id="kachumber_salad" data-name="Kachumber Salad" data-price="110" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-green-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Green Salad</p>
-                <span class="text-green-700 font-bold text-xl">₹110</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-                    data-id="green_salad" data-name="Green Salad" data-price="110" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-        </div>
-    </div>
-
-  <div id="quick-bite" class="mb-12 scroll-mt-32">
-    <div class="flex items-center gap-2 mb-6">
-      <i class="fas fa-pepper-hot text-orange-600 text-2xl"></i>
-      <h2 class="text-2xl font-bold text-orange-700">Quick Bite (Chaat & Snacks)</h2>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-orange-600 to-orange-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-pepper-hot mr-2"></i> Chaat & Fries
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <div class="border border-orange-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Chana Chaat</p>
-            <span class="text-orange-700 font-bold">₹160</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-md hover:from-orange-700 hover:to-orange-600 transition add-to-cart-btn"
-            data-id="chana_chaat" data-name="Chana Chaat" data-price="160" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-orange-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Peanut Chaat</p>
-            <span class="text-orange-700 font-bold">₹160</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-md hover:from-orange-700 hover:to-orange-600 transition add-to-cart-btn"
-            data-id="peanut_chaat" data-name="Peanut Chaat" data-price="160" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-orange-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Aloo Chaat</p>
-            <span class="text-orange-700 font-bold">₹140</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-md hover:from-orange-700 hover:to-orange-600 transition add-to-cart-btn"
-            data-id="aloo_chaat" data-name="Aloo Chaat" data-price="140" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-orange-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">French Fries</p>
-            <span class="text-orange-700 font-bold">₹150</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-md hover:from-orange-700 hover:to-orange-600 transition add-to-cart-btn"
-            data-id="french_fries" data-name="French Fries" data-price="150" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-orange-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Peri Peri French Fries</p>
-            <span class="text-orange-700 font-bold">₹170</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-md hover:from-orange-700 hover:to-orange-600 transition add-to-cart-btn"
-            data-id="peri_peri_fries" data-name="Peri Peri French Fries" data-price="170" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-orange-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Cheese Fresh Fries</p>
-            <span class="text-orange-700 font-bold">₹180</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-md hover:from-orange-700 hover:to-orange-600 transition add-to-cart-btn"
-            data-id="cheese_fries" data-name="Cheese Fresh Fries" data-price="180" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="cold-drinks" class="mb-12 scroll-mt-32">
-        <div class="flex items-center gap-2 mb-6">
-            <i class="fas fa-glass-water text-blue-600 text-2xl"></i>
-            <h2 class="text-2xl font-bold text-blue-700">Cold Drinks & Fresh Juices</h2>
-        </div>
-        
-        <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-blue-600 to-blue-500 text-white px-4 py-2 rounded-lg shadow-md">
-            <i class="fas fa-glass-water mr-2"></i> Fresh Juices & Cold Drinks
-        </h3>
-        
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            <div class="border border-blue-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Pineapple Juice</p>
-                <span class="text-blue-700 font-bold text-xl">₹110</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-md hover:from-blue-700 hover:to-blue-600 transition add-to-cart-btn"
-                    data-id="pineapple_juice_item" data-name="Pineapple Juice" data-price="110" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-blue-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Watermelon Juice</p>
-                <span class="text-blue-700 font-bold text-xl">₹110</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-md hover:from-blue-700 hover:to-blue-600 transition add-to-cart-btn"
-                    data-id="watermelon_juice_item" data-name="Watermelon Juice" data-price="110" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-blue-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Orange Juice</p>
-                <span class="text-blue-700 font-bold text-xl">₹110</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-md hover:from-blue-700 hover:to-blue-600 transition add-to-cart-btn"
-                    data-id="orange_juice_item" data-name="Orange Juice" data-price="110" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-blue-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Mosambi Juice</p>
-                <span class="text-blue-700 font-bold text-xl">₹110</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-md hover:from-blue-700 hover:to-blue-600 transition add-to-cart-btn"
-                    data-id="mosambi_juice_item" data-name="Mosambi Juice" data-price="110" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-blue-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Cold Drink (500ml)</p>
-                <span class="text-blue-700 font-bold text-xl">₹60</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-md hover:from-blue-700 hover:to-blue-600 transition add-to-cart-btn"
-                    data-id="cold_drink_item" data-name="Cold Drink (500ml)" data-price="60" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-            <div class="border border-blue-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                <p class="font-semibold text-gray-900">Soda (500ml)</p>
-                <span class="text-blue-700 font-bold text-xl">₹40</span>
-                <button
-                    class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-md hover:from-blue-700 hover:to-blue-600 transition add-to-cart-btn"
-                    data-id="soda_item" data-name="Soda (500ml)" data-price="40" data-type="item">
-                    <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-                </button>
-            </div>
-        </div>
-    </div>
-
-
-  <div id="mocktails" class="mb-12 scroll-mt-32">
-    <div class="flex items-center gap-2 mb-6">
-      <i class="fas fa-cocktail text-cyan-600 text-2xl"></i>
-      <h2 class="text-2xl font-bold text-cyan-700">Mocktails & Cold Beverages</h2>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-cyan-600 to-cyan-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-cocktail mr-2"></i> Mocktails & Cold Beverages
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <div class="border border-cyan-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Mojito</p>
-            <span class="text-cyan-700 font-bold">₹150</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-md hover:from-cyan-700 hover:to-cyan-600 transition add-to-cart-btn"
-            data-id="mojito" data-name="Mojito" data-price="150" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-cyan-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Virgin Pinacolada</p>
-            <span class="text-cyan-700 font-bold">₹200</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-md hover:from-cyan-700 hover:to-cyan-600 transition add-to-cart-btn"
-            data-id="virgin_pinacolada" data-name="Virgin Pinacolada" data-price="200" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-cyan-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Virgin Mary</p>
-            <span class="text-cyan-700 font-bold">₹150</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-md hover:from-cyan-700 hover:to-cyan-600 transition add-to-cart-btn"
-            data-id="virgin_mary" data-name="Virgin Mary" data-price="150" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-cyan-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Blue Lagoon</p>
-            <span class="text-cyan-700 font-bold">₹150</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-md hover:from-cyan-700 hover:to-cyan-600 transition add-to-cart-btn"
-            data-id="blue_lagoon" data-name="Blue Lagoon" data-price="150" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-cyan-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Iced Tea</p>
-            <span class="text-cyan-700 font-bold">₹100</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-md hover:from-cyan-700 hover:to-cyan-600 transition add-to-cart-btn"
-            data-id="iced_tea" data-name="Iced Tea" data-price="100" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-cyan-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Cold Coffee</p>
-            <span class="text-cyan-700 font-bold">₹80</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-md hover:from-cyan-700 hover:to-cyan-600 transition add-to-cart-btn"
-            data-id="cold_coffee" data-name="Cold Coffee" data-price="80" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-cyan-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Cold Coffee with Ice Cream</p>
-            <span class="text-cyan-700 font-bold">₹120</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-cyan-600 to-cyan-500 text-white rounded-md hover:from-cyan-700 hover:to-cyan-600 transition add-to-cart-btn"
-            data-id="cold_coffee_ice_cream" data-name="Cold Coffee with Ice Cream" data-price="120" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="desserts" class="mb-12 scroll-mt-32">
-    <div class="flex items-center gap-2 mb-6">
-      <i class="fas fa-ice-cream text-amber-600 text-2xl"></i>
-      <h2 class="text-2xl font-bold text-amber-700">Desserts</h2>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-amber-600 to-amber-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-ice-cream mr-2"></i> Sweet Delights
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Gulab Jamun</p>
-            <span class="text-amber-700 font-bold">₹60</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-            data-id="gulab_jamun" data-name="Gulab Jamun" data-price="60" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Rasmalai</p>
-            <span class="text-amber-700 font-bold">₹120</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-            data-id="rasmalai" data-name="Rasmalai" data-price="120" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Angoori Rabdi</p>
-            <span class="text-amber-700 font-bold">₹120</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-            data-id="angoori_rabdi" data-name="Angoori Rabdi" data-price="120" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Gajar Halwa (Seasonal)</p>
-            <span class="text-amber-700 font-bold">₹120</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-            data-id="gajar_halwa" data-name="Gajar Halwa (Seasonal)" data-price="120" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Dudhi Halwa</p>
-            <span class="text-amber-700 font-bold">₹120</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-            data-id="dudhi_halwa" data-name="Dudhi Halwa" data-price="120" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Ice Cream (Any Flavour)</p>
-            <span class="text-amber-700 font-bold">₹40</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-            data-id="ice_cream" data-name="Ice Cream (Any Flavour)" data-price="40" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Kulfi (Any Flavour)</p>
-            <span class="text-amber-700 font-bold">₹50</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-            data-id="kulfi" data-name="Kulfi (Any Flavour)" data-price="50" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Mango Cream (Seasonal)</p>
-            <span class="text-amber-700 font-bold">₹250</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-            data-id="mango_cream" data-name="Mango Cream (Seasonal)" data-price="250" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-        
-        <div class="border border-amber-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div class="flex justify-between items-start">
-            <p class="font-semibold text-gray-900">Strawberry Cream (Seasonal)</p>
-            <span class="text-amber-700 font-bold">₹250</span>
-          </div>
-          <button
-            class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 text-white rounded-md hover:from-amber-700 hover:to-amber-600 transition add-to-cart-btn"
-            data-id="strawberry_cream" data-name="Strawberry Cream (Seasonal)" data-price="250" data-type="item">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center mt-8">
-      <p class="text-amber-800 font-bold">Note: Order Time Minimum 45 Minutes. Kitchen Timings are 8 AM to 10.30 PM</p>
-    </div>
-  </div>
-
-  <div id="meal-packages" class="mb-12 scroll-mt-32">
-    <div class="flex items-center gap-2 mb-6">
-      <i class="fas fa-box-open text-indigo-600 text-2xl"></i>
-      <h2 class="text-2xl md:text-3xl font-bold text-indigo-700">Meal Packages</h2>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-leaf mr-2"></i> Full Meal Plan – Vegetarian
-        <span class="ml-2 text-sm bg-white text-green-800 px-2 py-1 rounded">Min. 12 Pax</span>
-      </h3>
-      <div class="border border-green-200 rounded-lg p-6 bg-white shadow-md mb-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <h4 class="font-bold text-green-700 mb-2">Lunch</h4>
-            <p class="text-gray-700">Veg Gravy, Veg Dry, Dal, Rice, Chapati, Sweet, Salad, Papad, Pickle</p>
-          </div>
-          <div>
-            <h4 class="font-bold text-green-700 mb-2">Hi-Tea</h4>
-            <p class="text-gray-700">Snacks, Tea, Coffee, Biscuit, Live Barbeque (Unlimited 2 hrs): Paneer, Potato, Pineapple, Baby Corn, Mushroom, Bel Papers</p>
-          </div>
-          <div>
-            <h4 class="font-bold text-green-700 mb-2">Full Dinner</h4>
-            <p class="text-gray-700">Veg Gravy, Veg Dry, Dal, Rice, Chapati, Sweet, Salad, Papad, Pickle</p>
-          </div>
-          <div>
-            <h4 class="font-bold text-green-700 mb-2">Next Day Breakfast</h4>
-            <p class="text-gray-700">Indian Dry Snack, Liquid Snacks, Toast / Bread, Butter, Jam, Tea, Coffee, Real Juice</p>
-          </div>
-        </div>
-        <div class="flex flex-col md:flex-row justify-between items-center bg-green-50 p-4 rounded-lg">
-          <div>
-            <p class="font-bold text-green-800">One Night Food Package: <span class="text-xl">₹1450/- Per Head</span></p>
-            <p class="font-bold text-green-800">Two Night Food Package: <span class="text-xl">₹1250/- Per Head</span></p>
-          </div>
-          <button class="mt-3 md:mt-0 px-6 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-            data-id="veg_full_meal_pkg"
-            data-name="Vegetarian Full Meal Plan"
-            data-price="1450"
-            data-type="package">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-      </div>
-      
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-leaf mr-2"></i> Half Meal Plan – Vegetarian
-        <span class="ml-2 text-sm bg-white text-green-800 px-2 py-1 rounded">Min. 12 Pax</span>
-      </h3>
-      <div class="border border-green-200 rounded-lg p-6 bg-white shadow-md">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <h4 class="font-bold text-green-700 mb-2">Lunch</h4>
-            <p class="text-gray-700">Veg Gravy, Veg Dry, Dal, Rice, Chapati, Sweet, Salad, Papad, Pickle</p>
-          </div>
-          <div>
-            <h4 class="font-bold text-green-700 mb-2">Hi-Tea</h4>
-            <p class="text-gray-700">Snacks, Tea, Coffee, Biscuit, Live Barbeque: Paneer, Potato, Pineapple, Baby Corn, Mushroom, Bel Papers</p>
-          </div>
-          <div>
-            <h4 class="font-bold text-green-700 mb-2">Half Dinner</h4>
-            <p class="text-gray-700">Veg Gravy / Pav Bhaji, Biryani / Tawa Pulao, Hakka Noodles, Raita, Papad, Salad Sweet</p>
-          </div>
-          <div>
-            <h4 class="font-bold text-green-700 mb-2">Next Day Breakfast</h4>
-            <p class="text-gray-700">Indian Dry Snack, Liquid Snacks, Toast / Bread, Butter, Jam, Tea, Coffee, Real Juice</p>
-          </div>
-        </div>
-        <div class="flex flex-col md:flex-row justify-between items-center bg-green-50 p-4 rounded-lg">
-          <div>
-            <p class="font-bold text-green-800">One Night Food Package: <span class="text-xl">₹1300/- Per Head</span></p>
-            <p class="font-bold text-green-800">Two Night Food Package: <span class="text-xl">₹1100/- Per Head</span></p>
-            <p class="font-bold text-green-800 mt-2">Skip Lunch Package (Min. 15 Pax):</p>
-            <p class="text-green-800">Without Barbeque: <span class="font-bold">₹900/- Per Head</span> | With Barbeque: <span class="font-bold">₹1150/- Per Head</span></p>
-          </div>
-          <button class="mt-3 md:mt-0 px-6 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-md hover:from-green-700 hover:to-green-600 transition add-to-cart-btn"
-            data-id="veg_half_meal_pkg"
-            data-name="Vegetarian Half Meal Plan"
-            data-price="1300"
-            data-type="package">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <div class="mb-8">
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-rose-600 to-rose-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-drumstick-bite mr-2"></i> Full Meal Plan – Non-Vegetarian
-        <span class="ml-2 text-sm bg-white text-rose-800 px-2 py-1 rounded">Min. 12 Pax</span>
-      </h3>
-      <div class="border border-rose-200 rounded-lg p-6 bg-white shadow-md mb-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <h4 class="font-bold text-rose-700 mb-2">Lunch</h4>
-            <p class="text-gray-700">Chicken Gravy, Paneer Gravy, Dal, Rice, Chapati, Sweet, Salad, Papad</p>
-          </div>
-          <div>
-            <h4 class="font-bold text-rose-700 mb-2">Hi-Tea</h4>
-            <p class="text-gray-700">Snacks Veg, Snacks NonVeg, Tea, Coffee, Biscuit, Live Barbeque (Unlimited 2 hrs): Two Chicken Kebab, Potato, Pineapple, Paneer, Bel Papers</p>
-          </div>
-          <div>
-            <h4 class="font-bold text-rose-700 mb-2">Full Dinner</h4>
-            <p class="text-gray-700">Mutton Gravy, Veg Gravy, Dal, Rice, Chapati, Sweet, Salad, Papad</p>
-          </div>
-          <div>
-            <h4 class="font-bold text-rose-700 mb-2">Next Day Breakfast</h4>
-            <p class="text-gray-700">Break Fast, Eggs To Order, Liquid Snacks, Toast / Bread, Butter, Jam, Tea, Coffee, Real Juice</p>
-          </div>
-        </div>
-        <div class="flex flex-col md:flex-row justify-between items-center bg-rose-50 p-4 rounded-lg">
-          <div>
-            <p class="font-bold text-rose-800">One Night Food Package: <span class="text-xl">₹1500/- Per Head</span></p>
-            <p class="font-bold text-rose-800">Two Night Food Package: <span class="text-xl">₹1400/- Per Head</span></p>
-          </div>
-          <button class="mt-3 md:mt-0 px-6 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="nonveg_full_meal_pkg"
-            data-name="Non-Vegetarian Full Meal Plan"
-            data-price="1500"
-            data-type="package">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-      </div>
-      
-      <h3 class="text-xl font-semibold mb-4 flex items-center bg-gradient-to-r from-rose-600 to-rose-500 text-white px-4 py-2 rounded-lg shadow-md">
-        <i class="fas fa-drumstick-bite mr-2"></i> Half Meal Plan – Non-Vegetarian
-        <span class="ml-2 text-sm bg-white text-rose-800 px-2 py-1 rounded">Min. 12 Pax</span>
-      </h3>
-      <div class="border border-rose-200 rounded-lg p-6 bg-white shadow-md">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <h4 class="font-bold text-rose-700 mb-2">Lunch</h4>
-            <p class="text-gray-700">Chicken Gravy, Paneer Gravy, Dal, Rice, Chapati, Sweet, Salad, Papad, Pickle</p>
-          </div>
-          <div>
-            <h4 class="font-bold text-rose-700 mb-2">Hi-Tea</h4>
-            <p class="text-gray-700">Snacks, Tea, Coffee, Biscuit, Live Barbeque: Two Chicken Kebab, Potato, Pineapple, Paneer, Bel Papers</p>
-          </div>
-          <div>
-            <h4 class="font-bold text-rose-700 mb-2">Half Dinner</h4>
-            <p class="text-gray-700">Veg Biryani or Chicken Biryani, Veg Hakka Noodles or Chicken Hakka Noodles, Raita, Papad, Salad Sweet</p>
-          </div>
-          <div>
-            <h4 class="font-bold text-rose-700 mb-2">Next Day Breakfast</h4>
-            <p class="text-gray-700">Break Fast, Eggs To Order, Liquid Snacks, Toast / Bread, Butter, Jam, Tea, Coffee, Real Juice</p>
-          </div>
-        </div>
-        <div class="flex flex-col md:flex-row justify-between items-center bg-rose-50 p-4 rounded-lg">
-          <div>
-            <p class="font-bold text-rose-800">One Night Food Package: <span class="text-xl">₹1400/- Per Head</span></p>
-            <p class="font-bold text-rose-800">Two Night Food Package: <span class="text-xl">₹1300/- Per Head</span></p>
-            <p class="font-bold text-rose-800 mt-2">Non-Veg Skip Lunch Package (Min. 15 Pax): <span class="text-xl">₹1000/- Per Head (Without BBQ)</span></p>
-            <p class="font-bold text-rose-800">Non-Veg Skip Lunch Package (Min. 15 Pax): <span class="text-xl">₹1200/- Per Head (With BBQ)</span></p>
-          </div>
-          <button class="mt-3 md:mt-0 px-6 py-2 bg-gradient-to-r from-rose-600 to-rose-500 text-white rounded-md hover:from-rose-700 hover:to-rose-600 transition add-to-cart-btn"
-            data-id="nonveg_half_meal_pkg"
-            data-name="Non-Vegetarian Half Meal Plan"
-            data-price="1400"
-            data-type="package">
-            <i class="fas fa-cart-plus mr-2"></i> Add to Cart
-          </button>
-        </div>
-      </div>
-    </div>
-    
-    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
-      <p class="text-amber-800 font-bold">Note: Order Time Minimum 45 Minutes. Kitchen Timings are 8 AM to 10.30 PM</p>
-      <p class="text-amber-700 mt-2">No charges for children below 5 years</p>
-      <p class="text-amber-700">Half charges for children between 5 to 12 years</p>
-    </div>
-  </div>
-
-</section>
+</div>
 
 <div class="fixed bottom-6 right-6 z-[100]">
-  <button id="cart-button" class="flex items-center justify-center bg-amber-600 text-white rounded-full w-16 h-16 shadow-lg hover:bg-amber-700 transition">
+  <button id="cart-button" class="flex items-center justify-center bg-amber-500 text-gray-900 rounded-full w-14 h-14 shadow-lg hover:bg-amber-400 transition">
     <div class="relative">
-      <i class="fas fa-shopping-cart text-2xl"></i>
-      <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+      <i class="fas fa-shopping-cart text-xl"></i>
+      <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center">0</span>
     </div>
   </button>
 </div>
 
-<!-- Shopping Cart Modal -->
-<div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
-  <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] flex flex-col">
-    <div class="p-4 border-b flex justify-between items-center bg-amber-600 text-white rounded-t-lg">
-      <h3 class="text-xl font-bold">Your Order</h3>
-      <button id="close-cart" class="text-white hover:text-gray-200">
+<div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center px-4">
+  <div class="bg-white border border-gray-200 rounded-2xl shadow-2xl max-w-md w-full max-h-[80vh] flex flex-col overflow-hidden">
+    <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+      <h3 class="text-sm font-semibold text-gray-900">Your Food Order</h3>
+      <button id="close-cart" class="text-gray-500 hover:text-gray-800 text-sm">
         <i class="fas fa-times"></i>
       </button>
     </div>
-    <div class="overflow-y-auto p-4 flex-grow">
-      <div id="cart-items" class="divide-y">
-        <!-- Cart items will be added here dynamically -->
-      </div>
-      <div id="empty-cart-message" class="text-center py-8 text-gray-500">
-        <i class="fas fa-shopping-cart text-4xl mb-3"></i>
-        <p>Your cart is empty</p>
+    <div class="overflow-y-auto p-4 flex-grow bg-white">
+      <div id="cart-items" class="divide-y divide-gray-200 text-sm text-gray-900"></div>
+      <div id="empty-cart-message" class="text-center py-8 text-gray-400">
+        <i class="fas fa-shopping-cart text-3xl mb-3"></i>
+        <p>No items added yet.</p>
       </div>
     </div>
-    <div class="p-4 border-t bg-gray-50 rounded-b-lg">
-      <div class="flex justify-between mb-4">
-        <span class="font-semibold">Total:</span>
-        <span id="cart-total" class="font-bold">₹0</span>
+    <div class="p-4 border-t border-gray-200 bg-gray-50">
+      <div class="flex justify-between mb-3 text-sm">
+        <span class="text-gray-600">Total</span>
+        <span id="cart-total" class="font-semibold text-amber-600">₹0</span>
       </div>
-      <button id="checkout-button" class="w-full bg-amber-600 text-white py-3 rounded-md hover:bg-amber-700 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
-        Proceed to Checkout
+      <button
+        id="checkout-button"
+        class="w-full bg-gradient-to-r from-amber-500 to-amber-400 text-gray-900 py-2.5 rounded-full text-sm font-semibold hover:from-amber-400 hover:to-amber-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Share Order With Host
       </button>
+      <p class="mt-2 text-[10px] text-gray-500 text-center">Final billing happens at the property. This helps the team prepare in advance.</p>
     </div>
   </div>
 </div>
 
-<div id="menuModal" class="fixed inset-0 z-50 hidden bg-black/70 flex items-center justify-center p-4">
-  <button onclick="closeMenuModal()" class="absolute top-4 right-4 bg-white text-gray-700 rounded-full p-2 shadow-md">
-    <i class="fas fa-times"></i>
-  </button>
-  <img id="menuModalImg" src="" alt="Menu Card" class="max-h-[90vh] max-w-[95vw] rounded-lg shadow-2xl border border-green-200" />
-</div>
-
-<div id="itemAddedNotification" class="fixed bottom-20 right-6 bg-green-600 text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-10 opacity-0 transition-all duration-300 z-[100]">
-  <div class="flex items-center">
-    <i class="fas fa-check-circle mr-2"></i>
-    <span id="addedItemName">Item added to cart</span>
-  </div>
+<div id="itemAddedNotification" class="fixed bottom-20 right-6 bg-emerald-600 text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-10 opacity-0 transition-all duration-300 z-[100] text-xs">
+  <div class="flex items-center">
+    <i class="fas fa-check-circle mr-2"></i>
+    <span id="addedItemName">Item added to cart</span>
+  </div>
 </div>
 
 <script>
-  // Image Modal helpers
-  function openMenuModal(src) {
-    const modal = document.getElementById('menuModal');
-    const img = document.getElementById('menuModalImg');
-    img.src = src;
-    modal.classList.remove('hidden');
-  }
-  function closeMenuModal() {
-    const modal = document.getElementById('menuModal');
-    modal.classList.add('hidden');
-  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const cartCountElement = document.getElementById('cart-count');
+    const notification = document.getElementById('itemAddedNotification');
+    const addedItemName = document.getElementById('addedItemName');
+    const cartButton = document.getElementById('cart-button');
+    const cartModal = document.getElementById('cart-modal');
+    const closeCart = document.getElementById('close-cart');
+    const cartItemsContainer = document.getElementById('cart-items');
+    const emptyCartMessage = document.getElementById('empty-cart-message');
+    const cartTotalElement = document.getElementById('cart-total');
+    const checkoutButton = document.getElementById('checkout-button');
+    const searchInput = document.getElementById('menu-search');
+    const filterButtons = document.querySelectorAll('.menu-filter-btn');
+    const sectionToggles = document.querySelectorAll('.section-toggle');
+    const itemCards = document.querySelectorAll('.menu-item-card');
 
-  // Add to Cart (localStorage: foodCart)
-  document.addEventListener('DOMContentLoaded', function() {
-    const cartCountElement = document.getElementById('cart-count');
-    const floatingCartCount = document.getElementById('floating-cart-count');
-    const notification = document.getElementById('itemAddedNotification');
-    const addedItemName = document.getElementById('addedItemName');
+    let activeFilter = 'all';
 
-    function getCart() {
-      try { return JSON.parse(localStorage.getItem('foodCart')) || []; }
-      catch(e) { return []; }
-    }
-    
-    function setCart(cart) {
-      localStorage.setItem('foodCart', JSON.stringify(cart));
-      updateCartCount(cart);
-    }
-    
-    function updateCartCount(cart) {
-      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-      if (cartCountElement) {
-        cartCountElement.textContent = count > 0 ? count : '0';
-      }
-      if (floatingCartCount) {
-        floatingCartCount.textContent = count > 0 ? count : '0';
-      }
-    }
-    
-    function showNotification(itemName) {
-      addedItemName.textContent = `${itemName} added to cart`;
-      notification.classList.remove('translate-y-10', 'opacity-0');
-      notification.classList.add('translate-y-0', 'opacity-100');
-      
-      setTimeout(() => {
-        notification.classList.remove('translate-y-0', 'opacity-100');
-        notification.classList.add('translate-y-10', 'opacity-0');
-      }, 2000);
-    }
+    function getCart() {
+      try { return JSON.parse(localStorage.getItem('foodCart')) || []; }
+      catch(e) { return []; }
+    }
 
-    // Initialize count on page load
-    updateCartCount(getCart());
+    function setCart(cart) {
+      localStorage.setItem('foodCart', JSON.stringify(cart));
+      updateCartCount(cart);
+      renderCart();
+    }
 
-    // Wire Add to Cart buttons
-    document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.dataset.id;
-        const name = btn.dataset.name;
-        const price = parseFloat(btn.dataset.price);
-        const type = btn.dataset.type || 'item';
+    function updateCartCount(cart) {
+      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+      if (cartCountElement) {
+        cartCountElement.textContent = count > 0 ? count : '0';
+      }
+    }
 
-        let cart = getCart();
-        const idx = cart.findIndex(i => i.id === id && i.type === type);
-        if (idx >= 0) {
-          cart[idx].quantity += 1;
-        } else {
-          cart.push({ id, name, price, quantity: 1, type });
-        }
-        setCart(cart);
-        
-        // Show notification
-        showNotification(name);
+    function showNotification(name) {
+      addedItemName.textContent = name + ' added to cart';
+      notification.classList.remove('translate-y-10', 'opacity-0');
+      notification.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(function() {
+        notification.classList.remove('translate-y-0', 'opacity-100');
+        notification.classList.add('translate-y-10', 'opacity-0');
+      }, 2000);
+    }
 
-        // Quick feedback on button
-        const originalContent = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check mr-2"></i> Added!';
-        btn.classList.add('bg-green-700');
-        setTimeout(() => {
-          btn.innerHTML = originalContent;
-          btn.classList.remove('bg-green-700');
-        }, 800);
-      });
-    });
-    
-    // Smooth scroll for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        
-        const targetId = this.getAttribute('href');
-        const targetElement = document.querySelector(targetId);
-        
-        if (targetElement) {
-          window.scrollTo({
-            top: targetElement.offsetTop - 100,
-            behavior: 'smooth'
-          });
-        }
-      });
-    });
-  });
+    function formatCurrency(amount) {
+      return '₹' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(amount || 0);
+    }
+
+    function renderCart() {
+      const cart = getCart();
+      cartItemsContainer.innerHTML = '';
+      if (!cart.length) {
+        emptyCartMessage.classList.remove('hidden');
+        checkoutButton.disabled = true;
+        cartTotalElement.textContent = '₹0';
+        return;
+      }
+      emptyCartMessage.classList.add('hidden');
+      checkoutButton.disabled = false;
+      let total = 0;
+      cart.forEach(function(item, index) {
+        const row = document.createElement('div');
+        row.className = 'py-2 flex items-start justify-between gap-3';
+        const lineTotal = item.price * item.quantity;
+        total += lineTotal;
+        row.innerHTML = '<div>' +
+          '<p class="text-sm text-slate-100">' + item.name + '</p>' +
+          '<p class="text-[11px] text-slate-500">₹' + item.price + ' × ' + item.quantity + '</p>' +
+        '</div>' +
+        '<div class="text-right">' +
+          '<p class="text-sm font-semibold text-amber-300">' + formatCurrency(lineTotal) + '</p>' +
+          '<div class="mt-1 inline-flex items-center gap-1 text-[11px]">' +
+            '<button data-index="' + index + '" data-action="dec" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-200">-</button>' +
+            '<button data-index="' + index + '" data-action="inc" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-200">+</button>' +
+            '<button data-index="' + index + '" data-action="remove" class="px-2 py-0.5 rounded-full bg-slate-900 text-slate-400">×</button>' +
+          '</div>' +
+        '</div>';
+        cartItemsContainer.appendChild(row);
+      });
+      cartTotalElement.textContent = formatCurrency(total);
+    }
+
+    cartItemsContainer.addEventListener('click', function(e) {
+      const button = e.target.closest('button[data-action]');
+      if (!button) return;
+      const action = button.dataset.action;
+      const index = parseInt(button.dataset.index, 10);
+      let cart = getCart();
+      if (index < 0 || index >= cart.length) return;
+      if (action === 'inc') {
+        cart[index].quantity += 1;
+      } else if (action === 'dec') {
+        cart[index].quantity -= 1;
+        if (cart[index].quantity <= 0) {
+          cart.splice(index, 1);
+        }
+      } else if (action === 'remove') {
+        cart.splice(index, 1);
+      }
+      setCart(cart);
+    });
+
+    document.querySelectorAll('.add-to-cart-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const id = btn.dataset.id;
+        const name = btn.dataset.name;
+        const price = parseFloat(btn.dataset.price);
+        const type = btn.dataset.type || 'item';
+        let cart = getCart();
+        const idx = cart.findIndex(function(i) { return i.id === id && i.type === type; });
+        if (idx >= 0) {
+          cart[idx].quantity += 1;
+        } else {
+          cart.push({ id: id, name: name, price: price, quantity: 1, type: type });
+        }
+        setCart(cart);
+        showNotification(name);
+        const original = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check mr-2"></i> Added';
+        btn.classList.add('bg-emerald-500');
+        setTimeout(function() {
+          btn.innerHTML = original;
+          btn.classList.remove('bg-emerald-500');
+        }, 700);
+      });
+    });
+
+    cartButton.addEventListener('click', function() {
+      cartModal.classList.remove('hidden');
+      cartModal.classList.add('flex');
+      renderCart();
+    });
+
+    closeCart.addEventListener('click', function() {
+      cartModal.classList.add('hidden');
+      cartModal.classList.remove('flex');
+    });
+
+    cartModal.addEventListener('click', function(e) {
+      if (e.target === cartModal) {
+        cartModal.classList.add('hidden');
+        cartModal.classList.remove('flex');
+      }
+    });
+
+    checkoutButton.addEventListener('click', function() {
+      const cart = getCart();
+      if (!cart.length) return;
+      let text = 'Food order for The Royal Chalet:%0A%0A';
+      cart.forEach(function(item) {
+        text += '- ' + item.name + ' × ' + item.quantity + ' = ' + formatCurrency(item.price * item.quantity) + '%0A';
+      });
+      text += '%0ATotal: ' + cartTotalElement.textContent;
+      const url = 'https://wa.me/?text=' + text;
+      window.open(url, '_blank');
+    });
+
+    function applyFilters() {
+      const query = (searchInput.value || '').toLowerCase().trim();
+      itemCards.forEach(function(card) {
+        const isVeg = card.dataset.veg === '1';
+        const name = card.dataset.name || '';
+        let okFilter = activeFilter === 'all' || (activeFilter === 'veg' && isVeg) || (activeFilter === 'nonveg' && !isVeg);
+        let okSearch = !query || name.indexOf(query) !== -1;
+        card.classList.toggle('hidden', !(okFilter && okSearch));
+      });
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        applyFilters();
+      });
+    }
+
+    filterButtons.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        activeFilter = btn.dataset.filter;
+        filterButtons.forEach(function(b) {
+          b.classList.remove('border-amber-400', 'bg-amber-500/20', 'text-amber-200');
+        });
+        btn.classList.add('border-amber-400', 'bg-amber-500/20', 'text-amber-200');
+        applyFilters();
+      });
+    });
+
+    sectionToggles.forEach(function(button) {
+      const sectionId = button.dataset.sectionId;
+      const body = document.querySelector('#section-' + sectionId + ' .section-body');
+      const icon = button.querySelector('.section-toggle-icon');
+      button.addEventListener('click', function() {
+        if (body) {
+          body.classList.toggle('hidden');
+        }
+        if (icon) {
+          icon.classList.toggle('rotate-180');
+        }
+      });
+    });
+
+    updateCartCount(getCart());
+  });
 </script>
 {% endblock %}

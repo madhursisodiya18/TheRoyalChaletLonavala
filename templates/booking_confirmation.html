@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Confirmation{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-white">
+  <div class="max-w-3xl mx-auto px-4 py-10">
+    <div class="mb-8 text-center">
+      <h1 class="text-3xl md:text-4xl font-semibold tracking-tight mb-2">Thank You For Your Booking</h1>
+      <p class="text-slate-300 text-sm md:text-base">Your luxury stay at The Royal Chalet is now reserved.</p>
+    </div>
+
+    <div class="rounded-2xl bg-slate-900/90 border border-slate-800 shadow-2xl shadow-emerald-500/20 p-6 space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div>
+          <p class="text-xs uppercase tracking-wide text-slate-400 mb-1">Booking ID</p>
+          <p class="font-mono text-sm md:text-base text-emerald-300">{{ booking.booking_uid or booking.id }}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-xs uppercase tracking-wide text-slate-400 mb-1">Payment status</p>
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-[11px]
+            {% if payment_status == 'paid' or payment_status == 'completed' %}
+              bg-emerald-500/10 text-emerald-300 border border-emerald-500/50
+            {% elif payment_status == 'pending' %}
+              bg-amber-500/10 text-amber-300 border border-amber-500/50
+            {% else %}
+              bg-slate-700 text-slate-200 border border-slate-500
+            {% endif %}
+          ">
+            {{ payment_status|capitalize }}
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-3">
+          <p class="text-slate-400 mb-1">Stay dates</p>
+          <p class="text-slate-100">
+            {{ booking.check_in.strftime('%d %b %Y') }} – {{ booking.check_out.strftime('%d %b %Y') }}
+          </p>
+          <p class="text-slate-400 mt-1">
+            {{ (booking.check_out - booking.check_in).days }} night{% if (booking.check_out - booking.check_in).days != 1 %}s{% endif %}
+          </p>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-3">
+          <p class="text-slate-400 mb-1">Guests</p>
+          <p class="text-slate-100">{{ booking.guests }} guest{% if booking.guests != 1 %}s{% endif %}</p>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-3">
+          <p class="text-slate-400 mb-1">Booked on</p>
+          <p class="text-slate-100">
+            {{ (booking.booking_date or booking.created_at).strftime('%d %b %Y, %I:%M %p') }}
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-3">
+          <p class="text-slate-400 mb-1">Guest details</p>
+          <p class="text-slate-100">{{ booking.user_name or 'Guest' }}</p>
+          <p class="text-slate-300 mt-1">{{ booking.email }}</p>
+          <p class="text-slate-300">{{ booking.phone }}</p>
+          <p class="text-slate-400 mt-2 whitespace-pre-line">{{ booking.address }}</p>
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-3">
+          <p class="text-slate-400 mb-1">Special request</p>
+          <p class="text-slate-100 whitespace-pre-line">
+            {{ booking.special_requests or 'No special requests added.' }}
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-3">
+          <p class="text-slate-400 mb-1">Add-ons</p>
+          {% if addons and addons|length > 0 %}
+            <ul class="space-y-1">
+              {% for addon in addons %}
+                <li class="flex items-center justify-between">
+                  <span>{{ addon.addon_name }}</span>
+                  <span>₹{{ "{:,.0f}".format(addon.addon_price) }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-slate-400">No add-ons selected.</p>
+          {% endif %}
+        </div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-3">
+          <p class="text-slate-400 mb-1">Price breakdown</p>
+          <div class="flex items-center justify-between">
+            <span>Base + add-ons</span>
+            <span>₹{{ "{:,.0f}".format(booking.total_price / 1.12) }}</span>
+          </div>
+          <div class="flex items-center justify-between mt-1">
+            <span>Estimated taxes</span>
+            <span>₹{{ "{:,.0f}".format(booking.total_price - (booking.total_price / 1.12)) }}</span>
+          </div>
+          <div class="border-t border-slate-700 mt-2 pt-2 flex items-center justify-between">
+            <span class="text-slate-100 font-medium">Total payable</span>
+            <span class="text-lg font-semibold text-emerald-300">₹{{ "{:,.0f}".format(booking.total_price) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <div class="text-[11px] text-slate-400">
+          <p>This is a mock payment status for now. You can integrate your payment gateway later.</p>
+        </div>
+        <div class="flex gap-2 justify-end">
+          <a href="{{ url_for('booking') }}" class="inline-flex items-center px-3 py-2 rounded-full bg-slate-800 text-[11px] hover:bg-slate-700">
+            Book another stay
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

@@ -19,6 +19,11 @@ class User(UserMixin, db.Model):
 
 class Booking(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    booking_uid = db.Column('booking_id', db.String(50), unique=True, nullable=True)
+    user_name = db.Column(db.String(100), nullable=True)
+    email = db.Column(db.String(120), nullable=True)
+    phone = db.Column(db.String(20), nullable=True)
+    address = db.Column(db.Text, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Allow null for guest bookings
     check_in = db.Column(db.Date, nullable=False)
     check_out = db.Column(db.Date, nullable=False)
@@ -44,6 +49,28 @@ class Booking(db.Model):
     payment = db.relationship('Payment', backref='booking', uselist=False, lazy=True)
     coupon_id = db.Column(db.Integer, db.ForeignKey('coupon.id'), nullable=True)
     coupon = db.relationship('Coupon', backref='bookings', lazy=True)
+
+
+class BookingAddon(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    booking_id = db.Column(db.Integer, db.ForeignKey('booking.id'), nullable=False)
+    addon_name = db.Column(db.String(100), nullable=False)
+    addon_price = db.Column(db.Integer, nullable=False, default=0)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    booking = db.relationship('Booking', backref=db.backref('addons', lazy=True))
+
+
+class VillaPricing(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    weekday_price = db.Column(db.Integer, nullable=False, default=10000)
+    weekend_price = db.Column(db.Integer, nullable=False, default=15000)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+    )
 
 class MenuSection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -71,6 +98,35 @@ class FoodMenu(db.Model):
     preparation_time = db.Column(db.Integer, default=15)  # in minutes
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+
+
+class Category(db.Model):
+    __tablename__ = 'categories'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+
+
+class MenuItem(db.Model):
+    __tablename__ = 'menu_items'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    price = db.Column(db.Integer, nullable=False)
+    image = db.Column(db.String(255), nullable=True)
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
+    is_available = db.Column(db.Boolean, default=True, nullable=False)
+    is_veg = db.Column(db.Boolean, default=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
+
+    category = db.relationship('Category', backref=db.backref('menu_items', lazy=True))
 
 class FoodOrder(db.Model):
     id = db.Column(db.Integer, primary_key=True)

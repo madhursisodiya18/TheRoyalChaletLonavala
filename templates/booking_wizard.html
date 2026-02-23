@@ -1,0 +1,669 @@
+{% extends "base.html" %}
+
+{% block title %}Luxury Villa Booking{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50 text-gray-900">
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <div class="mb-10 text-center">
+      <h1 class="text-3xl md:text-4xl font-semibold tracking-tight mb-2 text-gray-900">Plan Your Luxury Stay</h1>
+      <p class="text-gray-600 text-sm md:text-base max-w-2xl mx-auto">A smooth, four-step experience to confirm your Royal Chalet booking.</p>
+    </div>
+
+    <div class="sticky top-0 z-20 mb-8 bg-white/90 backdrop-blur rounded-2xl border border-gray-200 px-4 py-3 shadow-sm">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-medium text-gray-600" id="step-label">Step 1 of 4 • Stay Details</span>
+        <span class="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200" id="price-pill">
+          Total: ₹<span id="price-pill-amount">0</span>
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
+          <div id="step-progress-bar" class="h-full w-1/4 bg-gradient-to-r from-amber-400 via-amber-500 to-emerald-400 transition-all duration-500"></div>
+        </div>
+        <div class="flex gap-1">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold bg-amber-500 text-white shadow-md" data-step-indicator="1">1</div>
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold bg-gray-200 text-gray-600" data-step-indicator="2">2</div>
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold bg-gray-200 text-gray-600" data-step-indicator="3">3</div>
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold bg-gray-200 text-gray-600" data-step-indicator="4">4</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr),minmax(260px,1fr)] gap-6">
+      <div class="space-y-6">
+        <div id="step-1" class="step-card rounded-2xl bg-white border border-gray-200 shadow-md p-6">
+          <h2 class="text-lg font-semibold mb-4 text-gray-900">Select Your Stay</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label for="check_in" class="block text-xs text-gray-600 mb-1">Check-in</label>
+              <input type="date" id="check_in" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" min="">
+              <p class="text-[11px] text-amber-600 mt-1">Weekdays: ₹10,000 • Weekends: ₹15,000</p>
+            </div>
+            <div>
+              <label for="check_out" class="block text-xs text-gray-600 mb-1">Check-out</label>
+              <input type="date" id="check_out" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" min="">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-xs text-gray-600 mb-1">Guests</label>
+              <div class="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-3 py-2">
+                <button type="button" id="guests-decrease" class="w-7 h-7 rounded-full bg-gray-100 text-gray-700 text-sm flex items-center justify-center">-</button>
+                <span class="flex-1 text-center text-sm">
+                  <span id="guest-count">2</span> Guests
+                </span>
+                <button type="button" id="guests-increase" class="w-7 h-7 rounded-full bg-gray-100 text-gray-700 text-sm flex items-center justify-center">+</button>
+              </div>
+              <p class="text-[11px] text-gray-500 mt-1">Ideal for 2–10 guests</p>
+            </div>
+            <div class="bg-amber-50/70 border border-amber-100 rounded-xl px-3 py-2 text-xs flex flex-col justify-center">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-700">Nights</span>
+                <span class="font-semibold" id="nights-label">0</span>
+              </div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="text-gray-700">Base stay</span>
+                <span class="font-semibold text-amber-700" id="base-price-label">₹0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between mt-4">
+            <p class="text-xs text-gray-500">We will verify availability against existing bookings.</p>
+            <button type="button" id="step-1-next" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-emerald-500 text-sm font-medium text-gray-900 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+              Continue
+              <span class="text-xs">→</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="step-2" class="step-card hidden rounded-2xl bg-white border border-gray-200 shadow-md p-6">
+          <h2 class="text-lg font-semibold mb-4 text-gray-900">Your Details</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="relative">
+              <input type="text" id="full_name" class="peer w-full bg-white border border-gray-200 rounded-xl px-3 pt-4 pb-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder=" ">
+              <label for="full_name" class="absolute left-3 top-2 text-[11px] text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Full Name</label>
+              <p class="mt-1 text-[11px] text-red-400 hidden" id="error-full-name"></p>
+            </div>
+            <div class="relative">
+              <input type="email" id="email" class="peer w-full bg-white border border-gray-200 rounded-xl px-3 pt-4 pb-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder=" ">
+              <label for="email" class="absolute left-3 top-2 text-[11px] text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Email</label>
+              <p class="mt-1 text-[11px] text-red-400 hidden" id="error-email"></p>
+            </div>
+            <div class="relative">
+              <input type="tel" id="phone" class="peer w-full bg-white border border-gray-200 rounded-xl px-3 pt-4 pb-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder=" ">
+              <label for="phone" class="absolute left-3 top-2 text-[11px] text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Phone</label>
+              <p class="mt-1 text-[11px] text-red-400 hidden" id="error-phone"></p>
+            </div>
+            <div class="relative md:col-span-2">
+              <textarea id="address" rows="2" class="peer w-full bg-white border border-gray-200 rounded-xl px-3 pt-4 pb-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none resize-none" placeholder=" "></textarea>
+              <label for="address" class="absolute left-3 top-2 text-[11px] text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Address</label>
+              <p class="mt-1 text-[11px] text-red-400 hidden" id="error-address"></p>
+            </div>
+            <div class="relative md:col-span-2">
+              <textarea id="special_request" rows="2" class="peer w-full bg-white border border-gray-200 rounded-xl px-3 pt-4 pb-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none resize-none" placeholder=" "></textarea>
+              <label for="special_request" class="absolute left-3 top-2 text-[11px] text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Special Request (optional)</label>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between mt-6">
+            <button type="button" data-prev-step="1" class="step-prev inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-all">
+              <span class="text-xs">←</span>
+              Back
+            </button>
+            <button type="button" id="step-2-next" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-emerald-500 text-sm font-medium text-gray-900 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+              Continue
+              <span class="text-xs">→</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="step-3" class="step-card hidden rounded-2xl bg-white border border-gray-200 shadow-md p-6">
+          <h2 class="text-lg font-semibold mb-2 text-gray-900">Add-ons & Food</h2>
+          <p class="text-xs text-gray-600 mb-4">Curate your experience with optional enhancements.</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="flex items-start gap-3 bg-amber-50/60 border border-amber-100 rounded-xl px-3 py-3 cursor-pointer hover:border-amber-400/70 transition-all">
+              <input type="checkbox" class="mt-1 addon-checkbox" data-name="BBQ Setup" data-price="2500">
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-gray-900">BBQ Setup</span>
+                  <span class="text-xs text-emerald-600 font-semibold">+ ₹2,500</span>
+                </div>
+                <p class="text-[11px] text-gray-500 mt-1">Premium grill setup with charcoal and skewers.</p>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-3 bg-amber-50/60 border border-amber-100 rounded-xl px-3 py-3 cursor-pointer hover:border-amber-400/70 transition-all">
+              <input type="checkbox" class="mt-1 addon-checkbox" data-name="Romantic Decoration" data-price="3000">
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-gray-900">Romantic Decoration</span>
+                  <span class="text-xs text-emerald-600 font-semibold">+ ₹3,000</span>
+                </div>
+                <p class="text-[11px] text-gray-500 mt-1">Candles, florals and mood lighting on arrival.</p>
+              </div>
+            </label>
+
+            <label class="flex items-start gap-3 bg-amber-50/60 border border-amber-100 rounded-xl px-3 py-3 cursor-pointer hover:border-amber-400/70 transition-all">
+              <input type="checkbox" class="mt-1 addon-checkbox" data-name="Extra Bed" data-price="1500">
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-medium text-gray-900">Extra Bed</span>
+                  <span class="text-xs text-emerald-600 font-semibold">+ ₹1,500</span>
+                </div>
+                <p class="text-[11px] text-gray-500 mt-1">Comfort mattress with hotel-grade linen.</p>
+              </div>
+            </label>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-3">
+              <p class="text-xs text-gray-700 mb-2">Food pre-booking</p>
+              <p class="text-[11px] text-gray-500 mb-3">Prefer selecting food now? We will link your stay to your food orders.</p>
+              <a href="{{ url_for('menu') }}" target="_blank" class="inline-flex items-center gap-2 text-xs px-3 py-2 rounded-full bg-white border border-amber-300 hover:bg-amber-50 text-amber-700">
+                Browse Food Menu
+                <span class="text-[10px]">↗</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between mt-6">
+            <button type="button" data-prev-step="2" class="step-prev inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-all">
+              <span class="text-xs">←</span>
+              Back
+            </button>
+            <button type="button" id="step-3-next" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-emerald-500 text-sm font-medium text-gray-900 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+              Continue
+              <span class="text-xs">→</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="step-4" class="step-card hidden rounded-2xl bg-white border border-gray-200 shadow-md p-6">
+          <h2 class="text-lg font-semibold mb-4 text-gray-900">Review & Confirm</h2>
+
+          <div class="space-y-4 text-sm">
+            <div class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-3">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-gray-700">Stay</span>
+                <span id="review-dates"></span>
+              </div>
+              <p class="text-xs text-gray-500" id="review-guests"></p>
+            </div>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-3">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-gray-700">Add-ons</span>
+                <span id="review-addons-empty" class="text-xs text-gray-500">No add-ons selected</span>
+              </div>
+              <ul id="review-addons-list" class="text-xs space-y-1"></ul>
+            </div>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-3">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-700">Base stay</span>
+                <span id="review-base-price"></span>
+              </div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="text-gray-700">Add-ons</span>
+                <span id="review-addons-price"></span>
+              </div>
+              <div class="flex items-center justify-between mt-1 text-xs">
+                <span class="text-gray-500">Estimated taxes</span>
+                <span id="review-tax-amount"></span>
+              </div>
+              <div class="border-top border-gray-200 mt-2 pt-2 flex items-center justify-between">
+                <span class="text-gray-800 font-medium">Total payable</span>
+                <span class="text-lg font-semibold text-emerald-600" id="review-total"></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between mt-6">
+            <button type="button" data-prev-step="3" class="step-prev inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-all">
+              <span class="text-xs">←</span>
+              Back
+            </button>
+            <button type="button" id="confirm-booking-btn" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 via-emerald-400 to-amber-400 text-sm font-semibold text-gray-900 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+              Confirm Booking
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="rounded-2xl bg-white border border-gray-200 shadow-md p-5 flex flex-col gap-4">
+        <div>
+          <p class="text-xs uppercase tracking-wide text-gray-500 mb-1">Booking summary</p>
+          <p class="text-lg font-semibold text-gray-900" id="summary-villa-name">The Royal Chalet</p>
+        </div>
+
+        <div class="space-y-2 text-xs">
+          <div class="flex items-center justify-between">
+            <span class="text-gray-700">Dates</span>
+            <span id="summary-dates">Select your stay</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-gray-700">Guests</span>
+            <span id="summary-guests">2 guests</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-gray-700">Nights</span>
+            <span id="summary-nights">0</span>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-3 space-y-2 text-xs">
+          <div class="flex items-center justify-between">
+            <span class="text-gray-700">Base stay</span>
+            <span id="summary-base-price">₹0</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-gray-700">Add-ons</span>
+            <span id="summary-addons-price">₹0</span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-gray-500">Estimated taxes</span>
+            <span id="summary-tax">₹0</span>
+          </div>
+          <div class="border-t border-gray-200 pt-2 flex items-center justify-between">
+            <span class="text-gray-800 font-medium">Total</span>
+            <span class="text-xl font-semibold text-emerald-600" id="summary-total">₹0</span>
+          </div>
+        </div>
+
+        <div class="text-[11px] text-gray-500">
+          <p>Prices are indicative. Final confirmation happens after availability and details are validated.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-gray-900 text-xs text-white shadow-lg opacity-0 pointer-events-none transition-opacity"></div>
+
+  <div id="success-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity">
+    <div class="max-w-md w-full bg-white border border-gray-200 rounded-2xl p-6 text-center shadow-2xl shadow-emerald-500/30">
+      <div class="mx-auto mb-4 w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-500">
+        ✓
+      </div>
+      <h3 class="text-xl font-semibold mb-2 text-gray-900">Booking Confirmed</h3>
+      <p class="text-xs text-gray-600 mb-3">Your stay has been reserved. You can review full details on the confirmation page.</p>
+      <p class="text-xs text-gray-500 mb-4">Booking ID: <span id="success-booking-id" class="font-mono text-emerald-600"></span></p>
+      <a id="success-view-booking" href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-amber-400 text-xs font-medium text-gray-900">
+        View Booking
+        <span class="text-[10px]">↗</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const WEEKDAY_PRICE = 10000;
+  const WEEKEND_PRICE = 15000;
+  const TAX_RATE = 0.12;
+
+  const state = {
+    step: 1,
+    checkIn: null,
+    checkOut: null,
+    guests: 2,
+    nights: 0,
+    basePrice: 0,
+    addons: [],
+    addonsPrice: 0,
+    taxAmount: 0,
+    total: 0,
+    bookingId: null,
+    confirmationUrl: null,
+  };
+
+  function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(amount || 0);
+  }
+
+  function showToast(message, variant = 'info') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.remove('opacity-0');
+    toast.classList.remove('bg-red-900/90', 'border-red-600/70');
+    toast.classList.remove('bg-emerald-900/90', 'border-emerald-600/70');
+    if (variant === 'error') {
+      toast.classList.add('bg-red-900/90', 'border-red-600/70');
+    } else if (variant === 'success') {
+      toast.classList.add('bg-emerald-900/90', 'border-emerald-600/70');
+    }
+    setTimeout(() => {
+      toast.classList.add('opacity-0');
+    }, 2600);
+  }
+
+  function updateSummary() {
+    document.getElementById('summary-nights').textContent = state.nights;
+    document.getElementById('summary-base-price').textContent = '₹' + formatCurrency(state.basePrice);
+    document.getElementById('summary-addons-price').textContent = '₹' + formatCurrency(state.addonsPrice);
+    document.getElementById('summary-tax').textContent = '₹' + formatCurrency(state.taxAmount);
+    document.getElementById('summary-total').textContent = '₹' + formatCurrency(state.total);
+    document.getElementById('price-pill-amount').textContent = formatCurrency(state.total);
+
+    const nightsLabel = document.getElementById('nights-label');
+    const basePriceLabel = document.getElementById('base-price-label');
+    nightsLabel.textContent = state.nights;
+    basePriceLabel.textContent = '₹' + formatCurrency(state.basePrice);
+
+    const summaryGuests = document.getElementById('summary-guests');
+    summaryGuests.textContent = state.guests + (state.guests === 1 ? ' guest' : ' guests');
+
+    const datesText = (state.checkIn && state.checkOut)
+      ? state.checkIn.toLocaleDateString('en-IN') + ' - ' + state.checkOut.toLocaleDateString('en-IN')
+      : 'Select your stay';
+    document.getElementById('summary-dates').textContent = datesText;
+  }
+
+  function updateReview() {
+    const reviewDates = document.getElementById('review-dates');
+    const reviewGuests = document.getElementById('review-guests');
+    const reviewBase = document.getElementById('review-base-price');
+    const reviewAddonsPrice = document.getElementById('review-addons-price');
+    const reviewTax = document.getElementById('review-tax-amount');
+    const reviewTotal = document.getElementById('review-total');
+    const addonsList = document.getElementById('review-addons-list');
+    const addonsEmpty = document.getElementById('review-addons-empty');
+
+    if (state.checkIn && state.checkOut) {
+      reviewDates.textContent =
+        state.checkIn.toLocaleDateString('en-IN') + ' → ' + state.checkOut.toLocaleDateString('en-IN') +
+        ' (' + state.nights + ' nights)';
+    } else {
+      reviewDates.textContent = 'Select your stay';
+    }
+
+    reviewGuests.textContent = state.guests + (state.guests === 1 ? ' guest' : ' guests');
+    reviewBase.textContent = '₹' + formatCurrency(state.basePrice);
+    reviewAddonsPrice.textContent = '₹' + formatCurrency(state.addonsPrice);
+    reviewTax.textContent = '₹' + formatCurrency(state.taxAmount);
+    reviewTotal.textContent = '₹' + formatCurrency(state.total);
+
+    addonsList.innerHTML = '';
+    if (state.addons.length === 0) {
+      addonsEmpty.classList.remove('hidden');
+    } else {
+      addonsEmpty.classList.add('hidden');
+      state.addons.forEach(a => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between';
+        li.innerHTML = '<span>' + a.name + '</span><span>₹' + formatCurrency(a.price) + '</span>';
+        addonsList.appendChild(li);
+      });
+    }
+  }
+
+  function recalc() {
+    if (!state.checkIn || !state.checkOut || state.checkOut <= state.checkIn) {
+      state.nights = 0;
+      state.basePrice = 0;
+    } else {
+      let nights = 0;
+      let base = 0;
+      const current = new Date(state.checkIn);
+      while (current < state.checkOut) {
+        const day = current.getDay();
+        const isWeekend = day === 0 || day === 6;
+        base += isWeekend ? WEEKEND_PRICE : WEEKDAY_PRICE;
+        nights += 1;
+        current.setDate(current.getDate() + 1);
+      }
+      state.nights = nights;
+      state.basePrice = base;
+    }
+    state.addonsPrice = state.addons.reduce((sum, a) => sum + a.price, 0);
+    const subtotal = state.basePrice + state.addonsPrice;
+    state.taxAmount = Math.round(subtotal * TAX_RATE);
+    state.total = subtotal + state.taxAmount;
+    updateSummary();
+    updateReview();
+  }
+
+  function setStep(step) {
+    state.step = step;
+    document.querySelectorAll('.step-card').forEach((card, index) => {
+      const s = index + 1;
+      if (s === step) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+    const progress = document.getElementById('step-progress-bar');
+    progress.style.width = (step * 25) + '%';
+    const indicators = document.querySelectorAll('[data-step-indicator]');
+    indicators.forEach(node => {
+      const s = parseInt(node.getAttribute('data-step-indicator'), 10);
+      if (s <= step) {
+        node.classList.remove('bg-slate-700', 'text-slate-300');
+        node.classList.add('bg-amber-500', 'text-white');
+      } else {
+        node.classList.add('bg-slate-700', 'text-slate-300');
+        node.classList.remove('bg-amber-500', 'text-white');
+      }
+    });
+    const stepLabel = document.getElementById('step-label');
+    if (step === 1) stepLabel.textContent = 'Step 1 of 4 • Stay Details';
+    if (step === 2) stepLabel.textContent = 'Step 2 of 4 • Personal Details';
+    if (step === 3) stepLabel.textContent = 'Step 3 of 4 • Add-ons & Food';
+    if (step === 4) stepLabel.textContent = 'Step 4 of 4 • Review & Confirm';
+  }
+
+  function initBookingWizard() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const minStr = today.toISOString().split('T')[0];
+    const checkInInput = document.getElementById('check_in');
+    const checkOutInput = document.getElementById('check_out');
+    checkInInput.min = minStr;
+    checkOutInput.min = minStr;
+
+    checkInInput.addEventListener('change', () => {
+      if (!checkInInput.value) return;
+      const selected = new Date(checkInInput.value);
+      selected.setHours(0, 0, 0, 0);
+      if (selected < today) {
+        showToast('Past dates are not allowed', 'error');
+        checkInInput.value = '';
+        state.checkIn = null;
+        recalc();
+        return;
+      }
+      state.checkIn = selected;
+      if (!state.checkOut || state.checkOut <= state.checkIn) {
+        const out = new Date(selected);
+        out.setDate(out.getDate() + 1);
+        checkOutInput.value = out.toISOString().split('T')[0];
+        state.checkOut = out;
+      }
+      recalc();
+    });
+
+    checkOutInput.addEventListener('change', () => {
+      if (!checkOutInput.value) return;
+      const selected = new Date(checkOutInput.value);
+      selected.setHours(0, 0, 0, 0);
+      if (state.checkIn && selected <= state.checkIn) {
+        showToast('Check-out must be after check-in', 'error');
+        checkOutInput.value = '';
+        state.checkOut = null;
+        recalc();
+        return;
+      }
+      state.checkOut = selected;
+      recalc();
+    });
+
+    const guestCountSpan = document.getElementById('guest-count');
+    document.getElementById('guests-decrease').addEventListener('click', () => {
+      if (state.guests > 1) {
+        state.guests -= 1;
+        guestCountSpan.textContent = state.guests;
+        document.getElementById('summary-guests').textContent = state.guests + ' guests';
+      }
+    });
+    document.getElementById('guests-increase').addEventListener('click', () => {
+      if (state.guests < 20) {
+        state.guests += 1;
+        guestCountSpan.textContent = state.guests;
+        document.getElementById('summary-guests').textContent = state.guests + ' guests';
+      }
+    });
+
+    document.querySelectorAll('.addon-checkbox').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const name = cb.getAttribute('data-name');
+        const price = parseInt(cb.getAttribute('data-price'), 10) || 0;
+        if (cb.checked) {
+          state.addons.push({ name, price });
+        } else {
+          state.addons = state.addons.filter(a => a.name !== name);
+        }
+        recalc();
+      });
+    });
+
+    document.getElementById('step-1-next').addEventListener('click', async () => {
+      if (!state.checkIn || !state.checkOut || state.nights <= 0) {
+        showToast('Select valid check-in and check-out dates', 'error');
+        return;
+      }
+      try {
+        const resp = await fetch('{{ url_for("booking_api.check_availability") }}', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            check_in: checkInInput.value,
+            check_out: checkOutInput.value,
+          }),
+        });
+        let data = {};
+        try {
+          data = await resp.json();
+        } catch (e) {}
+        if (resp.ok && data.available === false) {
+          showToast(data.message || 'Selected dates are not available', 'error');
+          return;
+        }
+        if (!resp.ok) {
+          console.error('Availability check failed', resp.status, data);
+          showToast('Could not verify availability, continuing anyway.', 'error');
+        }
+      } catch (e) {
+        console.error('Availability check error', e);
+        showToast('Could not verify availability, continuing anyway.', 'error');
+      }
+      setStep(2);
+    });
+
+    document.getElementById('step-2-next').addEventListener('click', () => {
+      let valid = true;
+      const nameInput = document.getElementById('full_name');
+      const emailInput = document.getElementById('email');
+      const phoneInput = document.getElementById('phone');
+      const addressInput = document.getElementById('address');
+
+      const errName = document.getElementById('error-full-name');
+      const errEmail = document.getElementById('error-email');
+      const errPhone = document.getElementById('error-phone');
+      const errAddress = document.getElementById('error-address');
+
+      errName.classList.add('hidden');
+      errEmail.classList.add('hidden');
+      errPhone.classList.add('hidden');
+      errAddress.classList.add('hidden');
+
+      if (!nameInput.value.trim()) {
+        errName.textContent = 'Name is required';
+        errName.classList.remove('hidden');
+        valid = false;
+      }
+      if (!emailInput.value.trim() || !emailInput.value.includes('@')) {
+        errEmail.textContent = 'Enter a valid email';
+        errEmail.classList.remove('hidden');
+        valid = false;
+      }
+      if (!phoneInput.value.trim() || phoneInput.value.replace(/\D/g, '').length < 10) {
+        errPhone.textContent = 'Enter a valid phone number';
+        errPhone.classList.remove('hidden');
+        valid = false;
+      }
+      if (!addressInput.value.trim()) {
+        errAddress.textContent = 'Address is required';
+        errAddress.classList.remove('hidden');
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      state.userName = nameInput.value.trim();
+      state.email = emailInput.value.trim();
+      state.phone = phoneInput.value.trim();
+      state.address = addressInput.value.trim();
+      state.specialRequest = document.getElementById('special_request').value.trim();
+
+      setStep(3);
+    });
+
+    document.getElementById('step-3-next').addEventListener('click', () => {
+      updateReview();
+      setStep(4);
+    });
+
+    document.querySelectorAll('.step-prev').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const prev = parseInt(btn.getAttribute('data-prev-step'), 10);
+        setStep(prev);
+      });
+    });
+
+    document.getElementById('confirm-booking-btn').addEventListener('click', async () => {
+      if (!state.checkIn || !state.checkOut || !state.userName || !state.email || !state.phone || !state.address) {
+        showToast('Complete all steps before confirming', 'error');
+        return;
+      }
+      try {
+        const resp = await fetch('{{ url_for("booking_api.create") }}', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            check_in: document.getElementById('check_in').value,
+            check_out: document.getElementById('check_out').value,
+            guests: state.guests,
+            full_name: state.userName,
+            email: state.email,
+            phone: state.phone,
+            address: state.address,
+            special_request: state.specialRequest || '',
+            addons: state.addons,
+          }),
+        });
+        const data = await resp.json();
+        if (!resp.ok || !data.success) {
+          showToast(data.message || 'Could not confirm booking', 'error');
+          return;
+        }
+        state.bookingId = data.booking_id;
+        state.confirmationUrl = data.confirmation_url;
+        document.getElementById('success-booking-id').textContent = state.bookingId;
+        const modal = document.getElementById('success-modal');
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        document.getElementById('success-view-booking').href = state.confirmationUrl;
+      } catch (e) {
+        showToast('Something went wrong. Please try again.', 'error');
+      }
+    });
+
+    updateSummary();
+    updateReview();
+    setStep(1);
+  }
+
+  document.addEventListener('DOMContentLoaded', initBookingWizard);
+</script>
+
+{% endblock %}

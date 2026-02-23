@@ -63,7 +63,7 @@
     <style>
       /* Custom styles */
       body {
-        font-family: 'Montserrat', sans-serif;
+        font-family: 'Poppins', 'Open Sans', 'sans-serif';
         font-size: 16px;
         line-height: 1.6;
         color: #333;
@@ -131,19 +131,6 @@
         100% { transform: rotate(360deg); }
       }
       
-      /* Header Styles */
-      nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        z-index: 1000;
-        background-color: rgb(238, 236, 236);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        height: 70px;
-      }
-      
       /* Card styling */
       .card {
         transition: all 0.3s ease;
@@ -152,11 +139,6 @@
       .card:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-      }
-      
-      /* Global Font and Color Styles */
-      body {
-        font-family: 'Cinzel', serif;
       }
       
       .btn-primary {
@@ -295,150 +277,6 @@
     <div id="toast" class="toast">
       <span id="toast-message"></span>
     </div>
-    
-    <!-- Header Styles -->
-    <style>
-      /* Navigation Styles */
-      .header-nav {
-        height: 80px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      }
-      
-      /* Logo Styles */
-      .logo-container {
-        height: 80px;
-        width: auto;
-        transition: transform 0.3s ease;
-      }
-      
-      .logo-container:hover {
-        transform: scale(1.05);
-      }
-      
-      /* Navigation Link Styles */
-      .nav-item {
-        position: relative;
-        padding: 0.75rem 1rem;
-        font-weight: 500;
-        font-size: 15px;
-        color: #4b5563;
-        transition: all 0.3s ease;
-        margin: 0 0.25rem;
-      }
-      
-      .nav-item:hover, .nav-item.active {
-        color: #d97706;
-      }
-      
-      .nav-item::after {
-        content: '';
-        position: absolute;
-        width: 0;
-        height: 2px;
-        bottom: 0;
-        left: 0;
-        background-color: #d97706;
-        transition: width 0.3s ease;
-      }
-      
-      .nav-item:hover::after, .nav-item.active::after {
-        width: 100%;
-      }
-      
-      /* Icon Button Styles */
-      .icon-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background-color: #f9fafb;
-        color: #4b5563;
-        transition: all 0.3s ease;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        margin: 0 0.25rem;
-      }
-      
-      .icon-button:hover {
-        background-color: #f3f4f6;
-        color: #d97706;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-      
-      /* Auth Button Styles */
-      .auth-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0.5rem 1.25rem;
-        border-radius: 6px;
-        font-weight: 500;
-        font-size: 14px;
-        transition: all 0.3s ease;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      }
-      
-      .auth-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-      
-      .login-button {
-        background-color: #d97706;
-        color: white;
-      }
-      
-      .login-button:hover {
-        background-color: #b45309;
-      }
-      
-      .register-button {
-        background-color: white;
-        color: #d97706;
-        border: 1px solid #d97706;
-      }
-      
-      .register-button:hover {
-        background-color: #fef3c7;
-      }
-      
-      /* User Profile Button */
-      .profile-button {
-        display: flex;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        border-radius: 9999px;
-        background-color: white;
-        border: 1px solid #e5e7eb;
-        transition: all 0.3s ease;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      }
-      
-      .profile-button:hover {
-        border-color: #d97706;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-      
-      /* Notification Badge */
-      .notification-badge {
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        min-width: 18px;
-        height: 18px;
-        padding: 0 5px;
-        border-radius: 9999px;
-        background-color: #ef4444;
-        color: white;
-        font-size: 10px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-    </style>
     
     <!-- Navigation -->
     <nav class="bg-white dark:bg-gray-900 fixed w-full top-0 z-[1000] transition-all duration-300 border-b border-gray-200 dark:border-gray-800 header-nav">
@@ -613,52 +451,6 @@
     
     <!-- Content Wrapper - Start -->
     <div class="content-wrapper">
-    
-    <style>
-      .nav-link {
-        @apply text-gray-700 dark:text-gray-200 hover:text-amber-500 dark:hover:text-amber-300 text-base font-medium transition-all duration-300 flex items-center px-4 py-2 relative rounded-full hover:bg-amber-50 dark:hover:bg-amber-900/30;
-      }
-      .nav-link::after {
-        content: '';
-        @apply absolute bottom-0 left-1/2 w-1/2 h-0.5 bg-amber-500 transform -translate-x-1/2 scale-x-0 transition-all duration-300 origin-center;
-      }
-      .nav-link.active {
-        @apply text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30;
-      }
-      .nav-link.active::after {
-        @apply scale-x-100;
-      }
-      .mobile-nav-link {
-        @apply flex items-center text-gray-700 dark:text-gray-200 hover:text-amber-600 dark:hover:text-amber-400 py-2.5 px-2 rounded-lg transition-all duration-300 hover:bg-amber-50 dark:hover:bg-amber-900/30 text-base font-medium;
-      }
-      .mobile-nav-link.active {
-        @apply bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 font-medium;
-      }
-      
-      /* Improve menu item visibility in dark mode */
-      .menu-item {
-        @apply border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-all duration-300;
-      }
-      .menu-item-name {
-        @apply text-gray-800 dark:text-gray-100 font-medium;
-      }
-      .menu-item-price {
-        @apply text-amber-600 dark:text-amber-400 font-bold;
-      }
-      .menu-section-title {
-        @apply text-gray-800 dark:text-gray-100 font-bold;
-      }
-      .menu-subcategory {
-        @apply text-gray-700 dark:text-gray-200;
-      }
-      
-      /* Improve cart button visibility */
-      .add-to-cart-btn {
-        @apply bg-amber-500 hover:bg-amber-600 text-white dark:bg-amber-600 dark:hover:bg-amber-700 font-medium py-1 px-3 rounded-full transition-all duration-300;
-      }
-    </style>
-      </div>
-    </nav>
     
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
