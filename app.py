@@ -752,120 +752,78 @@ def get_booked_dates():
 @app.route('/booking', methods=['GET', 'POST'])
 def booking():
     if request.method == 'POST':
-        # Get form data
         check_in_str = request.form.get('check_in')
         check_out_str = request.form.get('check_out')
         adults = int(request.form.get('adults', 1))
         children = int(request.form.get('children', 0))
-        villa_type = request.form.get('villa_type', 'Standard Villa')
+        villa_type = request.form.get('villa_type', 'standard')
         meal_plan = request.form.get('meal_plan', 'none')
+        coupon_code = request.form.get('coupon_code', '').strip()
         special_requests = request.form.get('special_requests', '')
         
-        # Get amenities
-        amenities = []
-        for amenity in ['airport_transfer', 'private_chef', 'spa_service', 'guided_tour', 'laundry']:
-            if request.form.get(amenity):
-                amenities.append(amenity)
-        
-        # Parse dates
         try:
             check_in = datetime.strptime(check_in_str, '%Y-%m-%d').date()
             check_out = datetime.strptime(check_out_str, '%Y-%m-%d').date()
         except ValueError:
             flash('Invalid date format', 'error')
-            return render_template('booking.html')
+            weekday_price = int(get_setting('weekday_price', 10000))
+            weekend_price = int(get_setting('weekend_price', 15000))
+            extended_stay_price = int(get_setting('extended_stay_price', 8500))
+            return render_template('booking.html',
+                                   weekday_price=weekday_price,
+                                   weekend_price=weekend_price,
+                                   extended_stay_price=extended_stay_price)
         
-        # Calculate total guests
-        total_guests = adults + children
-        
-        # Calculate price
-        nights = (check_out - check_in).days
-        
-        # Get pricing from settings
-        weekday_price = int(get_setting('weekday_price', 10000))
-        weekend_price = int(get_setting('weekend_price', 15000))
-        extended_stay_price = int(get_setting('extended_stay_price', 8500))
-        
-        # Count weekdays and weekends
-        weekdays = 0
-        weekends = 0
-        current_date = check_in
-        while current_date < check_out:
-            if current_date.weekday() >= 5:  # 5 = Saturday, 6 = Sunday
-                weekends += 1
-            else:
-                weekdays += 1
-            current_date += timedelta(days=1)
-        
-        # Calculate base price based on stay duration
-        if nights >= 7:  # Extended stay
-            base_price = extended_stay_price * nights
-        else:
-            # Calculate weekday and weekend prices
-            base_price = (weekday_price * weekdays) + (weekend_price * weekends)
-        
-        # Only Standard Villa is available, no multiplier needed
-        
-        # Add meal plan costs
-        meal_cost = 0
-        if meal_plan == "breakfast":
-            meal_cost = 500 * nights * total_guests
-        elif meal_plan == "half_board":
-            meal_cost = 1200 * nights * total_guests
-        elif meal_plan == "full_board":
-            meal_cost = 1800 * nights * total_guests
-        
-        # Add amenities costs
-        amenities_cost = 0
-        amenity_prices = {
-            'airport_transfer': 1500,
-            'private_chef': 3000 * nights,
-            'spa_service': 2500,
-            'guided_tour': 2000,
-            'laundry': 800 * nights
+        amenities = request.form.getlist('amenities[]')
+        try:
+            price_data = compute_booking_price(check_in, check_out, adults, children, villa_type, meal_plan, amenities, coupon_code)
+        except ValueError as e:
+            flash(str(e), 'error')
+            weekday_price = int(get_setting('weekday_price', 10000))
+            weekend_price = int(get_setting('weekend_price', 15000))
+            extended_stay_price = int(get_setting('extended_stay_price', 8500))
+            return render_template('booking.html',
+                                   weekday_price=weekday_price,
+                                   weekend_price=weekend_price,
+                                   extended_stay_price=extended_stay_price)
+        villa_display_names = {
+            'standard': 'Standard Villa',
+            'deluxe': 'Deluxe Villa',
+            'premium': 'Premium Villa'
         }
-        
-        for amenity in amenities:
-            if amenity in amenity_prices:
-                amenities_cost += amenity_prices[amenity]
-        
-        # Calculate subtotal
-        subtotal = base_price + meal_cost + amenities_cost
-        
-        # Apply GST (18%)
-        gst = subtotal * 0.18
-        total_price = subtotal + gst
-        
-        # Store booking details in session
-        session['booking'] = {
-            'check_in': check_in_str,
-            'check_out': check_out_str,
-            'adults': adults,
-            'children': children,
-            'total_guests': total_guests,
-            'villa_type': villa_type,
-            'meal_plan': meal_plan,
-            'amenities': amenities,
-            'special_requests': special_requests,
-            'nights': nights,
-            'weekdays': weekdays,
-            'weekends': weekends,
-            'base_price': round(base_price),
-            'meal_cost': round(meal_cost),
-            'amenities_cost': round(amenities_cost),
-            'subtotal': round(subtotal),
-            'gst': round(gst),
-            'total_price': round(total_price)
-        }
-        
-        # Debug print to confirm session data is set
-        print("Booking session data set:", session['booking'])
-        
-        # Redirect to booking review page (step 2)
-        return redirect(url_for('booking_review'))
+        villa_display = villa_display_names.get(villa_type, 'Standard Villa')
+        booking = Booking(
+            user_id=current_user.id if current_user.is_authenticated else None,
+            check_in=check_in,
+            check_out=check_out,
+            guests=price_data['guests'],
+            adults=adults,
+            children=children,
+            villa_type=villa_display,
+            meal_plan=meal_plan,
+            amenities=json.dumps(amenities),
+            base_price=price_data['base_price'],
+            meal_cost=price_data['meal_plan_cost'],
+            amenities_cost=price_data['amenities_cost'],
+            subtotal=price_data['subtotal'],
+            gst=price_data['tax_amount'],
+            total_price=price_data['total_price'],
+            status='pending',
+            payment_status='pending',
+            special_requests=special_requests,
+            booking_date=datetime.now(timezone.utc)
+        )
+        if price_data.get('coupon'):
+            booking.coupon_id = price_data['coupon'].id
+            price_data['coupon'].times_used = (price_data['coupon'].times_used or 0) + 1
+        db.session.add(booking)
+        db.session.commit()
+        session['confirmed_booking_id'] = booking.id
+        if current_user.is_authenticated:
+            return redirect(url_for('booking_payment', booking_id=booking.id))
+        return redirect(url_for('booking_confirmation', booking_id=booking.id))
     
     # GET request - render the booking form
-    # Get pricing from settings
     weekday_price = int(get_setting('weekday_price', 10000))
     weekend_price = int(get_setting('weekend_price', 15000))
     extended_stay_price = int(get_setting('extended_stay_price', 8500))
@@ -874,153 +832,125 @@ def booking():
                           weekday_price=weekday_price,
                           weekend_price=weekend_price,
                           extended_stay_price=extended_stay_price)
+    
+
+def compute_booking_price(check_in, check_out, adults, children, villa_type, meal_plan, amenities, coupon_code):
+    guests = adults + children
+    max_guests = int(get_setting('max_guests', '20'))
+    if guests > max_guests:
+        raise ValueError(f'Maximum {max_guests} guests allowed')
+    if check_out <= check_in:
+        raise ValueError('Check-out date must be after check-in date')
+    conflicting_bookings = Booking.query.filter(
+        db.or_(
+            db.and_(Booking.check_in <= check_in, Booking.check_out > check_in),
+            db.and_(Booking.check_in < check_out, Booking.check_out >= check_out),
+            db.and_(Booking.check_in >= check_in, Booking.check_out <= check_out)
+        ),
+        Booking.status.in_(['confirmed', 'pending'])
+    ).first()
+    if conflicting_bookings:
+        raise ValueError('Villa is not available for selected dates')
+    nights = (check_out - check_in).days
+    weekdays = 0
+    weekends = 0
+    current_date = check_in
+    while current_date < check_out:
+        if current_date.weekday() in [5, 6]:
+            weekends += 1
+        else:
+            weekdays += 1
+        current_date += timedelta(days=1)
+    weekday_price = int(get_setting('weekday_price', 10000))
+    weekend_price = int(get_setting('weekend_price', 15000))
+    villa_surcharges = {
+        'standard': 0,
+        'deluxe': 2000,
+        'premium': 5000
+    }
+    villa_surcharge = villa_surcharges.get(villa_type, 0) * nights
+    base_price = (weekdays * weekday_price) + (weekends * weekend_price)
+    base_guests = 8
+    additional_guest_fee = 500
+    additional_guests = max(0, guests - base_guests)
+    additional_guest_cost = 0
+    if additional_guests > 0:
+        additional_guest_cost = additional_guests * additional_guest_fee * nights
+    normalized_meal_plan = (meal_plan or '').replace('-', '_')
+    meal_plan_costs = {
+        'none': 0,
+        'breakfast': 500,
+        'half_board': 800,
+        'full_board': 1200
+    }
+    meal_plan_cost = meal_plan_costs.get(normalized_meal_plan, 0) * guests * nights
+    amenities_set = set(amenities or [])
+    amenities_cost = 0
+    if 'private-chef' in amenities_set or 'private_chef' in amenities_set:
+        amenities_cost += 4000 * nights
+    if 'barbeque' in amenities_set:
+        amenities_cost += 1000 * guests
+    if 'flavored-smoked' in amenities_set:
+        amenities_cost += 1000 * nights
+    subtotal = base_price + villa_surcharge + additional_guest_cost + meal_plan_cost + amenities_cost
+    discount = 0
+    applied_coupon = None
+    if coupon_code:
+        coupon = Coupon.query.filter_by(code=coupon_code.upper()).first()
+        if coupon and coupon.is_active:
+            today = datetime.now().date()
+            if coupon.valid_from.date() <= today <= coupon.valid_until.date():
+                if not coupon.max_uses or coupon.times_used < coupon.max_uses:
+                    discount = int(subtotal * (coupon.discount_percentage / 100))
+                    applied_coupon = coupon
+    tax_rate = 0.18
+    tax_amount = int((subtotal - discount) * tax_rate)
+    total_price = subtotal - discount + tax_amount
+    return {
+        'guests': guests,
+        'nights': nights,
+        'weekdays': weekdays,
+        'weekends': weekends,
+        'base_price': base_price,
+        'villa_type': villa_type,
+        'villa_surcharge': villa_surcharge,
+        'additional_guest_cost': additional_guest_cost,
+        'meal_plan_cost': meal_plan_cost,
+        'amenities_cost': amenities_cost,
+        'subtotal': subtotal,
+        'discount': discount,
+        'tax_rate': tax_rate * 100,
+        'tax_amount': tax_amount,
+        'total_price': total_price,
+        'coupon': applied_coupon
+    }
 
 
+@app.route('/api/calculate-price', methods=['POST'])
 def calculate_booking_price():
-    """API endpoint to calculate booking price with all options"""
     try:
-        data = request.get_json()
-        
-        # Parse dates
+        data = request.get_json() or {}
         try:
             check_in = datetime.strptime(data['check_in'], '%Y-%m-%d').date()
             check_out = datetime.strptime(data['check_out'], '%Y-%m-%d').date()
-        except ValueError:
+        except (KeyError, ValueError):
             return jsonify({'error': 'Invalid date format'}), 400
-        
-        # Get other parameters
         adults = int(data.get('adults', 1))
         children = int(data.get('children', 0))
         villa_type = data.get('villa_type', 'standard')
         meal_plan = data.get('meal_plan', 'none')
         amenities = data.get('amenities', [])
         coupon_code = data.get('coupon_code', '')
-        
-        # Calculate total guests
-        guests = adults + children
-        
-        # Validate guest count
-        max_guests = int(get_setting('max_guests', '20'))
-        if guests > max_guests:
-            return jsonify({'error': f'Maximum {max_guests} guests allowed'}), 400
-        
-        if check_out <= check_in:
-            return jsonify({'error': 'Check-out date must be after check-in date'}), 400
-        
-        # Check availability
-        conflicting_bookings = Booking.query.filter(
-            db.or_(
-                db.and_(Booking.check_in <= check_in, Booking.check_out > check_in),
-                db.and_(Booking.check_in < check_out, Booking.check_out >= check_out),
-                db.and_(Booking.check_in >= check_in, Booking.check_out <= check_out)
-            ),
-            Booking.status.in_(['confirmed', 'pending'])
-        ).first()
-        
-        if conflicting_bookings:
-            return jsonify({'error': 'Villa is not available for selected dates'}), 400
-        
-        # Calculate nights
-        nights = (check_out - check_in).days
-        
-        # Calculate price based on weekdays and weekends
-        weekdays = 0
-        weekends = 0
-        current_date = check_in
-        while current_date < check_out:
-            if current_date.weekday() in [5, 6]:  # Saturday, Sunday
-                weekends += 1
-            else:
-                weekdays += 1
-            current_date += timedelta(days=1)
-        
-        # Get base prices
-        weekday_price = int(get_setting('weekday_price', 10000))
-        weekend_price = int(get_setting('weekend_price', 15000))
-        
-        # Villa type pricing
-        villa_surcharges = {
-            'standard': 0,
-            'deluxe': 2000,  # ₹2,000 extra per night for deluxe
-            'premium': 5000   # ₹5,000 extra per night for premium
-        }
-        
-        villa_surcharge = villa_surcharges.get(villa_type, 0) * nights
-        
-        # Base price calculation for nights
-        base_price = (weekdays * weekday_price) + (weekends * weekend_price)
-        
-        # Additional guest pricing
-        base_guests = 8  # Base rate is for 8 guests
-        additional_guest_fee = 500  # ₹500 per additional guest per night
-        
-        additional_guests = max(0, guests - base_guests)
-        additional_guest_cost = 0
-        
-        if additional_guests > 0:
-            additional_guest_cost = additional_guests * additional_guest_fee * nights
-        
-        # Meal plan pricing
-        meal_plan_costs = {
-            'none': 0,
-            'breakfast': 500,  # ₹500 per person per day
-            'half_board': 800,  # ₹800 per person per day
-            'full_board': 1200  # ₹1,200 per person per day
-        }
-        
-        meal_plan_cost = meal_plan_costs.get(meal_plan, 0) * guests * nights
-        
-        # Amenities pricing
-        amenity_costs = {
-            'airport_transfer': 2000,  # One-time cost
-            'private_chef': 3000 * nights,  # Per day
-            'spa_service': 1500 * nights,  # Per day
-            'guided_tour': 2500,  # One-time cost
-            'laundry_service': 500 * nights  # Per day
-        }
-        
-        amenities_cost = sum(amenity_costs.get(amenity, 0) for amenity in amenities)
-        
-        # Calculate subtotal before tax and discount
-        subtotal = base_price + villa_surcharge + additional_guest_cost + meal_plan_cost + amenities_cost
-        
-        # Apply coupon discount if provided
-        discount = 0
-        if coupon_code:
-            coupon = Coupon.query.filter_by(code=coupon_code, is_active=True).first()
-            if coupon and (coupon.valid_until is None or coupon.valid_until >= datetime.now().date()):
-                if coupon.max_uses is None or coupon.current_uses < coupon.max_uses:
-                    if coupon.discount_type == 'percent':
-                        discount = int(subtotal * (coupon.discount_value / 100))
-                    else:  # fixed amount
-                        discount = min(coupon.discount_value, subtotal)  # Don't discount more than the subtotal
-        
-        # Calculate tax (GST 18%)
-        tax_rate = 0.18
-        tax_amount = int((subtotal - discount) * tax_rate)
-        
-        # Calculate total price
-        total_price = subtotal - discount + tax_amount
-        
-        # Prepare response
-        return jsonify({
-            'base_price': base_price,
-            'villa_type': villa_type,
-            'villa_surcharge': villa_surcharge,
-            'additional_guest_cost': additional_guest_cost,
-            'meal_plan_cost': meal_plan_cost,
-            'amenities_cost': amenities_cost,
-            'subtotal': subtotal,
-            'discount': discount,
-            'tax_rate': tax_rate * 100,  # Convert to percentage
-            'tax_amount': tax_amount,
-            'total_price': total_price,
-            'nights': nights,
-            'weekdays': weekdays,
-            'weekends': weekends,
-            'deposit_amount': total_price // 2  # 50% deposit
-        })
-    
+        result = compute_booking_price(check_in, check_out, adults, children, villa_type, meal_plan, amenities, coupon_code)
+        response = {k: v for k, v in result.items() if k != 'coupon'}
+        if result.get('coupon'):
+            response['coupon'] = {
+                'code': result['coupon'].code,
+                'discount_percentage': result['coupon'].discount_percentage
+            }
+        return jsonify(response)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
     except Exception as e:
         app.logger.error(f"Error calculating price: {str(e)}")
         return jsonify({'error': str(e)}), 500
