@@ -18,6 +18,24 @@
         </div>
     </div>
 
+    <div class="mt-2 mb-4 flex flex-wrap gap-2">
+        <a href="#section-general" class="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-100 text-blue-800 text-xs md:text-sm font-medium hover:bg-blue-200 transition-colors">
+            <i class="fas fa-sliders-h mr-2"></i>General
+        </a>
+        <a href="#section-pricing" class="inline-flex items-center px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 text-xs md:text-sm font-medium hover:bg-amber-200 transition-colors">
+            <i class="fas fa-rupee-sign mr-2"></i>Pricing
+        </a>
+        <a href="#section-contact" class="inline-flex items-center px-3 py-1.5 rounded-full bg-green-100 text-green-800 text-xs md:text-sm font-medium hover:bg-green-200 transition-colors">
+            <i class="fas fa-address-card mr-2"></i>Contact
+        </a>
+        <a href="#section-social" class="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 text-xs md:text-sm font-medium hover:bg-blue-100 transition-colors">
+            <i class="fas fa-share-alt mr-2"></i>Social
+        </a>
+        <a href="#section-coupons" class="inline-flex items-center px-3 py-1.5 rounded-full bg-purple-100 text-purple-800 text-xs md:text-sm font-medium hover:bg-purple-200 transition-colors">
+            <i class="fas fa-ticket-alt mr-2"></i>Coupons
+        </a>
+    </div>
+
     <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-blue-100 dark:border-blue-900 transition-all duration-300 hover:shadow-xl">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 rounded-t-lg">
             <div class="flex items-center">
@@ -29,10 +47,10 @@
             </div>
         </div>
 
-        <form method="POST" class="space-y-8">
+        <form id="villa-settings-form" method="POST" class="space-y-8">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             
-            <div class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
+            <div id="section-general" class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
                 <div class="flex items-center mb-6">
                     <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg mr-4">
                         <i class="fas fa-hotel text-xl"></i>
@@ -70,7 +88,7 @@
                 </div>
             </div>
 
-            <div class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
+            <div id="section-pricing" class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
                 <div class="flex items-center mb-6">
                     <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg mr-4">
                         <i class="fas fa-rupee-sign text-xl"></i>
@@ -161,7 +179,7 @@
                 </div>
             </div>
 
-            <div class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
+            <div id="section-contact" class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
                 <div class="flex items-center mb-6">
                     <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg mr-4">
                         <i class="fas fa-address-card text-xl"></i>
@@ -224,7 +242,7 @@
                 </div>
             </div>
             
-            <div class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
+            <div id="section-social" class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
                 <div class="flex items-center mb-6">
                     <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-purple-600 to-purple-800 text-white shadow-lg mr-4">
                         <i class="fas fa-clock text-xl"></i>
@@ -262,7 +280,7 @@
                 </div>
             </div>
             
-            <div class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
+            <div id="section-coupons" class="bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-xl p-6 backdrop-blur-md border border-blue-200 dark:border-blue-800 transition-colors duration-300">
                 <div class="flex items-center mb-6">
                     <span class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg mr-4">
                         <i class="fas fa-share-alt text-xl"></i>
@@ -356,7 +374,10 @@
                 </div>
             </div>
             
-            <div class="flex justify-end">
+            <div class="flex justify-end gap-3">
+                <button id="reset-settings-button" type="button" class="px-4 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm font-medium flex items-center transition-all duration-300">
+                    <i class="fas fa-undo mr-2"></i>Reset
+                </button>
                 <button type="submit" class="px-6 py-3 bg-admin-primary text-white rounded-xl hover:bg-blue-800 shadow-lg font-semibold flex items-center transition-all duration-300 transform hover:translate-y-[-2px]">
                     <i class="fas fa-save mr-2"></i>Save Settings
                 </button>
@@ -364,4 +385,15 @@
         </form>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var resetButton = document.getElementById('reset-settings-button');
+  var form = document.getElementById('villa-settings-form');
+  if (resetButton && form) {
+    resetButton.addEventListener('click', function() {
+      form.reset();
+    });
+  }
+});
+</script>
 {% endblock %}
