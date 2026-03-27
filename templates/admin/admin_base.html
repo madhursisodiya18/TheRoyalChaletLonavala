@@ -205,12 +205,13 @@
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex flex-col">
-    <nav class="bg-gradient-to-r from-admin-primary to-blue-800 shadow-md py-3 transition-colors duration-300 sticky top-0 z-50">
-        <div class="container mx-auto flex justify-between items-center px-4">
+    <nav class="bg-gradient-to-r from-admin-primary to-blue-800 shadow-md transition-colors duration-300 sticky top-0 z-50 header-nav">
+        <div class="container mx-auto flex justify-between items-center px-4 h-full">
             <a href="/admin/dashboard" class="flex items-center gap-3 group">
-                <div class="relative">
-                    <i class="fas fa-crown text-sky-400 text-2xl transform group-hover:scale-110 transition-transform duration-300"></i>
-                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-sky-300 rounded-full animate-ping"></span>
+                <div class="logo-container mr-2">
+                    <img src="{{ url_for('static', filename='Rc.png') }}"
+                         alt="Royal Chalet Logo"
+                         class="h-full w-auto object-contain">
                 </div>
                 <div class="flex flex-col">
                     <span class="text-xl font-bold text-white tracking-tight brand-text" style="font-family: 'Playfair Display', serif;">THE ROYAL CHALET</span>

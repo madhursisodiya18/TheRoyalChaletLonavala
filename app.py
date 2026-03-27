@@ -3134,5 +3134,5 @@ def add_header(response):
 app.register_blueprint(admin_menu_bp, url_prefix='/admin')
 app.register_blueprint(booking_api_bp, url_prefix='/api')
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
