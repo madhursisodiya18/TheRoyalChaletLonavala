@@ -1,10 +1,10 @@
 {% extends 'admin/admin_base.html' %}
 
 {% block content %}
-<div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+<div class="bg-white dark:bg-slate-900 shadow-md rounded-2xl border border-amber-100/80 dark:border-slate-700 p-6">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">{{ 'Edit' if coupon else 'Add New' }} Coupon</h1>
-    <a href="{{ url_for('admin_coupons') }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center">
+    <h1 class="text-2xl font-bold text-slate-800 dark:text-white font-serif" style="font-family: 'Playfair Display', serif;">{{ 'Edit' if coupon else 'Add New' }} Coupon</h1>
+    <a href="{{ url_for('admin_coupons') }}" class="text-amber-700 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-300 flex items-center text-sm font-medium">
       <i class="fas fa-arrow-left mr-2"></i>Back to Coupons
     </a>
   </div>
@@ -30,13 +30,33 @@
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Code will be automatically converted to uppercase</p>
       </div>
       
-      <!-- Discount Percentage -->
+      <!-- Discount Type -->
       <div>
+        <label for="discount_type" class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Discount Type</label>
+        <select id="discount_type" name="discount_type" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-500 bg-white dark:bg-gray-700 dark:text-white">
+          <option value="percentage" {% if not coupon or (coupon.discount_type or 'percentage') == 'percentage' %}selected{% endif %}>Percentage (%)</option>
+          <option value="fixed" {% if coupon and coupon.discount_type == 'fixed' %}selected{% endif %}>Fixed Amount (₹)</option>
+        </select>
+      </div>
+
+      <!-- Discount Percentage (Visible only if type is percentage) -->
+      <div id="percentage_container">
         <label for="discount_percentage" class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Discount Percentage</label>
         <div class="relative">
-          <input type="number" id="discount_percentage" name="discount_percentage" value="{{ coupon.discount_percentage if coupon else '' }}" required min="1" max="100" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-white" placeholder="e.g., 10">
+          <input type="number" id="discount_percentage" name="discount_percentage" value="{{ coupon.discount_percentage if coupon and coupon.discount_type == 'percentage' else (coupon.discount_percentage if coupon else '') }}" min="1" max="100" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-white" placeholder="e.g., 10">
           <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
             <span class="text-gray-500 dark:text-gray-400">%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Discount Value (Visible only if type is fixed) -->
+      <div id="fixed_container" style="display: none;">
+        <label for="discount_value" class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Discount Amount</label>
+        <div class="relative">
+          <input type="number" id="discount_value" name="discount_value" value="{{ coupon.discount_value if coupon and coupon.discount_type == 'fixed' else (coupon.discount_value if coupon else '') }}" min="1" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-white" placeholder="e.g., 500">
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <span class="text-gray-500 dark:text-gray-400">₹</span>
           </div>
         </div>
       </div>
@@ -44,13 +64,13 @@
       <!-- Valid From -->
       <div>
         <label for="valid_from" class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Valid From</label>
-        <input type="date" id="valid_from" name="valid_from" value="{{ coupon.valid_from.strftime('%Y-%m-%d') if coupon else '' }}" required class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-white">
+        <input type="date" id="valid_from" name="valid_from" value="{% if coupon and coupon.valid_from %}{{ (coupon.valid_from|coupon_as_date).strftime('%Y-%m-%d') }}{% endif %}" required class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-500 bg-white dark:bg-gray-700 dark:text-white">
       </div>
       
       <!-- Valid Until -->
       <div>
         <label for="valid_until" class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Valid Until</label>
-        <input type="date" id="valid_until" name="valid_until" value="{{ coupon.valid_until.strftime('%Y-%m-%d') if coupon else '' }}" required class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-600 dark:focus:ring-blue-500 bg-white dark:bg-gray-700 dark:text-white">
+        <input type="date" id="valid_until" name="valid_until" value="{% if coupon and coupon.valid_until %}{{ (coupon.valid_until|coupon_as_date).strftime('%Y-%m-%d') }}{% endif %}" required class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-500 bg-white dark:bg-gray-700 dark:text-white">
       </div>
       
       <!-- Max Uses -->
@@ -75,7 +95,7 @@
     
     <!-- Submit Button -->
     <div class="flex justify-end">
-      <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300">
+      <button type="submit" class="px-6 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-300">
         {{ 'Update Coupon' if coupon else 'Create Coupon' }}
       </button>
     </div>
@@ -103,6 +123,30 @@
       validFromInput.min = today;
       validUntilInput.min = today;
     }
+
+    // Toggle discount fields
+    const discountTypeSelect = document.getElementById('discount_type');
+    const percentageContainer = document.getElementById('percentage_container');
+    const fixedContainer = document.getElementById('fixed_container');
+    const percentageInput = document.getElementById('discount_percentage');
+    const fixedInput = document.getElementById('discount_value');
+
+    function toggleDiscountFields() {
+      if (discountTypeSelect.value === 'percentage') {
+        percentageContainer.style.display = 'block';
+        fixedContainer.style.display = 'none';
+        percentageInput.required = true;
+        fixedInput.required = false;
+      } else {
+        percentageContainer.style.display = 'none';
+        fixedContainer.style.display = 'block';
+        percentageInput.required = false;
+        fixedInput.required = true;
+      }
+    }
+
+    discountTypeSelect.addEventListener('change', toggleDiscountFields);
+    toggleDiscountFields(); // Run on load
   });
 </script>
 {% endblock %}

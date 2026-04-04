@@ -3,17 +3,19 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from extensions import db, csrf
+from sqlalchemy import text
 import os
 import json
+import uuid
 import logging
 import io
 import csv
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 import locale
 from functools import wraps
 from types import SimpleNamespace
 
-from models import User, Booking, FoodMenu, FoodOrder, Review, Contact, VillaSettings, Notification, MenuSection, Coupon, Category, MenuItem
+from models import User, Booking, BookingAddon, FoodMenu, FoodOrder, Review, Contact, VillaSettings, Notification, MenuSection, Coupon, Category, MenuItem
 from flask import abort
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from collections import defaultdict
@@ -33,8 +35,9 @@ def admin_required(f):
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key_here'
-app.config['DEBUG'] = True
+# Production: set SECRET_KEY (e.g. openssl rand -hex 32). See .env.example
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secret_key_here')
+app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', 'true').lower() in ('1', 'true', 'yes', 'on')
 
 # Upload folder configuration
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
@@ -57,14 +60,12 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'your-email@gmail.com')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'your-app-password')
 
-# Set debug mode
-app.config['DEBUG'] = True
+# SQLite DB always lives next to the app package (not the shell working directory)
+_APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+_INSTANCE_DIR = os.path.join(_APP_ROOT, 'instance')
+os.makedirs(_INSTANCE_DIR, exist_ok=True)
 
-# Ensure instance directory exists
-if not os.path.exists('instance'):
-    os.makedirs('instance')
-
-db_path = os.path.join(os.path.abspath('instance'), 'villa_booking.db')
+db_path = os.path.join(_INSTANCE_DIR, 'villa_booking.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -77,6 +78,66 @@ booking_api_bp = Blueprint('booking_api', __name__)
 with app.app_context():
     # Create tables if they don't exist
     db.create_all()
+
+    def ensure_booking_coupon_discount_column():
+        uri = app.config.get('SQLALCHEMY_DATABASE_URI') or ''
+        if 'sqlite' not in uri:
+            return
+        try:
+            with db.engine.begin() as conn:
+                rows = conn.execute(text('PRAGMA table_info(booking)')).fetchall()
+                col_names = {r[1] for r in rows}
+                if 'coupon_discount_amount' not in col_names:
+                    conn.execute(
+                        text('ALTER TABLE booking ADD COLUMN coupon_discount_amount INTEGER DEFAULT 0')
+                    )
+                    app.logger.info('Added booking.coupon_discount_amount column')
+        except Exception:
+            app.logger.exception('ensure_booking_coupon_discount_column failed')
+
+    def ensure_coupon_columns():
+        uri = app.config.get('SQLALCHEMY_DATABASE_URI') or ''
+        if 'sqlite' not in uri:
+            return
+        try:
+            with db.engine.begin() as conn:
+                rows = conn.execute(text('PRAGMA table_info(coupon)')).fetchall()
+                if not rows:
+                    return
+                col_names = {r[1] for r in rows}
+                # SQLite: avoid NOT NULL on ADD COLUMN unless every row gets a default
+                statements = []
+                if 'times_used' not in col_names:
+                    statements.append(
+                        text('ALTER TABLE coupon ADD COLUMN times_used INTEGER DEFAULT 0')
+                    )
+                if 'description' not in col_names:
+                    statements.append(text('ALTER TABLE coupon ADD COLUMN description TEXT'))
+                if 'discount_type' not in col_names:
+                    statements.append(
+                        text("ALTER TABLE coupon ADD COLUMN discount_type VARCHAR(20) DEFAULT 'percentage'")
+                    )
+                if 'discount_value' not in col_names:
+                    statements.append(
+                        text('ALTER TABLE coupon ADD COLUMN discount_value INTEGER DEFAULT 0')
+                    )
+                if 'max_uses' not in col_names:
+                    statements.append(text('ALTER TABLE coupon ADD COLUMN max_uses INTEGER'))
+                if 'is_active' not in col_names:
+                    statements.append(text('ALTER TABLE coupon ADD COLUMN is_active BOOLEAN DEFAULT 1'))
+                if 'created_at' not in col_names:
+                    statements.append(
+                        text('ALTER TABLE coupon ADD COLUMN created_at DATETIME')
+                    )
+                for stmt in statements:
+                    conn.execute(stmt)
+                if statements:
+                    app.logger.info('Coupon table: applied %s schema patch(es)', len(statements))
+        except Exception:
+            app.logger.exception('ensure_coupon_columns failed')
+
+    ensure_booking_coupon_discount_column()
+    ensure_coupon_columns()
     
     def initialize_default_settings():
         """Initialize default villa settings"""
@@ -341,6 +402,18 @@ def format_time(value):
     except (ValueError, AttributeError):
         # Return the original value if parsing fails
         return value
+
+
+@app.template_filter('coupon_as_date')
+def coupon_as_date(value):
+    """Normalize Coupon.valid_* (datetime or date) to a date for comparisons and inputs."""
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    return value
 
 
 def get_setting(key, default=None):
@@ -673,8 +746,57 @@ def get_booked_dates():
 
 @app.route('/booking', methods=['GET'])
 def booking():
-    return render_template('booking_wizard.html')
-    
+    weekday_price = int(get_setting('weekday_price', 10000))
+    weekend_price = int(get_setting('weekend_price', 15000))
+    max_guests = int(get_setting('max_guests', '20'))
+    coupons_enabled = str(get_setting('enable_coupons', 'true')).lower() in ('1', 'true', 'yes', 'on')
+    return render_template(
+        'booking_wizard.html',
+        weekday_price=weekday_price,
+        weekend_price=weekend_price,
+        max_guests=max_guests,
+        coupons_enabled=coupons_enabled,
+    )
+
+
+def resolve_coupon_for_booking(coupon_code):
+    """Return (coupon, error_message). coupon is None if code empty; error_message if invalid."""
+    if coupon_code is None:
+        return None, None
+    code = str(coupon_code).strip().upper()
+    if not code:
+        return None, None
+    coupon = Coupon.query.filter_by(code=code).first()
+    if not coupon:
+        return None, 'Invalid coupon code'
+    if not coupon.is_active:
+        return None, 'This coupon is no longer active'
+    today = datetime.now().date()
+    vf = coupon.valid_from.date() if hasattr(coupon.valid_from, 'date') else coupon.valid_from
+    vu = coupon.valid_until.date() if hasattr(coupon.valid_until, 'date') else coupon.valid_until
+    if today < vf or today > vu:
+        return None, 'This coupon is not valid for the current date'
+    used = getattr(coupon, 'times_used', None)
+    if used is None:
+        used = 0
+    if coupon.max_uses is not None and int(used) >= coupon.max_uses:
+        return None, 'This coupon has reached its maximum usage limit'
+    return coupon, None
+
+
+def coupon_discount_rupees(coupon, subtotal_before_discount):
+    """Rupees to subtract from subtotal before tax; never below zero or above subtotal."""
+    if not coupon or subtotal_before_discount <= 0:
+        return 0
+    subtotal_before_discount = int(subtotal_before_discount)
+    dtype = (getattr(coupon, 'discount_type', None) or 'percentage').lower()
+    if dtype == 'fixed':
+        v = int(getattr(coupon, 'discount_value', 0) or 0)
+        return min(max(0, v), subtotal_before_discount)
+    pct = int(getattr(coupon, 'discount_percentage', 0) or 0)
+    pct = max(0, min(100, pct))
+    return int(round(subtotal_before_discount * (pct / 100.0)))
+
 
 def compute_booking_price(check_in, check_out, adults, children, villa_type, meal_plan, amenities, coupon_code):
     guests = adults + children
@@ -738,13 +860,10 @@ def compute_booking_price(check_in, check_out, adults, children, villa_type, mea
     discount = 0
     applied_coupon = None
     if coupon_code:
-        coupon = Coupon.query.filter_by(code=coupon_code.upper()).first()
-        if coupon and coupon.is_active:
-            today = datetime.now().date()
-            if coupon.valid_from.date() <= today <= coupon.valid_until.date():
-                if not coupon.max_uses or coupon.times_used < coupon.max_uses:
-                    discount = int(subtotal * (coupon.discount_percentage / 100))
-                    applied_coupon = coupon
+        coupon, _cerr = resolve_coupon_for_booking(coupon_code)
+        if coupon:
+            discount = coupon_discount_rupees(coupon, subtotal)
+            applied_coupon = coupon
     tax_rate = 0.18
     tax_amount = int((subtotal - discount) * tax_rate)
     total_price = subtotal - discount + tax_amount
@@ -804,21 +923,25 @@ def validate_promo():
         code = data.get('code', '').strip().upper()
         if not code:
             return jsonify({'valid': False, 'message': 'No promo code provided'})
-        coupon = Coupon.query.filter_by(code=code).first()
+        coupon, err = resolve_coupon_for_booking(code)
+        if err:
+            return jsonify({'valid': False, 'message': err})
         if not coupon:
             return jsonify({'valid': False, 'message': 'Invalid promo code'})
-        if not coupon.is_active:
-            return jsonify({'valid': False, 'message': 'This promo code is no longer active'})
-        today = datetime.now().date()
-        if today < coupon.valid_from.date() or today > coupon.valid_until.date():
-            return jsonify({'valid': False, 'message': 'This promo code is not valid for the current date'})
-        if coupon.max_uses and coupon.times_used >= coupon.max_uses:
-            return jsonify({'valid': False, 'message': 'This promo code has reached its usage limit'})
+        dtype = (getattr(coupon, 'discount_type', None) or 'percentage').lower()
+        if dtype == 'fixed':
+            msg = f'Promo code applied: ₹{int(coupon.discount_value or 0)} off'
+            return jsonify({
+                'valid': True,
+                'message': msg,
+                'discount_type': 'fixed',
+                'discount_value': int(coupon.discount_value or 0),
+            })
         return jsonify({
             'valid': True,
             'message': f'Promo code applied: {coupon.discount_percentage}% discount',
             'discount_type': 'percent',
-            'discount_value': coupon.discount_percentage
+            'discount_value': coupon.discount_percentage,
         })
     except Exception as e:
         app.logger.error(f"Error validating promo code: {str(e)}")
@@ -890,12 +1013,17 @@ def booking_create():
     if conflicting:
         return jsonify({'success': False, 'message': 'These dates are no longer available'}), 200
 
+    weekday_p = int(get_setting('weekday_price', 10000))
+    weekend_p = int(get_setting('weekend_price', 15000))
+    coupons_enabled = str(get_setting('enable_coupons', 'true')).lower() in ('1', 'true', 'yes', 'on')
+    coupon_code_raw = (data.get('coupon_code') or '').strip()
+
     current = check_in
     base_price = 0
     while current < check_out:
         day = current.weekday()
-        is_weekend = day == 5 or day == 6
-        base_price += WEEKEND_PRICE if is_weekend else WEEKDAY_PRICE
+        is_weekend = day in (5, 6)
+        base_price += weekend_p if is_weekend else weekday_p
         current += timedelta(days=1)
 
     addons_total = 0
@@ -910,9 +1038,20 @@ def booking_create():
             normalized_addons.append({'name': name, 'price': price})
             addons_total += price
 
-    subtotal = base_price + addons_total
-    tax_amount = int(round(subtotal * 0.12))
-    total = subtotal + tax_amount
+    subtotal_before_discount = base_price + addons_total
+    coupon_obj = None
+    discount_amt = 0
+    if coupon_code_raw:
+        if not coupons_enabled:
+            return jsonify({'success': False, 'message': 'Coupons are not enabled at this time'}), 400
+        coupon_obj, cerr = resolve_coupon_for_booking(coupon_code_raw)
+        if cerr:
+            return jsonify({'success': False, 'message': cerr}), 400
+        discount_amt = coupon_discount_rupees(coupon_obj, subtotal_before_discount)
+
+    subtotal_after_discount = subtotal_before_discount - discount_amt
+    tax_amount = int(round(subtotal_after_discount * 0.12))
+    total = subtotal_after_discount + tax_amount
 
     booking_code = datetime.now(timezone.utc).strftime('%y%m%d') + '-' + uuid.uuid4().hex[:6].upper()
 
@@ -925,12 +1064,17 @@ def booking_create():
         check_in=check_in,
         check_out=check_out,
         guests=int(guests),
+        base_price=base_price,
+        subtotal=subtotal_after_discount,
+        gst=tax_amount,
         total_price=total,
         status='pending',
         payment_status='pending',
         special_requests=special_request,
         booking_date=datetime.now(timezone.utc),
         booking_uid=booking_code,
+        coupon_id=coupon_obj.id if coupon_obj else None,
+        coupon_discount_amount=discount_amt if coupon_obj else 0,
     )
     db.session.add(booking)
     db.session.flush()
@@ -942,6 +1086,14 @@ def booking_create():
             addon_price=a['price'],
         )
         db.session.add(addon)
+
+    if coupon_obj:
+        c_row = Coupon.query.get(coupon_obj.id)
+        if c_row and c_row.max_uses is not None and (c_row.times_used or 0) >= c_row.max_uses:
+            db.session.rollback()
+            return jsonify({'success': False, 'message': 'This coupon has reached its maximum usage limit'}), 400
+        if c_row:
+            c_row.times_used = (c_row.times_used or 0) + 1
 
     db.session.commit()
 
@@ -2538,36 +2690,43 @@ def admin_cancel_booking(booking_id):
     return redirect(url_for('admin_bookings'))
 
 @app.route('/api/validate-coupon', methods=['POST'])
+@csrf.exempt
 def validate_coupon():
-    data = request.json
-    coupon_code = data.get('coupon_code', '').strip().upper()
-    
-    if not coupon_code:
-        return jsonify({'valid': False, 'message': 'Please enter a valid coupon code'})
-    
-    # Query the database for the coupon
-    coupon = Coupon.query.filter_by(code=coupon_code).first()
-    
-    # Check if coupon exists and is valid
+    data = request.get_json(silent=True) or {}
+    coupon_code = data.get('coupon_code', '')
+    if str(get_setting('enable_coupons', 'true')).lower() not in ('1', 'true', 'yes', 'on'):
+        return jsonify({'valid': False, 'message': 'Coupons are not enabled at this time'})
+    coupon, err = resolve_coupon_for_booking(coupon_code)
+    if err:
+        return jsonify({'valid': False, 'message': err})
     if not coupon:
-        return jsonify({'valid': False, 'message': 'Invalid coupon code'})
-    
-    if not coupon.is_active:
-        return jsonify({'valid': False, 'message': 'This coupon is no longer active'})
-    
-    today = datetime.now().date()
-    if today < coupon.valid_from.date() or today > coupon.valid_until.date():
-        return jsonify({'valid': False, 'message': 'This coupon is not valid for the current date'})
-    
-    if coupon.max_uses and coupon.times_used >= coupon.max_uses:
-        return jsonify({'valid': False, 'message': 'This coupon has reached its maximum usage limit'})
-    
-    # Coupon is valid
+        return jsonify({'valid': False, 'message': 'Please enter a valid coupon code'})
+    dtype = (getattr(coupon, 'discount_type', None) or 'percentage').lower()
+    if dtype == 'fixed':
+        msg = f'Coupon applied: ₹{int(coupon.discount_value or 0)} off your stay'
+    else:
+        msg = f'Coupon applied: {coupon.discount_percentage}% discount'
     return jsonify({
         'valid': True,
-        'discount_percentage': coupon.discount_percentage,
-        'message': f'Coupon applied: {coupon.discount_percentage}% discount'
+        'code': coupon.code,
+        'discount_type': dtype,
+        'discount_percentage': int(coupon.discount_percentage or 0),
+        'discount_value': int(coupon.discount_value or 0),
+        'message': msg,
     })
+
+def _parse_coupon_form_dates(form):
+    vf_raw = form.get('valid_from')
+    vu_raw = form.get('valid_until')
+    if not vf_raw or not vu_raw:
+        return None, None, 'Please provide valid from and valid until dates'
+    try:
+        valid_from = datetime.strptime(vf_raw, '%Y-%m-%d')
+        valid_until = datetime.strptime(vu_raw, '%Y-%m-%d')
+    except (TypeError, ValueError):
+        return None, None, 'Invalid date format'
+    return valid_from, valid_until, None
+
 
 @app.route('/admin/coupons')
 @login_required
@@ -2584,19 +2743,27 @@ def admin_add_coupon():
     if request.method == 'POST':
         code = request.form.get('code', '').strip().upper()
         discount_percentage = request.form.get('discount_percentage', type=int)
-        valid_from = datetime.strptime(request.form.get('valid_from'), '%Y-%m-%d')
-        valid_until = datetime.strptime(request.form.get('valid_until'), '%Y-%m-%d')
+        discount_type = request.form.get('discount_type', 'percentage') or 'percentage'
+        discount_value = request.form.get('discount_value', type=int)
+        valid_from, valid_until, date_err = _parse_coupon_form_dates(request.form)
+        if date_err:
+            flash(date_err, 'error')
+            return redirect(url_for('admin_add_coupon'))
         max_uses = request.form.get('max_uses', type=int)
         is_active = 'is_active' in request.form
         description = request.form.get('description', '').strip()
         
         # Validate input
-        if not code or not discount_percentage:
+        if not code or (discount_type == 'percentage' and not discount_percentage) or (discount_type == 'fixed' and not discount_value):
             flash('Please fill in all required fields', 'error')
             return redirect(url_for('admin_add_coupon'))
         
-        if discount_percentage < 1 or discount_percentage > 100:
+        if discount_type == 'percentage' and (discount_percentage < 1 or discount_percentage > 100):
             flash('Discount percentage must be between 1 and 100', 'error')
+            return redirect(url_for('admin_add_coupon'))
+
+        if discount_type == 'fixed' and discount_value < 1:
+            flash('Fixed discount amount must be at least ₹1', 'error')
             return redirect(url_for('admin_add_coupon'))
         
         if valid_until < valid_from:
@@ -2612,7 +2779,9 @@ def admin_add_coupon():
         # Create new coupon
         new_coupon = Coupon(
             code=code,
-            discount_percentage=discount_percentage,
+            discount_percentage=discount_percentage if discount_type == 'percentage' else 0,
+            discount_type=discount_type,
+            discount_value=discount_value if discount_type == 'fixed' else 0,
             valid_from=valid_from,
             valid_until=valid_until,
             max_uses=max_uses,
@@ -2620,10 +2789,16 @@ def admin_add_coupon():
             description=description
         )
         
-        db.session.add(new_coupon)
-        db.session.commit()
+        try:
+            db.session.add(new_coupon)
+            db.session.commit()
+            flash('Coupon created successfully', 'success')
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(f"Error creating coupon: {str(e)}")
+            flash(f'Error creating coupon: {str(e)}', 'error')
+            return redirect(url_for('admin_add_coupon'))
         
-        flash('Coupon created successfully', 'success')
         return redirect(url_for('admin_coupons'))
     
     return render_template('admin/admin_coupon_form.html', coupon=None)
@@ -2637,19 +2812,27 @@ def admin_edit_coupon(coupon_id):
     if request.method == 'POST':
         code = request.form.get('code', '').strip().upper()
         discount_percentage = request.form.get('discount_percentage', type=int)
-        valid_from = datetime.strptime(request.form.get('valid_from'), '%Y-%m-%d')
-        valid_until = datetime.strptime(request.form.get('valid_until'), '%Y-%m-%d')
+        discount_type = request.form.get('discount_type', 'percentage') or 'percentage'
+        discount_value = request.form.get('discount_value', type=int)
+        valid_from, valid_until, date_err = _parse_coupon_form_dates(request.form)
+        if date_err:
+            flash(date_err, 'error')
+            return redirect(url_for('admin_edit_coupon', coupon_id=coupon_id))
         max_uses = request.form.get('max_uses', type=int)
         is_active = 'is_active' in request.form
         description = request.form.get('description', '').strip()
         
         # Validate input
-        if not code or not discount_percentage:
+        if not code or (discount_type == 'percentage' and not discount_percentage) or (discount_type == 'fixed' and not discount_value):
             flash('Please fill in all required fields', 'error')
             return redirect(url_for('admin_edit_coupon', coupon_id=coupon_id))
         
-        if discount_percentage < 1 or discount_percentage > 100:
+        if discount_type == 'percentage' and (discount_percentage < 1 or discount_percentage > 100):
             flash('Discount percentage must be between 1 and 100', 'error')
+            return redirect(url_for('admin_edit_coupon', coupon_id=coupon_id))
+
+        if discount_type == 'fixed' and discount_value < 1:
+            flash('Fixed discount amount must be at least ₹1', 'error')
             return redirect(url_for('admin_edit_coupon', coupon_id=coupon_id))
         
         if valid_until < valid_from:
@@ -2664,16 +2847,25 @@ def admin_edit_coupon(coupon_id):
         
         # Update coupon
         coupon.code = code
-        coupon.discount_percentage = discount_percentage
+        coupon.discount_type = discount_type
+        coupon.discount_percentage = discount_percentage if discount_type == 'percentage' else 0
+        coupon.discount_value = discount_value if discount_type == 'fixed' else 0
         coupon.valid_from = valid_from
         coupon.valid_until = valid_until
         coupon.max_uses = max_uses
         coupon.is_active = is_active
         coupon.description = description
         
-        db.session.commit()
-        
-        flash('Coupon updated successfully', 'success')
+        try:
+            db.session.add(coupon)
+            db.session.commit()
+            flash('Coupon updated successfully', 'success')
+        except Exception as e:
+            db.session.rollback()
+            app.logger.error(f"Error updating coupon: {str(e)}")
+            flash(f'Error updating coupon: {str(e)}', 'error')
+            return redirect(url_for('admin_edit_coupon', coupon_id=coupon_id))
+            
         return redirect(url_for('admin_coupons'))
     
     return render_template('admin/admin_coupon_form.html', coupon=coupon)

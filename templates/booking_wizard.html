@@ -3,304 +3,591 @@
 {% block title %}Luxury Villa Booking{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50 text-gray-900">
-  <div class="max-w-6xl mx-auto px-4 py-12">
-    <div class="mb-10 text-center">
-      <h1 class="text-3xl md:text-4xl font-semibold tracking-tight mb-2 text-gray-900">Plan Your Luxury Stay</h1>
-      <p class="text-gray-600 text-sm md:text-base max-w-2xl mx-auto">A smooth, four-step experience to confirm your Royal Chalet booking.</p>
+<style>
+  .booking-page {
+    --booking-gold: #c5a059;
+    --booking-gold-soft: rgba(197, 160, 89, 0.15);
+    --booking-navy: #0f2557;
+  }
+  @keyframes booking-step-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes booking-shimmer {
+    0% { background-position: 200% center; }
+    100% { background-position: -200% center; }
+  }
+  @keyframes price-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+  }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translate(-50%, 12px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+  @keyframes modal-pop {
+    from { opacity: 0; transform: scale(0.94) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes soft-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(197, 160, 89, 0.35); }
+    50% { box-shadow: 0 0 0 10px rgba(197, 160, 89, 0); }
+  }
+  .step-card.step-active { animation: booking-step-in 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+  #price-pill.price-updated { animation: price-pulse 0.45s ease-out; }
+  .booking-hero-pattern {
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(197, 160, 89, 0.18), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 50%, rgba(15, 37, 87, 0.06), transparent),
+      radial-gradient(ellipse 50% 30% at 0% 80%, rgba(5, 150, 105, 0.06), transparent);
+  }
+  .dark .booking-hero-pattern {
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(197, 160, 89, 0.12), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 40%, rgba(15, 37, 87, 0.35), transparent);
+  }
+  #sticky-booking-bar {
+    transition: box-shadow 0.35s ease, border-color 0.35s ease, background-color 0.35s ease;
+  }
+  #sticky-booking-bar.is-stuck {
+    box-shadow: 0 12px 40px rgba(15, 37, 87, 0.12);
+    border-color: rgba(197, 160, 89, 0.35);
+  }
+  .dark #sticky-booking-bar.is-stuck {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    border-color: rgba(197, 160, 89, 0.25);
+  }
+  .step-dot {
+    position: relative;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  }
+  .step-dot:focus-visible {
+    outline: 2px solid #f59e0b;
+    outline-offset: 3px;
+  }
+  .step-dot-current {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 18px rgba(245, 158, 11, 0.5);
+    transform: scale(1.12);
+    animation: soft-pulse 2.2s ease-in-out infinite;
+  }
+  .step-dot-done {
+    background: linear-gradient(135deg, #059669, #047857) !important;
+    color: #fff !important;
+    box-shadow: 0 2px 10px rgba(5, 150, 105, 0.35);
+    transform: scale(1);
+  }
+  .step-dot-idle {
+    background: #e5e7eb;
+    color: #4b5563;
+  }
+  .dark .step-dot-idle {
+    background: #334155;
+    color: #cbd5e1;
+  }
+  .booking-card {
+    border-radius: 1.25rem;
+    background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+    border: 1px solid rgba(197, 160, 89, 0.2);
+    box-shadow: 0 4px 24px rgba(15, 37, 87, 0.06);
+    transition: box-shadow 0.35s ease, border-color 0.35s ease, transform 0.35s ease;
+  }
+  .dark .booking-card {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.95));
+    border-color: rgba(197, 160, 89, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  }
+  .booking-card:hover {
+    box-shadow: 0 12px 36px rgba(15, 37, 87, 0.1);
+    border-color: rgba(197, 160, 89, 0.35);
+  }
+  .dark .booking-card:hover {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  }
+  .booking-step-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, rgba(197, 160, 89, 0.2), rgba(245, 158, 11, 0.15));
+    color: #92400e;
+    border: 1px solid rgba(197, 160, 89, 0.35);
+  }
+  .dark .booking-step-badge {
+    color: #fcd34d;
+    background: linear-gradient(135deg, rgba(197, 160, 89, 0.2), rgba(15, 37, 87, 0.4));
+    border-color: rgba(197, 160, 89, 0.3);
+  }
+  .booking-btn-primary {
+    background: linear-gradient(105deg, #d97706, #f59e0b, #ca8a04, #d97706);
+    background-size: 200% auto;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  }
+  .booking-btn-primary:hover:not(:disabled) {
+    background-position: right center;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(217, 119, 6, 0.35);
+  }
+  .booking-btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  .booking-btn-primary:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    filter: grayscale(0.2);
+  }
+  .addon-card-interactive {
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+  .addon-card-interactive:hover {
+    transform: translateY(-2px);
+  }
+  .addon-card-interactive:has(input:checked) {
+    border-color: rgba(245, 158, 11, 0.65) !important;
+    background: linear-gradient(135deg, rgba(254, 243, 199, 0.5), rgba(255, 251, 235, 0.4)) !important;
+    box-shadow: 0 8px 28px rgba(245, 158, 11, 0.15);
+  }
+  .dark .addon-card-interactive:has(input:checked) {
+    background: linear-gradient(135deg, rgba(120, 53, 15, 0.25), rgba(30, 41, 59, 0.8)) !important;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  }
+  .quick-night-btn {
+    transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+  }
+  .quick-night-btn:hover {
+    transform: scale(1.03);
+    border-color: rgba(197, 160, 89, 0.6);
+    background: rgba(197, 160, 89, 0.12);
+  }
+  .quick-night-btn:active {
+    transform: scale(0.98);
+  }
+  .summary-panel {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(250, 247, 242, 0.95) 100%);
+    border: 1px solid rgba(197, 160, 89, 0.25);
+    box-shadow: 0 8px 32px rgba(15, 37, 87, 0.08);
+  }
+  .dark .summary-panel {
+    background: linear-gradient(180deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.95));
+    border-color: rgba(197, 160, 89, 0.2);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  }
+  .summary-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #c5a059, #f59e0b, #059669);
+    pointer-events: none;
+  }
+  #toast.toast-visible {
+    animation: toast-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  #success-modal.modal-visible .booking-modal-inner {
+    animation: modal-pop 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .guest-step-btn {
+    transition: transform 0.15s ease, background 0.2s ease;
+  }
+  .guest-step-btn:active {
+    transform: scale(0.92);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .step-card.step-active, #price-pill.price-updated, .step-dot-current, #toast.toast-visible, #success-modal.modal-visible .booking-modal-inner {
+      animation: none !important;
+    }
+    .booking-btn-primary { transition: none; background-size: auto; }
+  }
+</style>
+<div class="booking-page min-h-screen booking-hero-pattern bg-gradient-to-b from-amber-50/90 via-white to-stone-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-gray-900 dark:text-slate-100 transition-colors duration-300">
+  <div class="max-w-6xl mx-auto px-4 py-10 md:py-14">
+    <div class="mb-8 md:mb-10 text-center relative">
+      <p class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-widest text-amber-900 dark:text-amber-200 bg-amber-100/80 dark:bg-amber-950/50 border border-amber-200/80 dark:border-amber-800/50 mb-4">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></span>
+        Live pricing
+      </p>
+      <h1 class="text-3xl md:text-5xl font-semibold tracking-tight mb-3 text-slate-900 dark:text-white" style="font-family: 'Playfair Display', Georgia, serif;">Reserve Your Stay</h1>
+      <p class="text-slate-600 dark:text-slate-400 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">Four guided steps—dates, your details, optional add-ons, then confirm. Your total updates instantly. Tap any step number to go back.</p>
+      <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-6 text-xs text-slate-500 dark:text-slate-400">
+        <span class="inline-flex items-center gap-1.5"><i class="fas fa-shield-halved text-emerald-600 dark:text-emerald-400"></i> Secure request</span>
+        <span class="inline-flex items-center gap-1.5"><i class="fas fa-bolt text-amber-600 dark:text-amber-400"></i> Instant estimate</span>
+        <span class="inline-flex items-center gap-1.5"><i class="fas fa-calendar-check text-slate-600 dark:text-slate-300"></i> Availability check</span>
+      </div>
     </div>
 
-    <div class="sticky top-0 z-20 mb-8 bg-white/90 backdrop-blur rounded-2xl border border-gray-200 px-4 py-3 shadow-sm">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-medium text-gray-600" id="step-label">Step 1 of 4 • Stay Details</span>
-        <span class="text-xs px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200" id="price-pill">
-          Total: ₹<span id="price-pill-amount">0</span>
+    <div id="sticky-booking-bar" class="sticky top-0 z-20 mb-8 rounded-2xl border border-amber-200/60 dark:border-slate-600/80 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl px-4 py-3.5 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+        <div>
+          <span class="text-[10px] uppercase tracking-widest text-amber-800/80 dark:text-amber-400/90 font-semibold">Progress</span>
+          <p class="text-sm font-semibold text-slate-800 dark:text-slate-100" id="step-label">Step 1 of 4 — Stay details</p>
+        </div>
+        <span class="inline-flex items-center gap-2 self-start sm:self-auto text-sm px-4 py-2 rounded-full bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/60 dark:to-teal-950/40 text-emerald-900 dark:text-emerald-100 border border-emerald-200/80 dark:border-emerald-800/60 font-semibold tabular-nums shadow-sm" id="price-pill" title="Estimated total including taxes">
+          <i class="fas fa-indian-rupee-sign text-xs opacity-80"></i>
+          <span id="price-pill-amount">0</span>
+          <span class="text-[10px] font-normal opacity-80 hidden sm:inline">est.</span>
         </span>
       </div>
-      <div class="flex items-center gap-2">
-        <div class="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
-          <div id="step-progress-bar" class="h-full w-1/4 bg-gradient-to-r from-amber-400 via-amber-500 to-emerald-400 transition-all duration-500"></div>
+      <div class="flex items-center gap-3">
+        <div class="flex-1 h-2.5 rounded-full bg-slate-200/80 dark:bg-slate-800 overflow-hidden ring-1 ring-slate-200 dark:ring-slate-700">
+          <div id="step-progress-bar" class="h-full w-1/4 rounded-full bg-gradient-to-r from-amber-400 via-amber-500 to-emerald-500 dark:from-amber-500 dark:via-amber-400 dark:to-emerald-400 transition-all duration-500 ease-out shadow-sm"></div>
         </div>
-        <div class="flex gap-1">
-          <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold bg-amber-500 text-white shadow-md" data-step-indicator="1">1</div>
-          <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold bg-gray-200 text-gray-600" data-step-indicator="2">2</div>
-          <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold bg-gray-200 text-gray-600" data-step-indicator="3">3</div>
-          <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold bg-gray-200 text-gray-600" data-step-indicator="4">4</div>
+        <div class="flex gap-1.5 shrink-0" role="tablist" aria-label="Booking steps">
+          <button type="button" class="step-dot step-dot-current w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-bold cursor-pointer focus:outline-none" data-step-indicator="1" aria-label="Step 1, Stay details" title="Stay details">1</button>
+          <button type="button" class="step-dot step-dot-idle w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-bold cursor-pointer focus:outline-none" data-step-indicator="2" aria-label="Step 2, Your details" title="Your details">2</button>
+          <button type="button" class="step-dot step-dot-idle w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-bold cursor-pointer focus:outline-none" data-step-indicator="3" aria-label="Step 3, Add-ons" title="Add-ons">3</button>
+          <button type="button" class="step-dot step-dot-idle w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-bold cursor-pointer focus:outline-none" data-step-indicator="4" aria-label="Step 4, Review" title="Review">4</button>
         </div>
       </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr),minmax(260px,1fr)] gap-6">
       <div class="space-y-6">
-        <div id="step-1" class="step-card rounded-2xl bg-white border border-gray-200 shadow-md p-6">
-          <h2 class="text-lg font-semibold mb-4 text-gray-900">Select Your Stay</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div id="step-1" class="step-card booking-card p-6 md:p-8">
+          <div class="flex items-start gap-3 mb-6">
+            <span class="booking-step-badge shrink-0" aria-hidden="true">1</span>
             <div>
-              <label for="check_in" class="block text-xs text-gray-600 mb-1">Check-in</label>
-              <input type="date" id="check_in" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" min="">
-              <p class="text-[11px] text-amber-600 mt-1">Weekdays: ₹10,000 • Weekends: ₹15,000</p>
-            </div>
-            <div>
-              <label for="check_out" class="block text-xs text-gray-600 mb-1">Check-out</label>
-              <input type="date" id="check_out" class="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" min="">
+              <h2 class="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white" style="font-family: 'Playfair Display', Georgia, serif;">Select your stay</h2>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Choose dates and party size. Weekend nights are priced differently.</p>
             </div>
           </div>
-
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div class="group">
+              <label for="check_in" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Check-in</label>
+              <input type="date" id="check_in" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-shadow group-hover:border-amber-300/60 dark:group-hover:border-amber-600/50" min="">
+              <p class="text-[11px] text-amber-800 dark:text-amber-400 mt-2 leading-snug"><i class="fas fa-tag mr-1 opacity-80"></i> Weekday ₹{{ weekday_price|default(10000)|int|format_number }} · Weekend ₹{{ weekend_price|default(15000)|int|format_number }}</p>
+            </div>
+            <div class="group">
+              <label for="check_out" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Check-out</label>
+              <input type="date" id="check_out" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-shadow group-hover:border-amber-300/60 dark:group-hover:border-amber-600/50" min="">
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Quick length <span class="text-slate-400">(from your check-in)</span></p>
+          <div class="flex flex-wrap gap-2 mb-6" id="quick-stay-chips" role="group" aria-label="Quick stay length">
+            <button type="button" class="quick-night-btn px-3 py-1.5 rounded-full text-xs font-semibold border border-slate-200 dark:border-slate-600 bg-white/80 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200" data-nights="2">2 nights</button>
+            <button type="button" class="quick-night-btn px-3 py-1.5 rounded-full text-xs font-semibold border border-slate-200 dark:border-slate-600 bg-white/80 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200" data-nights="3">3 nights</button>
+            <button type="button" class="quick-night-btn px-3 py-1.5 rounded-full text-xs font-semibold border border-slate-200 dark:border-slate-600 bg-white/80 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200" data-nights="5">5 nights</button>
+            <button type="button" class="quick-night-btn px-3 py-1.5 rounded-full text-xs font-semibold border border-slate-200 dark:border-slate-600 bg-white/80 dark:bg-slate-900/80 text-slate-700 dark:text-slate-200" data-nights="7">1 week</button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
-              <label class="block text-xs text-gray-600 mb-1">Guests</label>
-              <div class="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-3 py-2">
-                <button type="button" id="guests-decrease" class="w-7 h-7 rounded-full bg-gray-100 text-gray-700 text-sm flex items-center justify-center">-</button>
-                <span class="flex-1 text-center text-sm">
-                  <span id="guest-count">2</span> Guests
+              <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Guests</label>
+              <div class="flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2.5 shadow-inner">
+                <button type="button" id="guests-decrease" class="guest-step-btn w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-lg font-medium flex items-center justify-center hover:bg-amber-100 dark:hover:bg-slate-700" aria-label="Decrease guests">−</button>
+                <span class="flex-1 text-center text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  <span id="guest-count">2</span> guests
                 </span>
-                <button type="button" id="guests-increase" class="w-7 h-7 rounded-full bg-gray-100 text-gray-700 text-sm flex items-center justify-center">+</button>
+                <button type="button" id="guests-increase" class="guest-step-btn w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-lg font-medium flex items-center justify-center hover:bg-amber-100 dark:hover:bg-slate-700" aria-label="Increase guests">+</button>
               </div>
-              <p class="text-[11px] text-gray-500 mt-1">Ideal for 2–10 guests</p>
+              <p class="text-[11px] text-slate-500 dark:text-slate-500 mt-1.5">Up to {{ max_guests }} guests</p>
             </div>
-            <div class="bg-amber-50/70 border border-amber-100 rounded-xl px-3 py-2 text-xs flex flex-col justify-center">
+            <div class="rounded-xl px-4 py-3 text-sm bg-gradient-to-br from-amber-50 to-orange-50/80 dark:from-amber-950/40 dark:to-slate-900/80 border border-amber-200/60 dark:border-amber-900/40 flex flex-col justify-center">
               <div class="flex items-center justify-between">
-                <span class="text-gray-700">Nights</span>
-                <span class="font-semibold" id="nights-label">0</span>
+                <span class="text-slate-600 dark:text-slate-400">Nights</span>
+                <span class="font-bold text-lg text-slate-900 dark:text-white tabular-nums" id="nights-label">0</span>
               </div>
-              <div class="flex items-center justify-between mt-1">
-                <span class="text-gray-700">Base stay</span>
-                <span class="font-semibold text-amber-700" id="base-price-label">₹0</span>
+              <div class="flex items-center justify-between mt-2 pt-2 border-t border-amber-200/50 dark:border-amber-900/30">
+                <span class="text-slate-600 dark:text-slate-400">Base stay</span>
+                <span class="font-bold text-amber-800 dark:text-amber-300 tabular-nums" id="base-price-label">₹0</span>
               </div>
             </div>
           </div>
 
-          <div class="flex items-center justify-between mt-4">
-            <p class="text-xs text-gray-500">We will verify availability against existing bookings.</p>
-            <button type="button" id="step-1-next" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-emerald-500 text-sm font-medium text-gray-900 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-2 pt-2 border-t border-slate-200/80 dark:border-slate-600/50">
+            <p class="text-xs text-slate-500 dark:text-slate-500 flex items-center gap-2"><i class="fas fa-circle-info text-amber-600 dark:text-amber-500"></i> We check availability before you continue.</p>
+            <button type="button" id="step-1-next" class="booking-btn-primary inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-slate-900 shadow-md w-full sm:w-auto">
               Continue
-              <span class="text-xs">→</span>
+              <i class="fas fa-arrow-right text-xs"></i>
             </button>
           </div>
         </div>
 
-        <div id="step-2" class="step-card hidden rounded-2xl bg-white border border-gray-200 shadow-md p-6">
-          <h2 class="text-lg font-semibold mb-4 text-gray-900">Your Details</h2>
+        <div id="step-2" class="step-card hidden booking-card p-6 md:p-8">
+          <div class="flex items-start gap-3 mb-6">
+            <span class="booking-step-badge shrink-0" aria-hidden="true">2</span>
+            <div>
+              <h2 class="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white" style="font-family: 'Playfair Display', Georgia, serif;">Your details</h2>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">We’ll use this for confirmation and important updates.</p>
+            </div>
+          </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="relative">
-              <input type="text" id="full_name" class="peer w-full bg-white border border-gray-200 rounded-xl px-3 pt-4 pb-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder=" ">
-              <label for="full_name" class="absolute left-3 top-2 text-[11px] text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Full Name</label>
+              <input type="text" id="full_name" class="peer w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-xl px-3 pt-4 pb-2 text-sm text-gray-900 dark:text-slate-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder=" ">
+              <label for="full_name" class="absolute left-3 top-2 text-[11px] text-gray-500 dark:text-slate-400 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Full Name</label>
               <p class="mt-1 text-[11px] text-red-400 hidden" id="error-full-name"></p>
             </div>
             <div class="relative">
-              <input type="email" id="email" class="peer w-full bg-white border border-gray-200 rounded-xl px-3 pt-4 pb-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder=" ">
-              <label for="email" class="absolute left-3 top-2 text-[11px] text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Email</label>
+              <input type="email" id="email" class="peer w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-xl px-3 pt-4 pb-2 text-sm text-gray-900 dark:text-slate-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder=" ">
+              <label for="email" class="absolute left-3 top-2 text-[11px] text-gray-500 dark:text-slate-400 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Email</label>
               <p class="mt-1 text-[11px] text-red-400 hidden" id="error-email"></p>
             </div>
             <div class="relative">
-              <input type="tel" id="phone" class="peer w-full bg-white border border-gray-200 rounded-xl px-3 pt-4 pb-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder=" ">
-              <label for="phone" class="absolute left-3 top-2 text-[11px] text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Phone</label>
+              <input type="tel" id="phone" class="peer w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-xl px-3 pt-4 pb-2 text-sm text-gray-900 dark:text-slate-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder=" ">
+              <label for="phone" class="absolute left-3 top-2 text-[11px] text-gray-500 dark:text-slate-400 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Phone</label>
               <p class="mt-1 text-[11px] text-red-400 hidden" id="error-phone"></p>
             </div>
             <div class="relative md:col-span-2">
-              <textarea id="address" rows="2" class="peer w-full bg-white border border-gray-200 rounded-xl px-3 pt-4 pb-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none resize-none" placeholder=" "></textarea>
-              <label for="address" class="absolute left-3 top-2 text-[11px] text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Address</label>
+              <textarea id="address" rows="2" class="peer w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-xl px-3 pt-4 pb-2 text-sm text-gray-900 dark:text-slate-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none resize-none" placeholder=" "></textarea>
+              <label for="address" class="absolute left-3 top-2 text-[11px] text-gray-500 dark:text-slate-400 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Address</label>
               <p class="mt-1 text-[11px] text-red-400 hidden" id="error-address"></p>
             </div>
             <div class="relative md:col-span-2">
-              <textarea id="special_request" rows="2" class="peer w-full bg-white border border-gray-200 rounded-xl px-3 pt-4 pb-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none resize-none" placeholder=" "></textarea>
-              <label for="special_request" class="absolute left-3 top-2 text-[11px] text-gray-500 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Special Request (optional)</label>
+              <textarea id="special_request" rows="2" class="peer w-full bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-xl px-3 pt-4 pb-2 text-sm text-gray-900 dark:text-slate-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none resize-none" placeholder=" "></textarea>
+              <label for="special_request" class="absolute left-3 top-2 text-[11px] text-gray-500 dark:text-slate-400 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-xs peer-focus:top-2 peer-focus:text-[11px]">Special Request (optional)</label>
             </div>
           </div>
 
-          <div class="flex items-center justify-between mt-6">
-            <button type="button" data-prev-step="1" class="step-prev inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-all">
-              <span class="text-xs">←</span>
+          <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-4 mt-8 pt-6 border-t border-slate-200/80 dark:border-slate-600/50">
+            <button type="button" data-prev-step="1" class="step-prev inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-slate-100 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 transition-all w-full sm:w-auto">
+              <i class="fas fa-arrow-left text-xs"></i>
               Back
             </button>
-            <button type="button" id="step-2-next" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-emerald-500 text-sm font-medium text-gray-900 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+            <button type="button" id="step-2-next" class="booking-btn-primary inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-slate-900 shadow-md w-full sm:w-auto">
               Continue
-              <span class="text-xs">→</span>
+              <i class="fas fa-arrow-right text-xs"></i>
             </button>
           </div>
         </div>
 
-        <div id="step-3" class="step-card hidden rounded-2xl bg-white border border-gray-200 shadow-md p-6">
-          <h2 class="text-lg font-semibold mb-2 text-gray-900">Add-ons & Food</h2>
-          <p class="text-xs text-gray-600 mb-4">Curate your experience with optional enhancements.</p>
+        <div id="step-3" class="step-card hidden booking-card p-6 md:p-8">
+          <div class="flex items-start gap-3 mb-4">
+            <span class="booking-step-badge shrink-0" aria-hidden="true">3</span>
+            <div>
+              <h2 class="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white" style="font-family: 'Playfair Display', Georgia, serif;">Add-ons & dining</h2>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Optional upgrades—toggle to add to your estimate. Browse the food menu anytime.</p>
+            </div>
+          </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label class="flex items-start gap-3 bg-amber-50/60 border border-amber-100 rounded-xl px-3 py-3 cursor-pointer hover:border-amber-400/70 transition-all">
-              <input type="checkbox" class="mt-1 addon-checkbox" data-name="BBQ Setup" data-price="2500">
+            <label class="addon-card addon-card-interactive flex items-start gap-3 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-100/80 dark:border-amber-900/40 rounded-2xl px-4 py-3.5 cursor-pointer">
+              <input type="checkbox" class="mt-1 addon-checkbox rounded border-gray-300 text-amber-600 focus:ring-amber-500" data-name="BBQ Setup" data-price="2500">
               <div class="flex-1">
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-gray-900">BBQ Setup</span>
+                  <span class="text-sm font-medium text-gray-900 dark:text-white">BBQ Setup</span>
                   <span class="text-xs text-emerald-600 font-semibold">+ ₹2,500</span>
                 </div>
-                <p class="text-[11px] text-gray-500 mt-1">Premium grill setup with charcoal and skewers.</p>
+                <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-1">Premium grill setup with charcoal and skewers.</p>
               </div>
             </label>
 
-            <label class="flex items-start gap-3 bg-amber-50/60 border border-amber-100 rounded-xl px-3 py-3 cursor-pointer hover:border-amber-400/70 transition-all">
-              <input type="checkbox" class="mt-1 addon-checkbox" data-name="Romantic Decoration" data-price="3000">
+            <label class="addon-card addon-card-interactive flex items-start gap-3 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-100/80 dark:border-amber-900/40 rounded-2xl px-4 py-3.5 cursor-pointer">
+              <input type="checkbox" class="mt-1 addon-checkbox rounded border-gray-300 text-amber-600 focus:ring-amber-500" data-name="Romantic Decoration" data-price="3000">
               <div class="flex-1">
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-gray-900">Romantic Decoration</span>
+                  <span class="text-sm font-medium text-gray-900 dark:text-white">Romantic Decoration</span>
                   <span class="text-xs text-emerald-600 font-semibold">+ ₹3,000</span>
                 </div>
-                <p class="text-[11px] text-gray-500 mt-1">Candles, florals and mood lighting on arrival.</p>
+                <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-1">Candles, florals and mood lighting on arrival.</p>
               </div>
             </label>
 
-            <label class="flex items-start gap-3 bg-amber-50/60 border border-amber-100 rounded-xl px-3 py-3 cursor-pointer hover:border-amber-400/70 transition-all">
-              <input type="checkbox" class="mt-1 addon-checkbox" data-name="Extra Bed" data-price="1500">
+            <label class="addon-card addon-card-interactive flex items-start gap-3 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-100/80 dark:border-amber-900/40 rounded-2xl px-4 py-3.5 cursor-pointer">
+              <input type="checkbox" class="mt-1 addon-checkbox rounded border-gray-300 text-amber-600 focus:ring-amber-500" data-name="Extra Bed" data-price="1500">
               <div class="flex-1">
                 <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium text-gray-900">Extra Bed</span>
+                  <span class="text-sm font-medium text-gray-900 dark:text-white">Extra Bed</span>
                   <span class="text-xs text-emerald-600 font-semibold">+ ₹1,500</span>
                 </div>
-                <p class="text-[11px] text-gray-500 mt-1">Comfort mattress with hotel-grade linen.</p>
+                <p class="text-[11px] text-gray-500 dark:text-slate-400 mt-1">Comfort mattress with hotel-grade linen.</p>
               </div>
             </label>
 
-            <div class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-3">
-              <p class="text-xs text-gray-700 mb-2">Food pre-booking</p>
-              <p class="text-[11px] text-gray-500 mb-3">Prefer selecting food now? We will link your stay to your food orders.</p>
-              <a href="{{ url_for('menu') }}" target="_blank" class="inline-flex items-center gap-2 text-xs px-3 py-2 rounded-full bg-white border border-amber-300 hover:bg-amber-50 text-amber-700">
-                Browse Food Menu
-                <span class="text-[10px]">↗</span>
+            <div class="bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-600 rounded-2xl px-4 py-4 flex flex-col justify-center">
+              <p class="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-1"><i class="fas fa-utensils text-amber-600 mr-2"></i>Food menu</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Pre-order or browse dishes in a new tab—your cart stays separate.</p>
+              <a href="{{ url_for('menu') }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 text-xs font-bold px-4 py-2.5 rounded-full bg-white dark:bg-slate-800 border-2 border-amber-400/70 dark:border-amber-600/50 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-amber-900 dark:text-amber-200 transition-colors">
+                Open food menu
+                <i class="fas fa-arrow-up-right-from-square text-[10px]"></i>
               </a>
             </div>
           </div>
 
-          <div class="flex items-center justify-between mt-6">
-            <button type="button" data-prev-step="2" class="step-prev inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-all">
-              <span class="text-xs">←</span>
+          <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-4 mt-8 pt-6 border-t border-slate-200/80 dark:border-slate-600/50">
+            <button type="button" data-prev-step="2" class="step-prev inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-slate-100 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 w-full sm:w-auto">
+              <i class="fas fa-arrow-left text-xs"></i>
               Back
             </button>
-            <button type="button" id="step-3-next" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-emerald-500 text-sm font-medium text-gray-900 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+            <button type="button" id="step-3-next" class="booking-btn-primary inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-slate-900 shadow-md w-full sm:w-auto">
               Continue
-              <span class="text-xs">→</span>
+              <i class="fas fa-arrow-right text-xs"></i>
             </button>
           </div>
         </div>
 
-        <div id="step-4" class="step-card hidden rounded-2xl bg-white border border-gray-200 shadow-md p-6">
-          <h2 class="text-lg font-semibold mb-4 text-gray-900">Review & Confirm</h2>
+        <div id="step-4" class="step-card hidden booking-card p-6 md:p-8">
+          <div class="flex items-start gap-3 mb-6">
+            <span class="booking-step-badge shrink-0" aria-hidden="true">4</span>
+            <div>
+              <h2 class="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white" style="font-family: 'Playfair Display', Georgia, serif;">Review & confirm</h2>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Double-check dates, guests, and your total before you submit.</p>
+            </div>
+          </div>
 
           <div class="space-y-4 text-sm">
-            <div class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-3">
+            <div class="bg-slate-50/90 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3">
               <div class="flex items-center justify-between mb-1">
-                <span class="text-gray-700">Stay</span>
-                <span id="review-dates"></span>
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Stay</span>
+                <span id="review-dates" class="text-gray-900 dark:text-slate-100 font-medium text-right"></span>
               </div>
-              <p class="text-xs text-gray-500" id="review-guests"></p>
+              <p class="text-xs text-gray-500 dark:text-slate-400" id="review-guests"></p>
             </div>
 
-            <div class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-3">
+            <div class="bg-slate-50/90 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-600 rounded-xl px-4 py-3">
               <div class="flex items-center justify-between mb-1">
-                <span class="text-gray-700">Add-ons</span>
-                <span id="review-addons-empty" class="text-xs text-gray-500">No add-ons selected</span>
+                <span class="text-slate-700 dark:text-slate-300 font-medium">Add-ons</span>
+                <span id="review-addons-empty" class="text-xs text-gray-500 dark:text-slate-400">No add-ons selected</span>
               </div>
-              <ul id="review-addons-list" class="text-xs space-y-1"></ul>
+              <ul id="review-addons-list" class="text-xs space-y-1 text-gray-800 dark:text-slate-200"></ul>
             </div>
 
-            <div class="bg-gray-50 border border-gray-200 rounded-xl px-3 py-3">
+            <div class="bg-gradient-to-br from-emerald-50/50 to-amber-50/40 dark:from-slate-900/90 dark:to-slate-900/70 border border-emerald-200/40 dark:border-slate-600 rounded-xl px-4 py-3">
               <div class="flex items-center justify-between">
-                <span class="text-gray-700">Base stay</span>
-                <span id="review-base-price"></span>
+                <span class="text-slate-700 dark:text-slate-300">Base stay</span>
+                <span id="review-base-price" class="text-gray-900 dark:text-slate-100"></span>
               </div>
-              <div class="flex items-center justify-between mt-1">
-                <span class="text-gray-700">Add-ons</span>
-                <span id="review-addons-price"></span>
-              </div>
-              <div class="flex items-center justify-between mt-1 text-xs">
-                <span class="text-gray-500">Estimated taxes</span>
-                <span id="review-tax-amount"></span>
-              </div>
-              <div class="border-top border-gray-200 mt-2 pt-2 flex items-center justify-between">
-                <span class="text-gray-800 font-medium">Total payable</span>
-                <span class="text-lg font-semibold text-emerald-600" id="review-total"></span>
+          <div class="flex items-center justify-between mt-1">
+            <span class="text-gray-700 dark:text-slate-300">Add-ons</span>
+            <span id="review-addons-price"></span>
+          </div>
+          <div id="review-coupon-block" class="mt-2 space-y-1 hidden">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-gray-700 dark:text-slate-300">Coupon</span>
+              <span id="review-coupon-label" class="text-amber-700 dark:text-amber-400 font-medium"></span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-gray-700 dark:text-slate-300">Discount</span>
+              <span id="review-discount-amount" class="text-emerald-600 dark:text-emerald-400 font-medium"></span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between mt-1 text-xs">
+            <span class="text-gray-500 dark:text-slate-400">Estimated taxes</span>
+            <span id="review-tax-amount"></span>
+          </div>
+              <div class="border-t border-gray-200 dark:border-slate-600 mt-2 pt-2 flex items-center justify-between">
+                <span class="text-gray-800 dark:text-white font-medium">Total payable</span>
+                <span class="text-lg font-semibold text-emerald-600 dark:text-emerald-400" id="review-total"></span>
               </div>
             </div>
           </div>
 
-          <div class="flex items-center justify-between mt-6">
-            <button type="button" data-prev-step="3" class="step-prev inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-all">
-              <span class="text-xs">←</span>
+          <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-4 mt-8 pt-6 border-t border-slate-200/80 dark:border-slate-600/50">
+            <button type="button" data-prev-step="3" class="step-prev inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-slate-100 dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600 w-full sm:w-auto">
+              <i class="fas fa-arrow-left text-xs"></i>
               Back
             </button>
-            <button type="button" id="confirm-booking-btn" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 via-emerald-400 to-amber-400 text-sm font-semibold text-gray-900 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
-              Confirm Booking
+            <button type="button" id="confirm-booking-btn" class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full text-sm font-bold text-white bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-lg shadow-emerald-900/20 dark:shadow-emerald-950/40 transition-all hover:-translate-y-0.5 active:translate-y-0 w-full sm:w-auto disabled:opacity-60 disabled:pointer-events-none disabled:hover:translate-y-0">
+              <span id="confirm-booking-label">Confirm booking</span>
+              <i class="fas fa-check text-xs" id="confirm-booking-icon"></i>
             </button>
           </div>
         </div>
       </div>
 
-      <aside class="rounded-2xl bg-white border border-gray-200 shadow-md p-5 flex flex-col gap-4">
+      <aside class="summary-panel rounded-2xl p-5 md:p-6 flex flex-col gap-4 lg:sticky lg:top-24 self-start transition-shadow hover:shadow-xl">
         <div>
-          <p class="text-xs uppercase tracking-wide text-gray-500 mb-1">Booking summary</p>
-          <p class="text-lg font-semibold text-gray-900" id="summary-villa-name">The Royal Chalet</p>
+          <p class="text-[10px] uppercase tracking-widest text-amber-800 dark:text-amber-400/90 font-bold mb-1">Live summary</p>
+          <p class="text-xl font-semibold text-slate-900 dark:text-white" style="font-family: 'Playfair Display', Georgia, serif;" id="summary-villa-name">The Royal Chalet</p>
         </div>
 
         <div class="space-y-2 text-xs">
           <div class="flex items-center justify-between">
-            <span class="text-gray-700">Dates</span>
-            <span id="summary-dates">Select your stay</span>
+            <span class="text-gray-700 dark:text-slate-300">Dates</span>
+            <span class="text-gray-900 dark:text-slate-100 font-medium text-right" id="summary-dates">Select your stay</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-gray-700">Guests</span>
-            <span id="summary-guests">2 guests</span>
+            <span class="text-gray-700 dark:text-slate-300">Guests</span>
+            <span class="text-gray-900 dark:text-slate-100" id="summary-guests">2 guests</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-gray-700">Nights</span>
-            <span id="summary-nights">0</span>
+            <span class="text-gray-700 dark:text-slate-300">Nights</span>
+            <span class="text-gray-900 dark:text-slate-100" id="summary-nights">0</span>
           </div>
         </div>
 
-        <div class="border-t border-gray-200 pt-3 space-y-2 text-xs">
+        {% if coupons_enabled %}
+        <div class="border-t border-gray-200 dark:border-slate-600 pt-3 space-y-2">
+          <label for="coupon_code_input" class="text-xs font-medium text-gray-600 dark:text-slate-400">Coupon code</label>
+          <div class="flex gap-2">
+            <input type="text" id="coupon_code_input" autocomplete="off" maxlength="32" class="flex-1 min-w-0 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg px-2 py-1.5 text-xs uppercase text-gray-900 dark:text-slate-100 focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Enter code">
+            <button type="button" id="apply-coupon-btn" class="shrink-0 px-3 py-1.5 rounded-lg bg-amber-500/90 dark:bg-amber-600 text-gray-900 dark:text-gray-900 text-[11px] font-semibold hover:bg-amber-400 dark:hover:bg-amber-500 transition-colors">Apply</button>
+          </div>
+          <div class="flex items-start justify-between gap-2">
+            <p id="coupon-message" class="text-[11px] text-gray-500 dark:text-slate-500 flex-1 min-w-0"></p>
+            <button type="button" id="remove-coupon-btn" class="hidden text-[11px] text-amber-700 dark:text-amber-400 underline shrink-0">Remove</button>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="border-t border-gray-200 dark:border-slate-600 pt-3 space-y-2 text-xs">
           <div class="flex items-center justify-between">
-            <span class="text-gray-700">Base stay</span>
-            <span id="summary-base-price">₹0</span>
+            <span class="text-gray-700 dark:text-slate-300">Base stay</span>
+            <span id="summary-base-price" class="text-gray-900 dark:text-slate-100">₹0</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-gray-700">Add-ons</span>
-            <span id="summary-addons-price">₹0</span>
+            <span class="text-gray-700 dark:text-slate-300">Add-ons</span>
+            <span id="summary-addons-price" class="text-gray-900 dark:text-slate-100">₹0</span>
+          </div>
+          <div id="summary-coupon-block" class="space-y-1 hidden">
+            <div class="flex items-center justify-between">
+              <span class="text-gray-700 dark:text-slate-300">Coupon</span>
+              <span id="summary-coupon-label" class="text-amber-700 dark:text-amber-400 font-medium text-[11px]"></span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-emerald-700 dark:text-emerald-400">Discount</span>
+              <span id="summary-discount" class="text-emerald-600 dark:text-emerald-400">−₹0</span>
+            </div>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-gray-500">Estimated taxes</span>
-            <span id="summary-tax">₹0</span>
+            <span class="text-gray-500 dark:text-slate-400">Estimated taxes</span>
+            <span id="summary-tax" class="text-gray-900 dark:text-slate-100">₹0</span>
           </div>
-          <div class="border-t border-gray-200 pt-2 flex items-center justify-between">
-            <span class="text-gray-800 font-medium">Total</span>
-            <span class="text-xl font-semibold text-emerald-600" id="summary-total">₹0</span>
+          <div class="border-t border-gray-200 dark:border-slate-600 pt-2 flex items-center justify-between">
+            <span class="text-gray-800 dark:text-white font-medium">Total</span>
+            <span class="text-xl font-semibold text-emerald-600 dark:text-emerald-400" id="summary-total">₹0</span>
           </div>
         </div>
 
-        <div class="text-[11px] text-gray-500">
-          <p>Prices are indicative. Final confirmation happens after availability and details are validated.</p>
+        <div class="text-[11px] text-slate-500 dark:text-slate-500 leading-relaxed border-t border-slate-200/80 dark:border-slate-600/50 pt-4">
+          <p><i class="fas fa-circle-info text-amber-600 dark:text-amber-500 mr-1"></i> Estimate includes taxes shown. Final amount confirmed after we validate your request.</p>
         </div>
       </aside>
     </div>
   </div>
 
-  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-gray-900 text-xs text-white shadow-lg opacity-0 pointer-events-none transition-opacity"></div>
+  <div id="toast" role="status" aria-live="polite" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl bg-slate-900/95 dark:bg-slate-950/95 text-xs sm:text-sm text-white dark:text-slate-100 shadow-2xl border border-slate-600/50 opacity-0 pointer-events-none z-[200] max-w-[min(90vw,24rem)] text-center font-medium backdrop-blur-md"></div>
 
-  <div id="success-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity">
-    <div class="max-w-md w-full bg-white border border-gray-200 rounded-2xl p-6 text-center shadow-2xl shadow-emerald-500/30">
-      <div class="mx-auto mb-4 w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-500">
-        ✓
+  <div id="success-modal" class="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-md flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 z-[190] p-4">
+    <div class="booking-modal-inner max-w-md w-full bg-white dark:bg-slate-800 border border-emerald-200/60 dark:border-emerald-900/40 rounded-2xl p-8 text-center shadow-2xl shadow-emerald-900/15 dark:shadow-black/50 relative overflow-hidden">
+      <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-500 via-amber-400 to-emerald-600"></div>
+      <div class="mx-auto mb-5 w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-50 dark:from-emerald-950/80 dark:to-slate-900 border border-emerald-200/80 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-2xl shadow-inner">
+        <i class="fas fa-check"></i>
       </div>
-      <h3 class="text-xl font-semibold mb-2 text-gray-900">Booking Confirmed</h3>
-      <p class="text-xs text-gray-600 mb-3">Your stay has been reserved. You can review full details on the confirmation page.</p>
-      <p class="text-xs text-gray-500 mb-4">Booking ID: <span id="success-booking-id" class="font-mono text-emerald-600"></span></p>
-      <a id="success-view-booking" href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-amber-400 text-xs font-medium text-gray-900">
-        View Booking
-        <span class="text-[10px]">↗</span>
+      <h3 class="text-2xl font-semibold mb-2 text-slate-900 dark:text-white" style="font-family: 'Playfair Display', Georgia, serif;">You're booked</h3>
+      <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">Your stay request is saved. Open the confirmation page for the full breakdown and reference.</p>
+      <p class="text-xs text-slate-500 dark:text-slate-500 mb-6">Reference <span id="success-booking-id" class="font-mono font-semibold text-emerald-600 dark:text-emerald-400"></span></p>
+      <a id="success-view-booking" href="#" class="booking-btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-slate-900 shadow-md">
+        View confirmation
+        <i class="fas fa-arrow-right text-xs"></i>
       </a>
     </div>
   </div>
 </div>
 
 <script>
-  const WEEKDAY_PRICE = 10000;
-  const WEEKEND_PRICE = 15000;
+  const WEEKDAY_PRICE = {{ weekday_price|default(10000)|int }};
+  const WEEKEND_PRICE = {{ weekend_price|default(15000)|int }};
+  const MAX_GUESTS = {{ max_guests|default(20)|int }};
   const TAX_RATE = 0.12;
+  const COUPONS_ENABLED = {{ 'true' if coupons_enabled else 'false' }};
 
   const state = {
     step: 1,
@@ -311,10 +598,15 @@
     basePrice: 0,
     addons: [],
     addonsPrice: 0,
+    discountAmount: 0,
     taxAmount: 0,
     total: 0,
     bookingId: null,
     confirmationUrl: null,
+    couponCode: null,
+    couponPercent: 0,
+    couponDiscountType: 'percentage',
+    couponFixedAmount: 0,
   };
 
   function formatCurrency(amount) {
@@ -323,18 +615,22 @@
 
   function showToast(message, variant = 'info') {
     const toast = document.getElementById('toast');
+    if (!toast) return;
     toast.textContent = message;
-    toast.classList.remove('opacity-0');
-    toast.classList.remove('bg-red-900/90', 'border-red-600/70');
-    toast.classList.remove('bg-emerald-900/90', 'border-emerald-600/70');
+    toast.classList.remove('opacity-0', 'toast-visible', 'bg-red-950/95', 'border-red-500/50', 'bg-emerald-950/95', 'border-emerald-500/50', 'bg-slate-900/95', 'border-slate-600/50');
     if (variant === 'error') {
-      toast.classList.add('bg-red-900/90', 'border-red-600/70');
+      toast.classList.add('bg-red-950/95', 'border-red-500/50');
     } else if (variant === 'success') {
-      toast.classList.add('bg-emerald-900/90', 'border-emerald-600/70');
+      toast.classList.add('bg-emerald-950/95', 'border-emerald-500/50');
+    } else {
+      toast.classList.add('bg-slate-900/95', 'border-slate-600/50');
     }
-    setTimeout(() => {
+    toast.classList.add('border', 'toast-visible');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => {
+      toast.classList.remove('toast-visible');
       toast.classList.add('opacity-0');
-    }, 2600);
+    }, 2800);
   }
 
   function updateSummary() {
@@ -344,6 +640,23 @@
     document.getElementById('summary-tax').textContent = '₹' + formatCurrency(state.taxAmount);
     document.getElementById('summary-total').textContent = '₹' + formatCurrency(state.total);
     document.getElementById('price-pill-amount').textContent = formatCurrency(state.total);
+
+    const couponBlock = document.getElementById('summary-coupon-block');
+    if (couponBlock) {
+      const labelEl = document.getElementById('summary-coupon-label');
+      const discEl = document.getElementById('summary-discount');
+      if (state.couponCode) {
+        couponBlock.classList.remove('hidden');
+        if (state.couponDiscountType === 'fixed' && state.couponFixedAmount > 0) {
+          labelEl.textContent = state.couponCode + ' (₹' + formatCurrency(state.couponFixedAmount) + ' off)';
+        } else {
+          labelEl.textContent = state.couponCode + ' (' + state.couponPercent + '%)';
+        }
+        discEl.textContent = '−₹' + formatCurrency(state.discountAmount);
+      } else {
+        couponBlock.classList.add('hidden');
+      }
+    }
 
     const nightsLabel = document.getElementById('nights-label');
     const basePriceLabel = document.getElementById('base-price-label');
@@ -383,6 +696,20 @@
     reviewTax.textContent = '₹' + formatCurrency(state.taxAmount);
     reviewTotal.textContent = '₹' + formatCurrency(state.total);
 
+    const reviewCouponBlock = document.getElementById('review-coupon-block');
+    if (reviewCouponBlock) {
+      if (state.couponCode) {
+        reviewCouponBlock.classList.remove('hidden');
+        const revLab = state.couponDiscountType === 'fixed' && state.couponFixedAmount > 0
+          ? (state.couponCode + ' · ₹' + formatCurrency(state.couponFixedAmount) + ' off')
+          : (state.couponCode + ' · ' + state.couponPercent + '% off');
+        document.getElementById('review-coupon-label').textContent = revLab;
+        document.getElementById('review-discount-amount').textContent = '−₹' + formatCurrency(state.discountAmount);
+      } else {
+        reviewCouponBlock.classList.add('hidden');
+      }
+    }
+
     addonsList.innerHTML = '';
     if (state.addons.length === 0) {
       addonsEmpty.classList.remove('hidden');
@@ -395,6 +722,15 @@
         addonsList.appendChild(li);
       });
     }
+  }
+
+  function pulsePricePill() {
+    const pill = document.getElementById('price-pill');
+    if (!pill) return;
+    pill.classList.remove('price-updated');
+    void pill.offsetWidth;
+    pill.classList.add('price-updated');
+    setTimeout(() => pill.classList.remove('price-updated'), 500);
   }
 
   function recalc() {
@@ -417,18 +753,41 @@
     }
     state.addonsPrice = state.addons.reduce((sum, a) => sum + a.price, 0);
     const subtotal = state.basePrice + state.addonsPrice;
-    state.taxAmount = Math.round(subtotal * TAX_RATE);
-    state.total = subtotal + state.taxAmount;
+    let discount = 0;
+    if (state.couponCode) {
+      if (state.couponDiscountType === 'fixed' && state.couponFixedAmount > 0) {
+        discount = Math.min(Math.round(state.couponFixedAmount), subtotal);
+      } else if (state.couponPercent > 0) {
+        discount = Math.round(subtotal * (state.couponPercent / 100));
+      }
+    }
+    state.discountAmount = discount;
+    const afterDiscount = Math.max(0, subtotal - discount);
+    state.taxAmount = Math.round(afterDiscount * TAX_RATE);
+    state.total = afterDiscount + state.taxAmount;
     updateSummary();
     updateReview();
+    pulsePricePill();
+  }
+
+  function canNavigateToStep(n) {
+    if (n === state.step) return true;
+    if (n < state.step) return true;
+    if (n === 2) return !!(state.checkIn && state.checkOut && state.nights > 0);
+    if (n === 3 || n === 4) {
+      return !!(state.userName && state.email && state.phone && state.address);
+    }
+    return false;
   }
 
   function setStep(step) {
     state.step = step;
     document.querySelectorAll('.step-card').forEach((card, index) => {
       const s = index + 1;
+      card.classList.remove('step-active');
       if (s === step) {
         card.classList.remove('hidden');
+        requestAnimationFrame(() => card.classList.add('step-active'));
       } else {
         card.classList.add('hidden');
       }
@@ -438,19 +797,23 @@
     const indicators = document.querySelectorAll('[data-step-indicator]');
     indicators.forEach(node => {
       const s = parseInt(node.getAttribute('data-step-indicator'), 10);
-      if (s <= step) {
-        node.classList.remove('bg-slate-700', 'text-slate-300');
-        node.classList.add('bg-amber-500', 'text-white');
+      node.classList.remove('step-dot-active', 'step-dot-idle', 'step-dot-current', 'step-dot-done');
+      if (s < step) {
+        node.classList.add('step-dot-done');
+        node.setAttribute('aria-current', 'false');
+      } else if (s === step) {
+        node.classList.add('step-dot-current');
+        node.setAttribute('aria-current', 'step');
       } else {
-        node.classList.add('bg-slate-700', 'text-slate-300');
-        node.classList.remove('bg-amber-500', 'text-white');
+        node.classList.add('step-dot-idle');
+        node.setAttribute('aria-current', 'false');
       }
     });
     const stepLabel = document.getElementById('step-label');
-    if (step === 1) stepLabel.textContent = 'Step 1 of 4 • Stay Details';
-    if (step === 2) stepLabel.textContent = 'Step 2 of 4 • Personal Details';
-    if (step === 3) stepLabel.textContent = 'Step 3 of 4 • Add-ons & Food';
-    if (step === 4) stepLabel.textContent = 'Step 4 of 4 • Review & Confirm';
+    if (step === 1) stepLabel.textContent = 'Step 1 of 4 — Stay details';
+    if (step === 2) stepLabel.textContent = 'Step 2 of 4 — Your details';
+    if (step === 3) stepLabel.textContent = 'Step 3 of 4 — Add-ons & dining';
+    if (step === 4) stepLabel.textContent = 'Step 4 of 4 — Review & confirm';
   }
 
   function initBookingWizard() {
@@ -461,6 +824,38 @@
     const checkOutInput = document.getElementById('check_out');
     checkInInput.min = minStr;
     checkOutInput.min = minStr;
+
+    const bar = document.getElementById('sticky-booking-bar');
+    if (bar) {
+      window.addEventListener('scroll', () => {
+        bar.classList.toggle('is-stuck', window.scrollY > 56);
+      }, { passive: true });
+    }
+
+    document.querySelectorAll('#quick-stay-chips [data-nights]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const n = parseInt(chip.getAttribute('data-nights'), 10);
+        if (!n || n < 1) return;
+        const addDays = (base, days) => {
+          const x = new Date(base);
+          x.setDate(x.getDate() + days);
+          return x;
+        };
+        let ci = state.checkIn ? new Date(state.checkIn) : addDays(today, 1);
+        if (!state.checkIn) {
+          state.checkIn = ci;
+          checkInInput.value = ci.toISOString().split('T')[0];
+        }
+        const co = addDays(ci, n);
+        state.checkOut = co;
+        checkOutInput.value = co.toISOString().split('T')[0];
+        if (checkOutInput.min && checkOutInput.value < checkOutInput.min) {
+          checkOutInput.min = checkInInput.value;
+        }
+        recalc();
+        showToast(n + '-night stay applied', 'success');
+      });
+    });
 
     checkInInput.addEventListener('change', () => {
       if (!checkInInput.value) return;
@@ -507,7 +902,7 @@
       }
     });
     document.getElementById('guests-increase').addEventListener('click', () => {
-      if (state.guests < 20) {
+      if (state.guests < MAX_GUESTS) {
         state.guests += 1;
         guestCountSpan.textContent = state.guests;
         document.getElementById('summary-guests').textContent = state.guests + ' guests';
@@ -526,6 +921,69 @@
         recalc();
       });
     });
+
+    if (COUPONS_ENABLED) {
+      const applyCouponBtn = document.getElementById('apply-coupon-btn');
+      const removeCouponBtn = document.getElementById('remove-coupon-btn');
+      const couponInput = document.getElementById('coupon_code_input');
+      const couponMsg = document.getElementById('coupon-message');
+      if (applyCouponBtn && removeCouponBtn && couponMsg) {
+
+      applyCouponBtn.addEventListener('click', async () => {
+        const raw = (couponInput && couponInput.value) ? couponInput.value.trim() : '';
+        if (!raw) {
+          couponMsg.textContent = 'Enter a coupon code';
+          couponMsg.classList.remove('text-emerald-600', 'dark:text-emerald-400');
+          couponMsg.classList.add('text-red-600', 'dark:text-red-400');
+          return;
+        }
+        couponMsg.textContent = 'Checking…';
+        couponMsg.classList.remove('text-red-600', 'dark:text-red-400', 'text-emerald-600', 'dark:text-emerald-400');
+        try {
+          const resp = await fetch('{{ url_for("validate_coupon") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ coupon_code: raw }),
+          });
+          const data = await resp.json().catch(() => ({}));
+          if (resp.ok && data.valid) {
+            state.couponCode = (data.code || raw).toUpperCase();
+            state.couponDiscountType = (data.discount_type === 'fixed') ? 'fixed' : 'percentage';
+            state.couponFixedAmount = parseInt(data.discount_value, 10) || 0;
+            state.couponPercent = parseInt(data.discount_percentage, 10) || 0;
+            couponMsg.textContent = data.message || 'Coupon applied';
+            couponMsg.classList.add('text-emerald-600', 'dark:text-emerald-400');
+            removeCouponBtn.classList.remove('hidden');
+            recalc();
+          } else {
+            state.couponCode = null;
+            state.couponPercent = 0;
+            state.couponDiscountType = 'percentage';
+            state.couponFixedAmount = 0;
+            couponMsg.textContent = data.message || 'Invalid coupon';
+            couponMsg.classList.add('text-red-600', 'dark:text-red-400');
+            removeCouponBtn.classList.add('hidden');
+            recalc();
+          }
+        } catch (e) {
+          couponMsg.textContent = 'Could not validate coupon';
+          couponMsg.classList.add('text-red-600', 'dark:text-red-400');
+        }
+      });
+
+      removeCouponBtn.addEventListener('click', () => {
+        state.couponCode = null;
+        state.couponPercent = 0;
+        state.couponDiscountType = 'percentage';
+        state.couponFixedAmount = 0;
+        if (couponInput) couponInput.value = '';
+        couponMsg.textContent = '';
+        couponMsg.classList.remove('text-red-600', 'dark:text-red-400', 'text-emerald-600', 'dark:text-emerald-400');
+        removeCouponBtn.classList.add('hidden');
+        recalc();
+      });
+      }
+    }
 
     document.getElementById('step-1-next').addEventListener('click', async () => {
       if (!state.checkIn || !state.checkOut || state.nights <= 0) {
@@ -626,21 +1084,33 @@
         showToast('Complete all steps before confirming', 'error');
         return;
       }
+      const confirmBtn = document.getElementById('confirm-booking-btn');
+      const confirmLabel = document.getElementById('confirm-booking-label');
+      const confirmIcon = document.getElementById('confirm-booking-icon');
+      const prevLabel = confirmLabel ? confirmLabel.textContent : '';
+      const prevIconClass = confirmIcon ? confirmIcon.className : '';
+      if (confirmBtn) confirmBtn.disabled = true;
+      if (confirmLabel) confirmLabel.textContent = 'Confirming...';
+      if (confirmIcon) confirmIcon.className = 'fas fa-circle-notch fa-spin text-xs';
       try {
+        const payload = {
+          check_in: document.getElementById('check_in').value,
+          check_out: document.getElementById('check_out').value,
+          guests: state.guests,
+          full_name: state.userName,
+          email: state.email,
+          phone: state.phone,
+          address: state.address,
+          special_request: state.specialRequest || '',
+          addons: state.addons,
+        };
+        if (COUPONS_ENABLED && state.couponCode) {
+          payload.coupon_code = state.couponCode;
+        }
         const resp = await fetch('{{ url_for("booking_api.create") }}', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            check_in: document.getElementById('check_in').value,
-            check_out: document.getElementById('check_out').value,
-            guests: state.guests,
-            full_name: state.userName,
-            email: state.email,
-            phone: state.phone,
-            address: state.address,
-            special_request: state.specialRequest || '',
-            addons: state.addons,
-          }),
+          body: JSON.stringify(payload),
         });
         const data = await resp.json();
         if (!resp.ok || !data.success) {
@@ -652,15 +1122,32 @@
         document.getElementById('success-booking-id').textContent = state.bookingId;
         const modal = document.getElementById('success-modal');
         modal.classList.remove('opacity-0', 'pointer-events-none');
+        modal.classList.add('modal-visible');
         document.getElementById('success-view-booking').href = state.confirmationUrl;
       } catch (e) {
         showToast('Something went wrong. Please try again.', 'error');
+      } finally {
+        if (confirmBtn) confirmBtn.disabled = false;
+        if (confirmLabel) confirmLabel.textContent = prevLabel;
+        if (confirmIcon) confirmIcon.className = prevIconClass;
       }
     });
 
     updateSummary();
     updateReview();
     setStep(1);
+
+    document.querySelectorAll('[data-step-indicator]').forEach(node => {
+      node.addEventListener('click', () => {
+        const n = parseInt(node.getAttribute('data-step-indicator'), 10);
+        if (canNavigateToStep(n)) {
+          if (n === 4) updateReview();
+          setStep(n);
+        } else {
+          showToast('Complete the previous steps first', 'error');
+        }
+      });
+    });
   }
 
   document.addEventListener('DOMContentLoaded', initBookingWizard);

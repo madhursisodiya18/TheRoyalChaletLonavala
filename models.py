@@ -49,6 +49,7 @@ class Booking(db.Model):
     payment = db.relationship('Payment', backref='booking', uselist=False, lazy=True)
     coupon_id = db.Column(db.Integer, db.ForeignKey('coupon.id'), nullable=True)
     coupon = db.relationship('Coupon', backref='bookings', lazy=True)
+    coupon_discount_amount = db.Column(db.Integer, nullable=True, default=0)
 
 
 class BookingAddon(db.Model):
@@ -192,13 +193,15 @@ class Coupon(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(20), unique=True, nullable=False)
     discount_percentage = db.Column(db.Integer, nullable=False)
+    discount_type = db.Column(db.String(20), nullable=False, default='percentage') # percentage, fixed
+    discount_value = db.Column(db.Integer, nullable=False, default=0) # Used if discount_type is 'fixed'
     valid_from = db.Column(db.DateTime, nullable=False)
     valid_until = db.Column(db.DateTime, nullable=False)
     max_uses = db.Column(db.Integer, nullable=True)
     times_used = db.Column(db.Integer, default=0)
     is_active = db.Column(db.Boolean, default=True)
     description = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
     def __repr__(self):
         return f'<Coupon {self.code}>'

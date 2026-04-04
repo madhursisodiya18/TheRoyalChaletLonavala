@@ -1,266 +1,307 @@
 {% extends 'admin/admin_base.html' %}
 {% block content %}
-<div class="p-6 sm:p-10 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
-    <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
-            <div class="flex items-center">
-                <div class="bg-gradient-to-br from-emerald-500 to-emerald-700 text-white p-4 rounded-2xl shadow-xl shadow-emerald-200 dark:shadow-emerald-900/20 mr-6">
-                    <i class="fas fa-utensils text-2xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-4xl font-black text-gray-900 dark:text-white tracking-tight">Menu Management</h1>
-                    <p class="text-gray-500 dark:text-gray-400 font-medium">Add, edit or remove items from your food menu</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3 w-full md:w-auto">
-                <button onclick="document.getElementById('add-item-modal').classList.remove('hidden')" class="flex-1 md:flex-none inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-all transform hover:-translate-y-1 shadow-lg shadow-emerald-200 dark:shadow-none">
-                    <i class="fas fa-plus mr-2"></i> Add Item
-                </button>
-            </div>
-        </div>
+<div class="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-gray-900 dark:text-slate-100 py-10 transition-colors duration-300">
+  <div class="max-w-6xl mx-auto px-4">
+    <header class="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+      <div>
+        <p class="text-xs uppercase tracking-[0.3em] text-amber-600 dark:text-amber-400 mb-2">Royal Chalet · Admin</p>
+        <h1 class="text-3xl md:text-4xl font-semibold tracking-tight text-gray-900 dark:text-white">Menu Management</h1>
+        <p class="text-sm md:text-base text-gray-600 dark:text-slate-400 mt-2 max-w-xl">Same layout as your guest food menu — add, edit, or remove items by section.</p>
+      </div>
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <button type="button" onclick="document.getElementById('add-item-modal').classList.remove('hidden')" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-amber-500 hover:bg-amber-600 text-gray-900 font-semibold text-sm shadow-md hover:shadow-lg transition-all">
+          <i class="fas fa-plus"></i> Add Item
+        </button>
+      </div>
+    </header>
 
-        <!-- Search & Filter Bar -->
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8 flex flex-col md:flex-row gap-4 items-center">
-            <div class="relative flex-1 w-full">
-                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <form action="{{ url_for('admin_menu.admin_menu_dashboard') }}" method="GET" class="w-full">
-                    <input type="text" name="q" value="{{ search_query }}" placeholder="Search items by name or description..." class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all dark:text-white">
-                </form>
-            </div>
-            <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
-                <a href="{{ url_for('admin_menu.admin_menu_dashboard') }}" class="whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold {{ 'bg-emerald-100 text-emerald-700' if not selected_section_id else 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300' }}">All Items</a>
-                {% for section in sections %}
-                <a href="{{ url_for('admin_menu.admin_menu_dashboard', section=section.id) }}" class="whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold {{ 'bg-emerald-100 text-emerald-700' if selected_section_id == section.id else 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300' }}">{{ section.display_name }}</a>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Menu Items Table -->
-        <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
-                        <tr>
-                            <th class="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Item Details</th>
-                            <th class="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Section</th>
-                            <th class="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Dietary</th>
-                            <th class="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Price</th>
-                            <th class="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                        {% for item in items %}
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors">
-                            <td class="px-8 py-5">
-                                <div class="flex items-center gap-4">
-                                    {% if item.image_url %}
-                                    <img src="{{ url_for('static', filename=item.image_url) }}" class="w-12 h-12 rounded-xl object-cover">
-                                    {% else %}
-                                    <div class="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-400">
-                                        <i class="fas fa-image"></i>
-                                    </div>
-                                    {% endif %}
-                                    <div>
-                                        <p class="font-bold text-gray-900 dark:text-white">{{ item.name }}</p>
-                                        <p class="text-xs text-gray-500 line-clamp-1">{{ item.description or 'No description' }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-8 py-5">
-                                <span class="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-[10px] font-black uppercase tracking-wider">
-                                    {{ item.section.display_name if item.section else 'Uncategorized' }}
-                                </span>
-                            </td>
-                            <td class="px-8 py-5 text-center">
-                                {% if item.is_veg %}
-                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600" title="Vegetarian">
-                                    <i class="fas fa-leaf text-xs"></i>
-                                </span>
-                                {% else %}
-                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-900/30 text-rose-600" title="Non-Vegetarian">
-                                    <i class="fas fa-drumstick-bite text-xs"></i>
-                                </span>
-                                {% endif %}
-                            </td>
-                            <td class="px-8 py-5">
-                                <p class="font-black text-gray-900 dark:text-white">₹{{ item.price }}</p>
-                            </td>
-                            <td class="px-8 py-5 text-right">
-                                <div class="flex justify-end gap-2">
-                                    <button onclick="editItem({{ item.id }}, '{{ item.name }}', {{ item.price }}, '{{ item.description or '' }}', {{ item.section_id }}, {{ 'true' if item.is_veg else 'false' }})" class="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <form action="{{ url_for('admin_menu.admin_delete_menu_item', item_id=item.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this item?')" class="inline">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Pagination -->
-            {% if pagination and pagination.pages > 1 %}
-            <div class="px-8 py-5 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                <p class="text-sm text-gray-500 font-medium">Showing items {{ pagination.start_index }} to {{ pagination.end_index }} of {{ pagination.total }}</p>
-                <div class="flex gap-2">
-                    {% if pagination.has_prev %}
-                    <a href="{{ url_for('admin_menu.admin_menu_dashboard', page=pagination.prev_num, q=search_query, section=selected_section_id) }}" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 transition-all">Previous</a>
-                    {% endif %}
-                    {% if pagination.has_next %}
-                    <a href="{{ url_for('admin_menu.admin_menu_dashboard', page=pagination.next_num, q=search_query, section=selected_section_id) }}" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 transition-all">Next</a>
-                    {% endif %}
-                </div>
-            </div>
-            {% endif %}
-        </div>
+    <div class="flex flex-col md:flex-row md:items-center gap-3 mb-6">
+      <form action="{{ url_for('admin_menu.admin_menu_dashboard') }}" method="GET" class="relative flex-1 w-full">
+        {% if selected_section_id %}
+        <input type="hidden" name="section" value="{{ selected_section_id }}">
+        {% endif %}
+        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 text-sm"></i>
+        <input type="text" name="q" value="{{ search_query }}" placeholder="Search by dish name or description…"
+          class="w-full pl-11 pr-4 py-2.5 rounded-full border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400/70 focus:border-amber-400/40 text-sm" />
+      </form>
+      <div class="flex items-center gap-2 text-[11px] flex-wrap">
+        <button type="button" class="admin-diet-filter px-3 py-1.5 rounded-full border shadow-sm font-medium border-amber-400 bg-amber-500/15 text-amber-800 dark:text-amber-200" data-diet="all">All</button>
+        <button type="button" class="admin-diet-filter px-3 py-1.5 rounded-full border shadow-sm font-medium border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300" data-diet="veg">Veg</button>
+        <button type="button" class="admin-diet-filter px-3 py-1.5 rounded-full border shadow-sm font-medium border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300" data-diet="nonveg">Non-Veg</button>
+      </div>
     </div>
+
+    <div class="mb-8 sticky top-0 z-30 bg-amber-50/90 dark:bg-slate-900/90 backdrop-blur-md py-4 -mx-4 px-4 border-b border-amber-100/80 dark:border-slate-700/80 sm:static sm:bg-transparent sm:border-0 sm:py-0 sm:mx-0">
+      <div class="flex items-center justify-between mb-2 sm:mb-4">
+        <h2 class="text-sm font-bold text-gray-800 dark:text-slate-200 uppercase tracking-widest">Categories</h2>
+        <p class="text-[10px] text-gray-500 dark:text-slate-500 hidden sm:block">Filter by section</p>
+      </div>
+      <div class="overflow-x-auto no-scrollbar">
+        <div class="inline-flex gap-2 pb-2">
+          <a href="{{ url_for('admin_menu.admin_menu_dashboard', q=search_query) }}"
+            class="flex-shrink-0 px-5 py-2.5 rounded-2xl border-2 text-xs font-bold transition-all shadow-sm flex items-center gap-2 {% if not selected_section_id %}border-amber-400 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200{% else %}border-white dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:border-amber-400{% endif %}">
+            <i class="fas fa-layer-group text-amber-500"></i> All sections
+          </a>
+          {% for section in sections %}
+          <a href="{{ url_for('admin_menu.admin_menu_dashboard', section=section.id, q=search_query) }}"
+            class="flex-shrink-0 px-5 py-2.5 rounded-2xl border-2 text-xs font-bold transition-all shadow-sm flex items-center gap-2 {% if selected_section_id == section.id %}border-amber-400 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-200{% else %}border-white dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:border-amber-400{% endif %}">
+            <i class="{{ section.icon or 'fas fa-utensils' }} text-amber-500"></i>
+            <span>{{ section.display_name|title }}</span>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="admin-menu-grid">
+      {% for item in items %}
+      <article
+        class="admin-menu-item-card group bg-white dark:bg-slate-800 rounded-[2rem] p-5 border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-2xl hover:border-amber-200 dark:hover:border-amber-500/40 transition-all duration-500 flex flex-col"
+        data-veg="{{ 1 if item.is_veg else 0 }}"
+        data-name="{{ (item.name ~ ' ' ~ (item.description or ''))|lower }}">
+        <div class="flex gap-5">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-2">
+              {% if item.is_veg %}
+              <div class="w-4 h-4 border-2 border-emerald-500 p-0.5 flex items-center justify-center shrink-0">
+                <div class="w-full h-full rounded-full bg-emerald-500"></div>
+              </div>
+              {% else %}
+              <div class="w-4 h-4 border-2 border-rose-500 p-0.5 flex items-center justify-center shrink-0">
+                <div class="w-full h-full rounded-full bg-rose-500"></div>
+              </div>
+              {% endif %}
+              <span class="text-[10px] uppercase tracking-wider text-gray-400 dark:text-slate-500 truncate">{{ item.section.display_name if item.section else 'Uncategorized' }}</span>
+            </div>
+            <h4 class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors leading-tight mb-2">{{ item.name|title }}</h4>
+            <p class="text-xs text-gray-500 dark:text-slate-400 line-clamp-2 leading-relaxed mb-3">{{ item.description or 'No description yet.' }}</p>
+            <p class="text-xl font-bold text-gray-900 dark:text-white mb-4">₹{{ item.price }}</p>
+            <div class="flex flex-wrap gap-2 mt-auto pt-3 border-t border-gray-100 dark:border-slate-700">
+              <button type="button"
+                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors admin-edit-trigger"
+                data-id="{{ item.id }}"
+                data-name="{{ item.name|e }}"
+                data-price="{{ item.price }}"
+                data-description="{{ ((item.description or '')|replace('\r', ' ')|replace('\n', ' '))|e }}"
+                data-section="{{ item.section_id }}"
+                data-veg="{{ 'true' if item.is_veg else 'false' }}">
+                <i class="fas fa-edit"></i> Edit
+              </button>
+              <form action="{{ url_for('admin_menu.admin_delete_menu_item', item_id=item.id) }}" method="POST" class="inline" onsubmit="return confirm('Delete this menu item?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-semibold bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-colors">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </form>
+            </div>
+          </div>
+          {% if item.image_url %}
+          <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.5rem] overflow-hidden shadow-lg border-2 border-white dark:border-slate-600 shrink-0">
+            <img src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+          </div>
+          {% else %}
+          <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.5rem] bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-400 dark:text-slate-500 shrink-0 border-2 border-dashed border-gray-200 dark:border-slate-600">
+            <i class="fas fa-image text-2xl"></i>
+          </div>
+          {% endif %}
+        </div>
+      </article>
+      {% else %}
+      <p class="col-span-full text-sm text-gray-500 dark:text-slate-400 italic bg-gray-50 dark:bg-slate-800/50 p-10 rounded-3xl text-center border-2 border-dashed border-gray-200 dark:border-slate-600">No items match your filters. Add a dish or adjust search.</p>
+      {% endfor %}
+    </div>
+
+    {% if pagination and pagination.pages > 1 %}
+    <div class="mt-10 flex flex-col sm:flex-row justify-between items-center gap-4 px-2 py-4 rounded-2xl bg-white/80 dark:bg-slate-800/80 border border-gray-100 dark:border-slate-700">
+      <p class="text-sm text-gray-600 dark:text-slate-400">Showing {{ pagination.start_index }}–{{ pagination.end_index }} of {{ pagination.total }}</p>
+      <div class="flex gap-2">
+        {% if pagination.has_prev %}
+        <a href="{{ url_for('admin_menu.admin_menu_dashboard', page=pagination.prev_num, q=search_query, section=selected_section_id) }}" class="px-4 py-2 rounded-full text-sm font-semibold bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-amber-50 dark:hover:bg-slate-600 transition-colors">Previous</a>
+        {% endif %}
+        {% if pagination.has_next %}
+        <a href="{{ url_for('admin_menu.admin_menu_dashboard', page=pagination.next_num, q=search_query, section=selected_section_id) }}" class="px-4 py-2 rounded-full text-sm font-semibold bg-amber-500 text-gray-900 hover:bg-amber-600 transition-colors">Next</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
 </div>
 
 <!-- Add Item Modal -->
-<div id="add-item-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-2xl w-full max-w-xl overflow-hidden transform transition-all">
-        <div class="px-8 py-6 bg-emerald-600 text-white flex justify-between items-center">
-            <h3 class="text-2xl font-black">Add New Menu Item</h3>
-            <button onclick="document.getElementById('add-item-modal').classList.add('hidden')" class="text-white/80 hover:text-white">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-        </div>
-        <form action="{{ url_for('admin_menu.admin_add_menu_item') }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Item Name</label>
-                    <input type="text" name="name" required class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all dark:text-white">
-                </div>
-                <div class="space-y-2">
-                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Price (₹)</label>
-                    <input type="number" name="price" required class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all dark:text-white">
-                </div>
-            </div>
-            <div class="space-y-2">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Section</label>
-                <select name="section_id" required class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all dark:text-white">
-                    {% for section in sections %}
-                    <option value="{{ section.id }}">{{ section.display_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="space-y-2">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Description</label>
-                <textarea name="description" rows="3" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all dark:text-white"></textarea>
-            </div>
-            <div class="flex items-center gap-6">
-                <label class="flex items-center gap-3 cursor-pointer group">
-                    <input type="checkbox" name="is_veg" value="true" checked class="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
-                    <span class="text-sm font-bold text-gray-600 dark:text-gray-400 group-hover:text-emerald-600 transition-colors">Vegetarian</span>
-                </label>
-                <label class="flex items-center gap-3 cursor-pointer group">
-                    <input type="checkbox" name="is_available" value="true" checked class="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
-                    <span class="text-sm font-bold text-gray-600 dark:text-gray-400 group-hover:text-emerald-600 transition-colors">Available</span>
-                </label>
-            </div>
-            <div class="space-y-2">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Item Image</label>
-                <input type="file" name="image" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
-            </div>
-            <button type="submit" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl transition-all shadow-lg shadow-emerald-200 dark:shadow-none mt-4">
-                Create Menu Item
-            </button>
-        </form>
+<div id="add-item-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-xl overflow-hidden border border-gray-100 dark:border-slate-700">
+    <div class="px-6 py-5 bg-gradient-to-r from-amber-500 to-amber-600 text-gray-900 flex justify-between items-center">
+      <h3 class="text-xl font-bold">Add New Menu Item</h3>
+      <button type="button" onclick="document.getElementById('add-item-modal').classList.add('hidden')" class="opacity-80 hover:opacity-100" aria-label="Close">
+        <i class="fas fa-times text-xl"></i>
+      </button>
     </div>
+    <form action="{{ url_for('admin_menu.admin_add_menu_item') }}" method="POST" enctype="multipart/form-data" class="p-6 sm:p-8 space-y-5">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Item Name</label>
+          <input type="text" name="name" required class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+        </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Price (₹)</label>
+          <input type="number" name="price" required step="0.01" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+        </div>
+      </div>
+      <div class="space-y-1">
+        <label class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Section</label>
+        <select name="section_id" required class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+          {% for section in sections %}
+          <option value="{{ section.id }}">{{ section.display_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="space-y-1">
+        <label class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Description</label>
+        <textarea name="description" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none resize-none"></textarea>
+      </div>
+      <div class="flex flex-wrap items-center gap-6">
+        <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-slate-300">
+          <input type="checkbox" name="is_veg" value="true" checked class="rounded border-gray-300 text-amber-600 focus:ring-amber-500">
+          Vegetarian
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-slate-300">
+          <input type="checkbox" name="is_available" value="true" checked class="rounded border-gray-300 text-amber-600 focus:ring-amber-500">
+          Available
+        </label>
+      </div>
+      <div class="space-y-1">
+        <label class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Item Image</label>
+        <input type="file" name="image" accept="image/*" class="w-full text-sm text-gray-600 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-100 file:text-amber-800 dark:file:bg-amber-950 dark:file:text-amber-200">
+      </div>
+      <button type="submit" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-gray-900 font-bold shadow-lg hover:shadow-xl transition-all">Create Menu Item</button>
+    </form>
+  </div>
 </div>
 
-<!-- Edit Item Modal (Template) -->
-<div id="edit-item-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-2xl w-full max-w-xl overflow-hidden transform transition-all">
-        <div class="px-8 py-6 bg-blue-600 text-white flex justify-between items-center">
-            <h3 class="text-2xl font-black">Edit Menu Item</h3>
-            <button onclick="document.getElementById('edit-item-modal').classList.add('hidden')" class="text-white/80 hover:text-white">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-        </div>
-        <form id="edit-item-form" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Item Name</label>
-                    <input type="text" name="name" id="edit-name" required class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white">
-                </div>
-                <div class="space-y-2">
-                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Price (₹)</label>
-                    <input type="number" name="price" id="edit-price" required class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white">
-                </div>
-            </div>
-            <div class="space-y-2">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Section</label>
-                <select name="section_id" id="edit-section" required class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white">
-                    {% for section in sections %}
-                    <option value="{{ section.id }}">{{ section.display_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="space-y-2">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Description</label>
-                <textarea name="description" id="edit-description" rows="3" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white"></textarea>
-            </div>
-            <div class="flex items-center gap-6">
-                <label class="flex items-center gap-3 cursor-pointer group">
-                    <input type="checkbox" name="is_veg" id="edit-is-veg" value="true" class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                    <span class="text-sm font-bold text-gray-600 dark:text-gray-400 group-hover:text-blue-600 transition-colors">Vegetarian</span>
-                </label>
-                <label class="flex items-center gap-3 cursor-pointer group">
-                    <input type="checkbox" name="is_available" id="edit-is-available" value="true" checked class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                    <span class="text-sm font-bold text-gray-600 dark:text-gray-400 group-hover:text-blue-600 transition-colors">Available</span>
-                </label>
-            </div>
-            <div class="space-y-2">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Item Image</label>
-                <input type="file" name="image" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-            </div>
-            <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl transition-all shadow-lg shadow-blue-200 dark:shadow-none mt-4">
-                Update Menu Item
-            </button>
-        </form>
+<!-- Edit Item Modal -->
+<div id="edit-item-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+  <div class="bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl w-full max-w-xl overflow-hidden border border-gray-100 dark:border-slate-700">
+    <div class="px-6 py-5 bg-gradient-to-r from-slate-700 to-slate-800 text-white flex justify-between items-center">
+      <h3 class="text-xl font-bold">Edit Menu Item</h3>
+      <button type="button" onclick="document.getElementById('edit-item-modal').classList.add('hidden')" class="text-white/80 hover:text-white" aria-label="Close">
+        <i class="fas fa-times text-xl"></i>
+      </button>
     </div>
+    <form id="edit-item-form" method="POST" enctype="multipart/form-data" class="p-6 sm:p-8 space-y-5">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Item Name</label>
+          <input type="text" name="name" id="edit-name" required class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+        </div>
+        <div class="space-y-1">
+          <label class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Price (₹)</label>
+          <input type="number" name="price" id="edit-price" required step="0.01" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+        </div>
+      </div>
+      <div class="space-y-1">
+        <label class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Section</label>
+        <select name="section_id" id="edit-section" required class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none">
+          {% for section in sections %}
+          <option value="{{ section.id }}">{{ section.display_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="space-y-1">
+        <label class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Description</label>
+        <textarea name="description" id="edit-description" rows="3" class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none resize-none"></textarea>
+      </div>
+      <div class="flex flex-wrap items-center gap-6">
+        <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-slate-300">
+          <input type="checkbox" name="is_veg" id="edit-is-veg" value="true" class="rounded border-gray-300 text-amber-600 focus:ring-amber-500">
+          Vegetarian
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-slate-300">
+          <input type="checkbox" name="is_available" id="edit-is-available" value="true" checked class="rounded border-gray-300 text-amber-600 focus:ring-amber-500">
+          Available
+        </label>
+      </div>
+      <div class="space-y-1">
+        <label class="text-xs font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Replace Image (optional)</label>
+        <input type="file" name="image" accept="image/*" class="w-full text-sm text-gray-600 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-100 file:text-slate-800 dark:file:bg-slate-700 dark:file:text-slate-200">
+      </div>
+      <button type="submit" class="w-full py-3.5 rounded-2xl bg-slate-800 dark:bg-slate-700 text-white font-bold hover:bg-slate-900 dark:hover:bg-slate-600 transition-colors">Update Menu Item</button>
+    </form>
+  </div>
 </div>
 
 <script>
-function editItem(id, name, price, description, sectionId, isVeg) {
-    const modal = document.getElementById('edit-item-modal');
-    const form = document.getElementById('edit-item-form');
-    
-    document.getElementById('edit-name').value = name;
-    document.getElementById('edit-price').value = price;
-    document.getElementById('edit-description').value = description;
-    document.getElementById('edit-section').value = sectionId;
-    document.getElementById('edit-is-veg').checked = isVeg;
-    
-    form.action = `/admin/menu/${id}/edit`;
-    modal.classList.remove('hidden');
-}
+(function() {
+  var activeDiet = 'all';
+  var cards = document.querySelectorAll('.admin-menu-item-card');
+  var dietBtns = document.querySelectorAll('.admin-diet-filter');
+  var neutral = ['border-gray-200', 'dark:border-slate-600', 'bg-white', 'dark:bg-slate-800', 'text-gray-700', 'dark:text-slate-300'];
+  var activeAll = ['border-amber-500', 'bg-amber-100', 'dark:bg-amber-950/50', 'text-amber-900', 'dark:text-amber-100'];
+  var activeVeg = ['border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-950/50', 'text-emerald-900', 'dark:text-emerald-100'];
+  var activeNon = ['border-rose-500', 'bg-rose-50', 'dark:bg-rose-950/50', 'text-rose-900', 'dark:text-rose-100'];
 
-// Close modals when clicking outside
-window.onclick = function(event) {
-    const addModal = document.getElementById('add-item-modal');
-    const editModal = document.getElementById('edit-item-modal');
-    if (event.target == addModal) addModal.classList.add('hidden');
-    if (event.target == editModal) editModal.classList.add('hidden');
-}
+  function applyDiet() {
+    cards.forEach(function(card) {
+      var isVeg = card.getAttribute('data-veg') === '1';
+      var ok = activeDiet === 'all' || (activeDiet === 'veg' && isVeg) || (activeDiet === 'nonveg' && !isVeg);
+      card.classList.toggle('hidden', !ok);
+    });
+  }
+
+  function setDietButtonStyles(btn, diet) {
+    dietBtns.forEach(function(b) {
+      neutral.concat(activeAll, activeVeg, activeNon).forEach(function(c) { b.classList.remove(c); });
+      b.classList.add.apply(b.classList, neutral);
+    });
+    btn.classList.remove.apply(btn.classList, neutral);
+    if (diet === 'all') btn.classList.add.apply(btn.classList, activeAll);
+    else if (diet === 'veg') btn.classList.add.apply(btn.classList, activeVeg);
+    else btn.classList.add.apply(btn.classList, activeNon);
+  }
+
+  dietBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      activeDiet = btn.getAttribute('data-diet') || 'all';
+      setDietButtonStyles(btn, activeDiet);
+      applyDiet();
+    });
+  });
+
+  document.querySelectorAll('.admin-edit-trigger').forEach(function(el) {
+    el.addEventListener('click', function() {
+      var id = el.getAttribute('data-id');
+      var modal = document.getElementById('edit-item-modal');
+      var form = document.getElementById('edit-item-form');
+      document.getElementById('edit-name').value = el.getAttribute('data-name') || '';
+      document.getElementById('edit-price').value = el.getAttribute('data-price') || '';
+      document.getElementById('edit-description').value = el.getAttribute('data-description') || '';
+      document.getElementById('edit-section').value = el.getAttribute('data-section') || '';
+      document.getElementById('edit-is-veg').checked = el.getAttribute('data-veg') === 'true';
+      form.action = '/admin/menu/' + id + '/edit';
+      modal.classList.remove('hidden');
+    });
+  });
+
+  window.addEventListener('click', function(e) {
+    var addM = document.getElementById('add-item-modal');
+    var editM = document.getElementById('edit-item-modal');
+    if (e.target === addM) addM.classList.add('hidden');
+    if (e.target === editM) editM.classList.add('hidden');
+  });
+
+  applyDiet();
+})();
 </script>
 
 <style>
-    .line-clamp-1 {
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        -webkit-box-orient: vertical;  
-        overflow: hidden;
-    }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
 {% endblock %}

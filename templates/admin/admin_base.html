@@ -24,14 +24,22 @@
               'playfair': ['Playfair Display', 'serif'],
             },
             colors: {
+              'royal-navy': '#0f2557',
+              'royal-navy-mid': '#152a52',
+              'royal-navy-deep': '#0a1a3d',
+              'royal-cream': '#faf7f2',
+              'royal-cream-dark': '#f3eee6',
+              'royal-gold': '#c5a059',
+              'royal-gold-light': '#e8d5a3',
+              'royal-emerald': '#059669',
               'admin-primary': '#0f2557',
-              'admin-secondary': '#2563eb',
-              'admin-accent': '#0ea5e9',
+              'admin-secondary': '#d97706',
+              'admin-accent': '#c5a059',
               dark: {
-                bg: '#0f172a',      // slate-900
-                card: '#1e293b',    // slate-800
-                border: '#334155',  // slate-700
-                text: '#f1f5f9'     // slate-100
+                bg: '#0f172a',
+                card: '#1e293b',
+                border: '#334155',
+                text: '#f1f5f9'
               }
             }
           }
@@ -39,34 +47,73 @@
       }
     </script>
     <style>
+      /* Design tokens — cream / navy / gold / emerald (aligned with public site) */
+      :root {
+        --admin-page-bg: #faf7f2;
+        --admin-surface: #ffffff;
+        --admin-text: #1e293b;
+        --admin-text-muted: #64748b;
+        --admin-border: #e7e5e4;
+        --admin-navy: #0f2557;
+        --admin-navy-mid: #152a52;
+        --admin-gold: #c5a059;
+        --admin-gold-hover: #d4a84b;
+        --admin-emerald: #059669;
+        --admin-table-head-bg: #f3eee6;
+        --admin-table-head-text: #0f2557;
+        --admin-row-alt: #faf7f2;
+        --admin-row-hover: #fff7ed;
+        --admin-sidebar-bg: #0f2557;
+        --admin-sidebar-border: rgba(197, 160, 89, 0.22);
+        --admin-btn-primary: #0f2557;
+        --admin-btn-primary-hover: #1a3a6e;
+        --admin-btn-accent: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+        --admin-shadow-card: 0 4px 14px rgba(15, 37, 87, 0.08);
+      }
+      .dark {
+        --admin-page-bg: #0f172a;
+        --admin-surface: #1e293b;
+        --admin-text: #f1f5f9;
+        --admin-text-muted: #94a3b8;
+        --admin-border: #334155;
+        --admin-table-head-bg: #0f172a;
+        --admin-table-head-text: #e8d5a3;
+        --admin-row-alt: rgba(30, 41, 59, 0.55);
+        --admin-row-hover: rgba(51, 65, 85, 0.65);
+        --admin-sidebar-bg: #0a1628;
+        --admin-sidebar-border: rgba(197, 160, 89, 0.15);
+        --admin-shadow-card: 0 8px 24px rgba(0, 0, 0, 0.35);
+      }
+
       body {
         font-family: 'Poppins', 'Montserrat', 'Raleway', 'Playfair Display', sans-serif;
         scroll-behavior: smooth;
         padding: 0 !important;
         margin: 0;
         overflow-x: hidden;
-        background-color: #f8fafc;
+        background-color: var(--admin-page-bg);
+        color: var(--admin-text);
       }
       
       .dark body {
-        background-color: #0f172a;
-        color: #f1f5f9;
+        background-color: var(--admin-page-bg);
+        color: var(--admin-text);
       }
       
-      /* Professional header with light colors for white logo */
-      header, .admin-header, nav, .navbar, .fixed-header {
+      /* Inner pages only — do not flatten the main admin top bar (.header-nav) */
+      header:not(.header-nav), .admin-header, nav:not(.header-nav), .navbar:not(.header-nav), .fixed-header:not(.header-nav) {
         position: static !important;
         width: 100%;
         z-index: 10;
-        background: #ffffff !important;
+        background: var(--admin-surface) !important;
         padding: 0.75rem 0;
-        border-bottom: 1px solid #e2e8f0 !important;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+        border-bottom: 1px solid var(--admin-border) !important;
+        box-shadow: var(--admin-shadow-card) !important;
       }
       
-      .dark header, .dark .admin-header, .dark nav, .dark .navbar, .dark .fixed-header {
-        background: #1e293b !important;
-        border-bottom: 1px solid #334155 !important;
+      .dark header:not(.header-nav), .dark .admin-header, .dark nav:not(.header-nav), .dark .navbar:not(.header-nav), .dark .fixed-header:not(.header-nav) {
+        background: var(--admin-surface) !important;
+        border-bottom: 1px solid var(--admin-border) !important;
       }
       
       .admin-logo {
@@ -78,72 +125,55 @@
         font-family: 'Playfair Display', serif;
         font-size: 1.75rem;
         font-weight: 700;
-        color: #0f2557 !important;
+        color: var(--admin-navy) !important;
       }
       
       .dark .admin-title {
-        color: #f1f5f9 !important;
+        color: var(--admin-text) !important;
       }
       
-      /* Navigation links styling */
-      .nav-link, .nav-item a {
-        color: #475569 !important;
+      /* Sidebar / inner nav only — top bar uses Tailwind text-white */
+      main .nav-link, main .nav-item a, .admin-sidebar .nav-link, .admin-sidebar .nav-item a {
+        color: var(--admin-text-muted) !important;
         font-weight: 600 !important;
         transition: all 0.3s ease;
       }
       
-      .dark .nav-link, .dark .nav-item a {
+      .dark main .nav-link, .dark main .nav-item a, .dark .admin-sidebar .nav-link, .dark .admin-sidebar .nav-item a {
         color: #cbd5e1 !important;
       }
       
-      .nav-link:hover, .nav-item a:hover {
-        color: #2563eb !important;
+      main .nav-link:hover, main .nav-item a:hover, .admin-sidebar .nav-link:hover, .admin-sidebar .nav-item a:hover {
+        color: var(--admin-gold) !important;
         transform: translateY(-2px);
       }
       
-      .dark .nav-link:hover, .dark .nav-item a:hover {
-        color: #38bdf8 !important;
-      }
-      
-      /* Brand styling */
-      .brand-text {
-        color: #0f2557 !important;
+      /* Top bar brand (white on navy gradient) */
+      .header-nav .brand-text {
+        color: #ffffff !important;
         letter-spacing: 1px;
       }
       
-      .dark .brand-text {
-        color: #ffffff !important;
+      .header-nav .brand-subtext {
+        color: rgba(232, 213, 163, 0.95) !important;
       }
       
-      .brand-subtext {
-        color: #64748b !important;
-      }
-      
-      .dark .brand-subtext {
-        color: #94a3b8 !important;
-      }
-      
-      /* Icon styling */
-      .nav-icon {
-        color: #2563eb !important;
-      }
-      
-      .dark .nav-icon {
-        color: #38bdf8 !important;
+      .header-nav .nav-icon {
+        color: #e8d5a3 !important;
       }
       
       /* Button styling */
       .header-button {
-        background-color: #f1f5f9 !important;
-        border: 1px solid #e2e8f0 !important;
-        color: #475569 !important;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+        background-color: rgba(255, 255, 255, 0.12) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        color: #ffffff !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important;
       }
       
       .dark .header-button {
-        background-color: #334155 !important;
-        border: 1px solid #475569 !important;
-        color: #f1f5f9 !important;
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        color: #f8fafc !important;
       }
       
       /* Force all dropdown menus to be hidden */
@@ -157,18 +187,18 @@
         top: 0;
         height: 100vh;
         overflow-y: auto;
-        background-color: #1e293b !important;
-        border-right: 1px solid #334155 !important;
+        background-color: var(--admin-sidebar-bg) !important;
+        border-right: 1px solid var(--admin-sidebar-border) !important;
       }
       
       /* Fixed height containers */
       .fixed-height-container {
         height: 400px;
         overflow-y: auto;
-        border-radius: 0.5rem;
-        background-color: #ffffff !important;
-        border: 1px solid #e2e8f0 !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+        border-radius: 0.75rem;
+        background-color: var(--admin-surface) !important;
+        border: 1px solid var(--admin-border) !important;
+        box-shadow: var(--admin-shadow-card) !important;
       }
       
       /* Card-based layout */
@@ -176,16 +206,20 @@
         height: 200px;
         overflow-y: auto;
         margin-bottom: 1rem;
-        border-radius: 0.75rem;
-        background-color: #ffffff !important;
-        border: none !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+        border-radius: 1rem;
+        background-color: var(--admin-surface) !important;
+        border: 1px solid var(--admin-border) !important;
+        box-shadow: var(--admin-shadow-card) !important;
         transition: all 0.3s ease;
       }
       
       .admin-card:hover {
-        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1) !important;
+        box-shadow: 0 12px 28px rgba(15, 37, 87, 0.12) !important;
         transform: translateY(-2px);
+      }
+      
+      .dark .admin-card:hover {
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4) !important;
       }
       
       /* Table styling */
@@ -198,56 +232,78 @@
       }
       
       th {
-        background-color: #f1f5f9 !important;
-        color: #1e3a8a !important;
+        background-color: var(--admin-table-head-bg) !important;
+        color: var(--admin-table-head-text) !important;
         font-weight: 600;
         text-transform: uppercase;
         font-size: 0.75rem;
         letter-spacing: 0.05em;
+        border-color: var(--admin-border) !important;
       }
       
       tr:nth-child(even) {
-        background-color: #f8fafc;
+        background-color: var(--admin-row-alt);
       }
       
       tr:hover {
-        background-color: #f1f5f9;
+        background-color: var(--admin-row-hover);
       }
       
-      /* Button styling */
+      .dark tr:nth-child(even) {
+        background-color: var(--admin-row-alt);
+      }
+      
+      .dark tr:hover {
+        background-color: var(--admin-row-hover);
+      }
+      
+      .dark th {
+        background-color: var(--admin-table-head-bg) !important;
+        color: var(--admin-table-head-text) !important;
+        border-color: var(--admin-border);
+      }
+      
+      /* Primary CTA — navy; accent — gold gradient */
       .btn-primary {
-        background-color: #0f2557 !important;
+        background-color: var(--admin-btn-primary) !important;
         color: white !important;
-        border-radius: 0.5rem;
+        border-radius: 0.75rem;
         padding: 0.5rem 1rem;
-        font-weight: 500;
+        font-weight: 600;
         transition: all 0.3s ease;
       }
       
       .btn-primary:hover {
-        background-color: #1e3a8a !important;
+        background-color: var(--admin-btn-primary-hover) !important;
         transform: translateY(-1px);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 6px 16px rgba(15, 37, 87, 0.25);
       }
       
       .btn-secondary {
-        background-color: #0ea5e9 !important;
-        color: white !important;
-        border-radius: 0.5rem;
+        background: var(--admin-btn-accent) !important;
+        color: #1c1917 !important;
+        border-radius: 0.75rem;
         padding: 0.5rem 1rem;
-        font-weight: 500;
+        font-weight: 600;
         transition: all 0.3s ease;
       }
       
       .btn-secondary:hover {
-        background-color: #0284c7 !important;
+        filter: brightness(1.06);
         transform: translateY(-1px);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 6px 16px rgba(217, 119, 6, 0.35);
+      }
+
+      /* Optional: wrap admin content in consistent max width */
+      .admin-content-shell {
+        max-width: 80rem;
+        margin-left: auto;
+        margin-right: auto;
       }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex flex-col">
-    <nav class="bg-gradient-to-r from-admin-primary to-blue-800 shadow-md transition-colors duration-300 sticky top-0 z-50 header-nav">
+<body class="bg-royal-cream dark:bg-dark-bg text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen flex flex-col font-poppins">
+    <nav class="bg-gradient-to-r from-royal-navy via-royal-navy-mid to-[#1a3a6e] shadow-lg shadow-royal-navy/20 transition-colors duration-300 sticky top-0 z-50 header-nav border-b border-white/10">
         <div class="container mx-auto flex justify-between items-center px-4 h-full">
             <a href="/admin/dashboard" class="flex items-center gap-3 group">
                 <div class="logo-container mr-2">
@@ -257,62 +313,62 @@
                 </div>
                 <div class="flex flex-col">
                     <span class="text-xl font-bold text-white tracking-tight brand-text" style="font-family: 'Playfair Display', serif;">THE ROYAL CHALET</span>
-                    <span class="text-xs text-blue-200 font-semibold tracking-widest uppercase -mt-1 brand-subtext">Administration Panel</span>
+                    <span class="text-xs font-semibold tracking-widest uppercase -mt-1 brand-subtext">Administration Panel</span>
                 </div>
             </a>
             
             <!-- Desktop Navigation -->
-            <div class="hidden md:flex items-center gap-2 bg-blue-900/40 rounded-lg px-3 py-1.5 shadow-sm backdrop-blur-sm">
-                <a href="/admin/dashboard" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
-                    <i class="fas fa-tachometer-alt text-sky-400 group-hover:text-sky-300 transition-colors duration-300 nav-icon"></i>
+            <div class="hidden md:flex items-center gap-1 bg-black/20 rounded-xl px-2 py-1.5 shadow-inner border border-white/10 backdrop-blur-sm">
+                <a href="/admin/dashboard" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white nav-link">
+                    <i class="fas fa-tachometer-alt text-royal-gold-light nav-icon opacity-90"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="/admin/users" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
-                    <i class="fas fa-users text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
+                <a href="/admin/users" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white nav-link">
+                    <i class="fas fa-users text-royal-gold-light nav-icon opacity-90"></i>
                     <span>Users</span>
                 </a>
-                <a href="/admin/bookings" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
-                    <i class="fas fa-calendar-check text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
+                <a href="/admin/bookings" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white nav-link">
+                    <i class="fas fa-calendar-check text-royal-gold-light nav-icon opacity-90"></i>
                     <span>Bookings</span>
                 </a>
-                <a href="/admin/menu" class="px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
-                    <i class="fas fa-utensils text-blue-600 dark:text-blue-400 group-hover:text-blue-500 transition-colors duration-300 nav-icon"></i>
+                <a href="/admin/menu" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white nav-link">
+                    <i class="fas fa-utensils text-royal-gold-light nav-icon opacity-90"></i>
                     <span>Menu</span>
                 </a>
-                <a href="/admin/contacts" class="px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
-                    <i class="fas fa-address-book text-blue-600 dark:text-blue-400 group-hover:text-blue-500 transition-colors duration-300 nav-icon"></i>
+                <a href="/admin/contacts" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white nav-link">
+                    <i class="fas fa-address-book text-royal-gold-light nav-icon opacity-90"></i>
                     <span>Contacts</span>
                 </a>
-                <a href="/admin/settings" class="px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
-                    <i class="fas fa-cog text-blue-600 dark:text-blue-400 group-hover:text-blue-500 transition-colors duration-300 nav-icon"></i>
+                <a href="/admin/settings" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white nav-link">
+                    <i class="fas fa-cog text-royal-gold-light nav-icon opacity-90"></i>
                     <span>Settings</span>
                 </a>
-                <a href="/" class="px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
-                    <i class="fas fa-eye text-blue-600 dark:text-blue-400 group-hover:text-blue-500 transition-colors duration-300 nav-icon"></i>
+                <a href="/" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white nav-link">
+                    <i class="fas fa-eye text-royal-gold-light nav-icon opacity-90"></i>
                     <span>View Site</span>
                 </a>
             </div>
             
             <div class="flex items-center gap-2">
                 <a href="/profile" class="header-button px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm font-medium">
-                    <i class="fas fa-user-circle text-blue-600 dark:text-blue-400"></i>
+                    <i class="fas fa-user-circle text-royal-gold-light opacity-95"></i>
                     <span>{{ current_user.username }}</span>
                 </a>
                 <a href="{{ url_for('logout') }}" class="header-button px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm font-medium" title="Logout">
-                    <i class="fas fa-sign-out-alt text-red-500"></i>
+                    <i class="fas fa-sign-out-alt text-red-300"></i>
                     <span class="hidden lg:inline">Logout</span>
                 </a>
                 <button id="theme-toggle" class="header-button p-2 rounded-full ml-1" title="Toggle Dark Mode">
-                    <i class="fas fa-sun text-blue-600 dark:hidden" id="sunIcon"></i>
-                    <i class="fas fa-moon text-blue-300 hidden dark:block" id="moonIcon"></i>
+                    <i class="fas fa-sun text-royal-gold-light dark:hidden opacity-90" id="sunIcon"></i>
+                    <i class="fas fa-moon text-royal-gold-light hidden dark:block opacity-90" id="moonIcon"></i>
                 </button>
             </div>
         </div>
     </nav>
-    <main class="flex-1 container mx-auto px-4 py-6 transition-colors duration-300 dark:text-gray-200">
+    <main class="flex-1 container mx-auto px-4 py-6 transition-colors duration-300 text-slate-800 dark:text-slate-200">
         {% block content %}{% endblock %}
     </main>
-    <footer class="bg-gradient-to-r from-admin-primary to-blue-800 text-white py-4 px-6 transition-colors duration-300 border-t border-blue-800 dark:border-gray-800">
+    <footer class="bg-gradient-to-r from-royal-navy via-royal-navy-mid to-[#1a3a6e] text-white py-4 px-6 transition-colors duration-300 border-t border-white/10">
         <div class="container mx-auto text-center">
             <p>&copy; {{ now.year }} Royal Chalet Admin Panel. All rights reserved.</p>
         </div>
@@ -400,19 +456,13 @@
         });
     }
 </script>
-</body>
-</html>
 <script>
-  // Collapsible sections
   document.addEventListener('DOMContentLoaded', function() {
     const collapsibleHeaders = document.querySelectorAll('.collapsible-header');
-    
     collapsibleHeaders.forEach(header => {
       header.addEventListener('click', function() {
         const content = this.nextElementSibling;
-        content.classList.toggle('open');
-        
-        // Toggle icon
+        if (content) content.classList.toggle('open');
         const icon = this.querySelector('i.fa-chevron-down, i.fa-chevron-up');
         if (icon) {
           icon.classList.toggle('fa-chevron-down');
@@ -420,34 +470,26 @@
         }
       });
     });
-    
-    // Pagination functionality
+
     const paginationLinks = document.querySelectorAll('.pagination-link');
     const contentPages = document.querySelectorAll('.content-page');
-    
-    paginationLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        const targetPage = this.getAttribute('data-page');
-        
-        // Hide all pages
-        contentPages.forEach(page => {
-          page.classList.add('hidden');
-        });
-        
-        // Show target page
-        document.querySelector(`.content-page[data-page="${targetPage}"]`).classList.remove('hidden');
-        
-        // Update active link
         paginationLinks.forEach(link => {
-          link.classList.remove('bg-blue-600', 'text-white');
-          link.classList.add('bg-gray-200', 'text-gray-700');
+        link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetPage = this.getAttribute('data-page');
+        const target = document.querySelector('.content-page[data-page="' + targetPage + '"]');
+        if (!target) return;
+        contentPages.forEach(page => page.classList.add('hidden'));
+        target.classList.remove('hidden');
+        paginationLinks.forEach(l => {
+          l.classList.remove('bg-amber-600', 'text-white', 'dark:bg-amber-500');
+          l.classList.add('bg-royal-cream-dark', 'text-slate-700', 'dark:bg-slate-700', 'dark:text-slate-200');
         });
-        
-        this.classList.remove('bg-gray-200', 'text-gray-700');
-        this.classList.add('bg-blue-600', 'text-white');
+        this.classList.remove('bg-royal-cream-dark', 'text-slate-700', 'dark:bg-slate-700', 'dark:text-slate-200');
+        this.classList.add('bg-amber-600', 'text-white', 'dark:bg-amber-500');
       });
     });
   });
 </script>
+</body>
+</html>

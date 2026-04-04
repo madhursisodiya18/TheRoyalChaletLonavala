@@ -2,16 +2,16 @@
 {% block title %}Food Menu — The Royal Chalet{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50 text-gray-900 py-12">
+<div class="min-h-screen bg-gradient-to-b from-amber-50 via-white to-amber-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-gray-900 dark:text-slate-100 py-12 transition-colors duration-300">
   <div class="max-w-6xl mx-auto px-4">
     <header class="mb-10">
-      <p class="text-xs uppercase tracking-[0.3em] text-amber-500 mb-2">Royal Chalet</p>
+      <p class="text-xs uppercase tracking-[0.3em] text-amber-600 dark:text-amber-400 mb-2">Royal Chalet</p>
       <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
         <div>
-          <h1 class="text-3xl md:text-4xl font-semibold tracking-tight text-gray-900">Curated Food Menu</h1>
-          <p class="text-sm md:text-base text-gray-600 mt-2 max-w-xl">Freshly prepared, villa-style dining, managed by our in-house kitchen team.</p>
+          <h1 class="text-3xl md:text-4xl font-semibold tracking-tight text-gray-900 dark:text-white">Curated Food Menu</h1>
+          <p class="text-sm md:text-base text-gray-600 dark:text-slate-400 mt-2 max-w-xl">Freshly prepared, villa-style dining, managed by our in-house kitchen team.</p>
         </div>
-        <div class="text-xs text-right text-gray-500">
+        <div class="text-xs text-right text-gray-500 dark:text-slate-500">
           <p>Kitchen: 8:00 AM – 10:30 PM</p>
           <p class="mt-1">Order time: minimum 45 minutes</p>
         </div>
@@ -23,31 +23,31 @@
         <input
           id="menu-search"
           type="text"
-          class="w-full bg-white border border-gray-200 rounded-full px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400/70 focus:border-amber-400/40"
+          class="w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-full px-4 py-2.5 text-sm text-gray-900 dark:text-slate-100 placeholder:text-gray-400 dark:placeholder:text-slate-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-400/70 focus:border-amber-400/40"
           placeholder="Search for a dish, ingredient or category"
         />
-        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs">
+        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 text-xs">
           <i class="fas fa-search"></i>
         </span>
       </div>
       <div class="flex items-center gap-2 text-[11px]">
         <button
           type="button"
-          class="menu-filter-btn px-3 py-1.5 rounded-full border border-gray-300 bg-white text-gray-700 shadow-sm"
+          class="menu-filter-btn px-3 py-1.5 rounded-full border border-amber-500 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-100 shadow-sm font-medium"
           data-filter="all"
         >
           All
         </button>
         <button
           type="button"
-          class="menu-filter-btn px-3 py-1.5 rounded-full border border-emerald-500/60 bg-emerald-50 text-emerald-700"
+          class="menu-filter-btn px-3 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 shadow-sm"
           data-filter="veg"
         >
           Veg
         </button>
         <button
           type="button"
-          class="menu-filter-btn px-3 py-1.5 rounded-full border border-rose-500/60 bg-rose-50 text-rose-700"
+          class="menu-filter-btn px-3 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-300 shadow-sm"
           data-filter="nonveg"
         >
           Non-Veg
@@ -55,10 +55,10 @@
       </div>
     </div>
 
-    <div class="mb-8 sticky top-0 z-30 bg-amber-50/80 backdrop-blur-md py-4 -mx-4 px-4 sm:static sm:bg-transparent sm:py-0 sm:mx-0">
+    <div class="mb-8 sticky top-0 z-30 bg-amber-50/90 dark:bg-slate-900/90 backdrop-blur-md py-4 -mx-4 px-4 border-b border-amber-100/80 dark:border-slate-700/80 sm:static sm:bg-transparent sm:border-0 sm:py-0 sm:mx-0">
       <div class="flex items-center justify-between mb-2 sm:mb-4">
-        <h2 class="text-sm font-black text-gray-800 uppercase tracking-widest">Categories</h2>
-        <p class="text-[10px] text-gray-500 hidden sm:block">Swipe to explore</p>
+        <h2 class="text-sm font-black text-gray-800 dark:text-slate-200 uppercase tracking-widest">Categories</h2>
+        <p class="text-[10px] text-gray-500 dark:text-slate-500 hidden sm:block">Swipe to explore</p>
       </div>
       <div class="relative">
         <div class="overflow-x-auto no-scrollbar">
@@ -66,7 +66,7 @@
             {% for section in sections %}
             <a
               href="#section-{{ section.id }}"
-              class="category-pill flex-shrink-0 px-5 py-2.5 rounded-2xl border-2 border-white bg-white text-xs font-bold text-gray-600 hover:border-amber-400 hover:text-amber-600 transition-all shadow-sm flex items-center gap-2"
+              class="category-pill flex-shrink-0 px-5 py-2.5 rounded-2xl border-2 border-white dark:border-slate-600 bg-white dark:bg-slate-800 text-xs font-bold text-gray-600 dark:text-slate-300 hover:border-amber-400 hover:text-amber-600 dark:hover:text-amber-400 transition-all shadow-sm flex items-center gap-2"
             >
               <i class="{{ section.icon or 'fas fa-utensils' }} text-amber-500"></i>
               <span>{{ section.display_name|title }}</span>
@@ -81,14 +81,14 @@
       {% for section in sections %}
       <section id="section-{{ section.id }}" class="scroll-mt-24">
         <div class="flex items-center gap-4 mb-6">
-            <h3 class="text-2xl font-black text-gray-900 tracking-tight">{{ section.display_name|title }}</h3>
-            <div class="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent"></div>
+            <h3 class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ section.display_name|title }}</h3>
+            <div class="h-px flex-1 bg-gradient-to-r from-gray-200 dark:from-slate-600 to-transparent"></div>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {% for item in items_by_section[section.id] %}
           <article
-            class="menu-item-card group bg-white rounded-[2rem] p-5 border border-gray-100 shadow-sm hover:shadow-2xl hover:border-amber-200 transition-all duration-500 flex flex-col"
+            class="menu-item-card group bg-white dark:bg-slate-800 rounded-[2rem] p-5 border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-2xl hover:border-amber-200 dark:hover:border-amber-500/40 transition-all duration-500 flex flex-col"
             data-veg="{{ 1 if item.is_veg else 0 }}"
             data-name="{{ (item.name ~ ' ' ~ (item.description or ''))|lower }}"
           >
@@ -105,10 +105,10 @@
                         </div>
                         {% endif %}
                     </div>
-                    <h4 class="text-lg font-black text-gray-900 group-hover:text-amber-600 transition-colors leading-tight mb-2">{{ item.name|title }}</h4>
-                    <p class="text-xs text-gray-500 line-clamp-2 leading-relaxed mb-4">{{ item.description or 'Handcrafted with fresh ingredients by our chefs.' }}</p>
+                    <h4 class="text-lg font-black text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors leading-tight mb-2">{{ item.name|title }}</h4>
+                    <p class="text-xs text-gray-500 dark:text-slate-400 line-clamp-2 leading-relaxed mb-4">{{ item.description or 'Handcrafted with fresh ingredients by our chefs.' }}</p>
                     <div class="flex items-center justify-between mt-auto">
-                        <p class="text-xl font-black text-gray-900">₹{{ '%0.0f'|format(item.price) }}</p>
+                        <p class="text-xl font-black text-gray-900 dark:text-white">₹{{ '%0.0f'|format(item.price) }}</p>
                         <button
                             class="w-10 h-10 bg-amber-500 text-white rounded-full flex items-center justify-center hover:bg-amber-600 transition-all duration-300 add-to-cart-btn shadow-md hover:shadow-lg transform hover:scale-110"
                             data-id="menu-{{ item.id }}"
@@ -122,14 +122,14 @@
                     </div>
                 </div>
                 {% if item.image_url %}
-                <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.5rem] overflow-hidden shadow-lg border-2 border-white">
+                <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.5rem] overflow-hidden shadow-lg border-2 border-white dark:border-slate-600">
                     <img src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                 </div>
                 {% endif %}
             </div>
           </article>
           {% else %}
-          <p class="text-[12px] text-gray-500 italic col-span-full bg-gray-50 p-8 rounded-3xl text-center border-2 border-dashed border-gray-200">Our chefs are preparing something special. Please check back later!</p>
+          <p class="text-[12px] text-gray-500 dark:text-slate-400 italic col-span-full bg-gray-50 dark:bg-slate-800/50 p-8 rounded-3xl text-center border-2 border-dashed border-gray-200 dark:border-slate-600">Our chefs are preparing something special. Please check back later!</p>
           {% endfor %}
         </div>
       </section>
@@ -139,7 +139,7 @@
 </div>
 
 <div class="fixed bottom-24 right-6 z-[110]">
-  <button id="cart-button" class="flex items-center justify-center bg-amber-500 text-gray-900 rounded-full w-14 h-14 shadow-lg hover:bg-amber-400 transition-all transform hover:scale-110 active:scale-95 p-0 border-none outline-none cursor-pointer">
+  <button id="cart-button" type="button" class="flex items-center justify-center bg-amber-500 dark:bg-amber-500 text-gray-900 rounded-full w-14 h-14 shadow-lg hover:bg-amber-400 dark:hover:bg-amber-400 ring-2 ring-amber-200/50 dark:ring-amber-400/30 transition-all transform hover:scale-110 active:scale-95 p-0 border-none outline-none cursor-pointer">
     <div class="relative flex items-center justify-center w-full h-full pointer-events-none">
       <i class="fas fa-shopping-cart text-xl"></i>
       <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center border-2 border-white font-black">0</span>
@@ -147,33 +147,34 @@
   </button>
 </div>
 
-<div id="cart-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center px-4">
-  <div class="bg-white border border-gray-200 rounded-2xl shadow-2xl max-w-md w-full max-h-[80vh] flex flex-col overflow-hidden">
-    <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
-      <h3 class="text-sm font-semibold text-gray-900">Your Food Order</h3>
-      <button id="close-cart" class="text-gray-500 hover:text-gray-800 text-sm">
+<div id="cart-modal" class="fixed inset-0 bg-black/55 dark:bg-black/70 z-50 hidden items-center justify-center px-4 backdrop-blur-sm">
+  <div class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-2xl shadow-2xl max-w-md w-full max-h-[80vh] flex flex-col overflow-hidden">
+    <div class="p-4 border-b border-gray-200 dark:border-slate-600 flex justify-between items-center bg-gray-50 dark:bg-slate-900/80">
+      <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Your Food Order</h3>
+      <button type="button" id="close-cart" class="text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-white text-sm p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700">
         <i class="fas fa-times"></i>
       </button>
     </div>
-    <div class="overflow-y-auto p-4 flex-grow bg-white">
-      <div id="cart-items" class="divide-y divide-gray-200 text-sm text-gray-900"></div>
-      <div id="empty-cart-message" class="text-center py-8 text-gray-400">
+    <div class="overflow-y-auto p-4 flex-grow bg-white dark:bg-slate-800">
+      <div id="cart-items" class="divide-y divide-gray-200 dark:divide-slate-600 text-sm text-gray-900 dark:text-slate-100"></div>
+      <div id="empty-cart-message" class="text-center py-8 text-gray-400 dark:text-slate-500">
         <i class="fas fa-shopping-cart text-3xl mb-3"></i>
         <p>No items added yet.</p>
       </div>
     </div>
-    <div class="p-4 border-t border-gray-200 bg-gray-50">
+    <div class="p-4 border-t border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900/80">
       <div class="flex justify-between mb-3 text-sm">
-        <span class="text-gray-600">Total</span>
-        <span id="cart-total" class="font-semibold text-amber-600">₹0</span>
+        <span class="text-gray-600 dark:text-slate-400">Total</span>
+        <span id="cart-total" class="font-semibold text-amber-600 dark:text-amber-400">₹0</span>
       </div>
       <button
+        type="button"
         id="checkout-button"
-        class="w-full bg-gradient-to-r from-amber-500 to-amber-400 text-gray-900 py-2.5 rounded-full text-sm font-semibold hover:from-amber-400 hover:to-amber-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        class="w-full bg-gradient-to-r from-amber-500 to-amber-400 dark:from-amber-500 dark:to-amber-600 text-gray-900 py-2.5 rounded-full text-sm font-semibold hover:from-amber-400 hover:to-amber-300 dark:hover:from-amber-400 dark:hover:to-amber-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Share Order With Host
       </button>
-      <p class="mt-2 text-[10px] text-gray-500 text-center">Final billing happens at the property. This helps the team prepare in advance.</p>
+      <p class="mt-2 text-[10px] text-gray-500 dark:text-slate-500 text-center">Final billing happens at the property. This helps the team prepare in advance.</p>
     </div>
   </div>
 </div>
@@ -254,15 +255,15 @@
         const lineTotal = item.price * item.quantity;
         total += lineTotal;
         row.innerHTML = '<div>' +
-          '<p class="text-sm text-slate-100">' + item.name + '</p>' +
-          '<p class="text-[11px] text-slate-500">₹' + item.price + ' × ' + item.quantity + '</p>' +
+          '<p class="text-sm font-medium text-gray-900 dark:text-slate-100">' + item.name + '</p>' +
+          '<p class="text-[11px] text-gray-500 dark:text-slate-400">₹' + item.price + ' × ' + item.quantity + '</p>' +
         '</div>' +
         '<div class="text-right">' +
-          '<p class="text-sm font-semibold text-amber-300">' + formatCurrency(lineTotal) + '</p>' +
+          '<p class="text-sm font-semibold text-amber-600 dark:text-amber-400">' + formatCurrency(lineTotal) + '</p>' +
           '<div class="mt-1 inline-flex items-center gap-1 text-[11px]">' +
-            '<button data-index="' + index + '" data-action="dec" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-200">-</button>' +
-            '<button data-index="' + index + '" data-action="inc" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-200">+</button>' +
-            '<button data-index="' + index + '" data-action="remove" class="px-2 py-0.5 rounded-full bg-slate-900 text-slate-400">×</button>' +
+            '<button type="button" data-index="' + index + '" data-action="dec" class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 hover:bg-gray-200 dark:hover:bg-slate-600">-</button>' +
+            '<button type="button" data-index="' + index + '" data-action="inc" class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-slate-200 hover:bg-gray-200 dark:hover:bg-slate-600">+</button>' +
+            '<button type="button" data-index="' + index + '" data-action="remove" class="px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 hover:bg-rose-200 dark:hover:bg-rose-900/40">×</button>' +
           '</div>' +
         '</div>';
         cartItemsContainer.appendChild(row);
@@ -366,9 +367,19 @@
       btn.addEventListener('click', function() {
         activeFilter = btn.dataset.filter;
         filterButtons.forEach(function(b) {
-          b.classList.remove('border-amber-400', 'bg-amber-500/20', 'text-amber-200');
+          b.classList.remove('border-amber-500', 'bg-amber-50', 'dark:bg-amber-950/40', 'text-amber-900', 'dark:text-amber-100', 'font-medium');
+          b.classList.remove('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-950/40', 'text-emerald-900', 'dark:text-emerald-100');
+          b.classList.remove('border-rose-500', 'bg-rose-50', 'dark:bg-rose-950/40', 'text-rose-900', 'dark:text-rose-100');
+          b.classList.add('border-gray-300', 'dark:border-slate-600', 'bg-white', 'dark:bg-slate-800', 'text-gray-700', 'dark:text-slate-300');
         });
-        btn.classList.add('border-amber-400', 'bg-amber-500/20', 'text-amber-200');
+        btn.classList.remove('border-gray-300', 'dark:border-slate-600', 'bg-white', 'dark:bg-slate-800', 'text-gray-700', 'dark:text-slate-300');
+        if (activeFilter === 'all') {
+          btn.classList.add('border-amber-500', 'bg-amber-50', 'dark:bg-amber-950/40', 'text-amber-900', 'dark:text-amber-100', 'font-medium');
+        } else if (activeFilter === 'veg') {
+          btn.classList.add('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-950/40', 'text-emerald-900', 'dark:text-emerald-100', 'font-medium');
+        } else {
+          btn.classList.add('border-rose-500', 'bg-rose-50', 'dark:bg-rose-950/40', 'text-rose-900', 'dark:text-rose-100', 'font-medium');
+        }
         applyFilters();
       });
     });
