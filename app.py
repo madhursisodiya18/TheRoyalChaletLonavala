@@ -13,7 +13,7 @@ import locale
 from functools import wraps
 from types import SimpleNamespace
 
-from models import User, Booking, FoodMenu, FoodOrder, GalleryImage, Review, Contact, VillaSettings, Notification, MenuSection, Coupon, Category, MenuItem
+from models import User, Booking, FoodMenu, FoodOrder, Review, Contact, VillaSettings, Notification, MenuSection, Coupon, Category, MenuItem
 from flask import abort
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from collections import defaultdict
@@ -295,54 +295,6 @@ with app.app_context():
         except Exception as e:
             db.session.rollback()
             print(f"Error adding sample menu items: {e}")
-    
-    # Add sample gallery images if they don't exist
-    if not GalleryImage.query.first():
-        sample_gallery_images = [
-            {
-                'section': 'exterior',
-                'image_path': 'Villa From Outside1.jpg',
-                'caption': 'Villa Facade',
-                'alt_text': 'Beautiful villa exterior view',
-                'is_featured': True,
-                'display_order': 1
-            },
-            {
-                'section': 'exterior',
-                'image_path': 'Villa From Outside2.jpg',
-                'caption': 'Villa Side View',
-                'alt_text': 'Elegant villa side view',
-                'is_featured': True,
-                'display_order': 2
-            },
-            {
-                'section': 'bedrooms',
-                'image_path': 'masterbedroom.jpg',
-                'caption': 'Master Bedroom',
-                'alt_text': 'Luxurious master bedroom',
-                'is_featured': True,
-                'display_order': 3
-            },
-            {
-                'section': 'kitchen',
-                'image_path': 'kitchen.jpg',
-                'caption': 'Modern Kitchen',
-                'alt_text': 'Fully equipped modern kitchen',
-                'is_featured': False,
-                'display_order': 4
-            }
-        ]
-        
-        for image_data in sample_gallery_images:
-            gallery_image = GalleryImage(**image_data)
-            db.session.add(gallery_image)
-        
-        try:
-            db.session.commit()
-            print("Sample gallery images added successfully!")
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error adding sample gallery images: {e}")
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -552,12 +504,6 @@ def logout():
 @app.route('/')
 def index():
     try:
-        # Get featured gallery images
-        featured_images = GalleryImage.query.filter_by(is_featured=True).order_by(GalleryImage.display_order).limit(6).all()
-    except:
-        featured_images = []
-    
-    try:
         # Get recent reviews
         recent_reviews = Review.query.filter_by(is_approved=True).order_by(Review.created_at.desc()).limit(3).all()
     except:
@@ -579,7 +525,6 @@ def index():
     extended_stay_price = int(get_setting('extended_stay_price', 8500))
     
     return render_template('index.html', 
-                         featured_images=featured_images,
                          recent_reviews=recent_reviews,
                          total_bookings=total_bookings,
                          total_reviews=total_reviews,
@@ -587,31 +532,6 @@ def index():
                          weekday_price=weekday_price,
                          weekend_price=weekend_price,
                          extended_stay_price=extended_stay_price)
-
-@app.route('/gallery')
-def gallery():
-    try:
-        # Get gallery images organized by sections
-        gallery_sections = {}
-        images = GalleryImage.query.order_by(GalleryImage.display_order).all()
-        
-        for image in images:
-            section = image.section
-            if section not in gallery_sections:
-                gallery_sections[section] = []
-            gallery_sections[section].append(image)
-            
-            # Add 4BHK images to their own section if they have the 4bhk tag
-            if section == '4bhk' or getattr(image, 'tags', '').lower().find('4bhk') >= 0:
-                if '4bhk' not in gallery_sections:
-                    gallery_sections['4bhk'] = []
-                if section != '4bhk':  # Avoid duplicates
-                    gallery_sections['4bhk'].append(image)
-    except Exception as e:
-        app.logger.error(f"Error in gallery route: {str(e)}")
-        gallery_sections = {}
-    
-    return render_template('gallery.html', gallery_sections=gallery_sections)
 
 @app.route('/api/calculate-price', methods=['POST'])
 def calculate_price():
@@ -1519,9 +1439,11 @@ def admin_bookings():
     # Apply search filter if provided
     if search_query:
         # Join with User table to search by username or email
-        query = query.join(User).filter(
+        query = query.outerjoin(User).filter(
             db.or_(
                 Booking.id.like(f'%{search_query}%'),
+                Booking.user_name.like(f'%{search_query}%'),
+                Booking.email.like(f'%{search_query}%'),
                 User.username.like(f'%{search_query}%'),
                 User.email.like(f'%{search_query}%')
             )
@@ -1633,6 +1555,103 @@ def admin_bookings_calendar():
         })
     
     return render_template('admin/admin_bookings_calendar.html', calendar_events=calendar_events)
+
+
+@app.route('/admin/booking/<int:booking_id>')
+@login_required
+def admin_booking_details(booking_id):
+    if not current_user.is_admin:
+        abort(403)
+    
+    booking = Booking.query.get_or_404(booking_id)
+    return render_template('admin/admin_booking_details.html', booking=booking)
+
+
+@app.route('/admin/booking/delete/<int:booking_id>', methods=['POST'])
+@login_required
+def admin_booking_delete(booking_id):
+    if not current_user.is_admin:
+        abort(403)
+    
+    booking = Booking.query.get_or_404(booking_id)
+    db.session.delete(booking)
+    db.session.commit()
+    flash('Booking deleted successfully!', 'success')
+    return redirect(url_for('admin_bookings'))
+
+
+@app.route('/admin/booking/update-status/<int:booking_id>', methods=['POST'])
+@login_required
+def admin_booking_update_status(booking_id):
+    if not current_user.is_admin:
+        abort(403)
+    
+    booking = Booking.query.get_or_404(booking_id)
+    new_status = request.form.get('status')
+    if new_status in ['pending', 'confirmed', 'cancelled']:
+        booking.status = new_status
+        db.session.commit()
+        flash(f'Booking status updated to {new_status}!', 'success')
+    
+    return redirect(url_for('admin_booking_details', booking_id=booking.id))
+
+
+@app.route('/admin/bookings/new', methods=['GET', 'POST'])
+@login_required
+def admin_bookings_new():
+    if not current_user.is_admin:
+        abort(403)
+    
+    if request.method == 'POST':
+        user_id = request.form.get('user_id')
+        check_in = datetime.strptime(request.form.get('check_in'), '%Y-%m-%d')
+        check_out = datetime.strptime(request.form.get('check_out'), '%Y-%m-%d')
+        guests = int(request.form.get('guests'))
+        total_price = float(request.form.get('total_price'))
+        status = request.form.get('status')
+        special_requests = request.form.get('special_requests')
+        
+        booking = Booking(
+            user_id=user_id,
+            check_in=check_in,
+            check_out=check_out,
+            guests=guests,
+            total_price=total_price,
+            status=status,
+            special_requests=special_requests
+        )
+        db.session.add(booking)
+        db.session.commit()
+        flash('Booking created successfully!', 'success')
+        return redirect(url_for('admin_bookings'))
+    
+    users = User.query.all()
+    return render_template('admin/admin_booking_form.html', users=users, booking=None, today=datetime.now().strftime('%Y-%m-%d'))
+
+
+@app.route('/admin/booking/edit/<int:booking_id>', methods=['GET', 'POST'])
+@login_required
+def admin_booking_edit(booking_id):
+    if not current_user.is_admin:
+        abort(403)
+    
+    booking = Booking.query.get_or_404(booking_id)
+    
+    if request.method == 'POST':
+        booking.user_id = request.form.get('user_id')
+        booking.check_in = datetime.strptime(request.form.get('check_in'), '%Y-%m-%d')
+        booking.check_out = datetime.strptime(request.form.get('check_out'), '%Y-%m-%d')
+        booking.guests = int(request.form.get('guests'))
+        booking.total_price = float(request.form.get('total_price'))
+        booking.status = request.form.get('status')
+        booking.special_requests = request.form.get('special_requests')
+        
+        db.session.commit()
+        flash('Booking updated successfully!', 'success')
+        return redirect(url_for('admin_bookings'))
+    
+    users = User.query.all()
+    return render_template('admin/admin_booking_form.html', users=users, booking=booking, today=datetime.now().strftime('%Y-%m-%d'))
 
 # Export CSV route moved to the bottom of the file
 
@@ -1956,31 +1975,32 @@ def admin_menu_dashboard():
     page = request.args.get('page', 1, type=int)
     per_page = 15
     search_query = request.args.get('q', '', type=str).strip()
-    category_id = request.args.get('category', type=int)
+    section_id = request.args.get('section', type=int)
 
-    categories = Category.query.order_by(Category.name.asc()).all()
+    sections = MenuSection.query.order_by(MenuSection.name.asc()).all()
 
-    items_query = MenuItem.query
+    items_query = FoodMenu.query
 
-    if category_id:
-        items_query = items_query.filter(MenuItem.category_id == category_id)
+    if section_id:
+        items_query = items_query.filter(FoodMenu.section_id == section_id)
 
     if search_query:
         ilike_pattern = f"%{search_query}%"
         items_query = items_query.filter(
-            (MenuItem.name.ilike(ilike_pattern)) | (MenuItem.description.ilike(ilike_pattern))
+            (FoodMenu.name.ilike(ilike_pattern)) | (FoodMenu.description.ilike(ilike_pattern))
         )
 
-    items_query = items_query.order_by(MenuItem.created_at.desc())
+    # Use a different ordering if created_at is not available, or use id
+    items_query = items_query.order_by(FoodMenu.id.desc())
     pagination = items_query.paginate(page=page, per_page=per_page, error_out=False)
 
     return render_template(
         'admin/admin_menu.html',
-        categories=categories,
+        sections=sections,
         items=pagination.items,
         pagination=pagination,
         search_query=search_query,
-        selected_category_id=category_id,
+        selected_section_id=section_id,
     )
 
 
@@ -1990,13 +2010,13 @@ def admin_add_menu_item():
     if not current_user.is_admin:
         abort(403)
 
-    categories = Category.query.order_by(Category.name.asc()).all()
+    sections = MenuSection.query.order_by(MenuSection.name.asc()).all()
 
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         price = request.form.get('price', '').strip()
         description = request.form.get('description', '').strip()
-        category_id = request.form.get('category_id')
+        section_id = request.form.get('section_id')
         is_veg = request.form.get('is_veg') == 'true'
         is_available = request.form.get('is_available') == 'true'
         image_file = request.files.get('image')
@@ -2009,14 +2029,14 @@ def admin_add_menu_item():
             errors.append('Price is required.')
         else:
             try:
-                price = int(price)
+                price = float(price)
                 if price <= 0:
                     errors.append('Price must be positive.')
             except ValueError:
                 errors.append('Price must be a number.')
 
-        if not category_id:
-            errors.append('Category is required.')
+        if not section_id:
+            errors.append('Section is required.')
 
         image_path = None
         if image_file and image_file.filename:
@@ -2029,23 +2049,16 @@ def admin_add_menu_item():
         if errors:
             for error in errors:
                 flash(error, 'error')
-            return render_template(
-                'admin/admin_menu.html',
-                categories=categories,
-                items=[],
-                pagination=None,
-                search_query='',
-                selected_category_id=None,
-            )
+            return redirect(url_for('admin_menu.admin_menu_dashboard'))
 
-        menu_item = MenuItem(
+        menu_item = FoodMenu(
             name=name,
             description=description,
             price=price,
-            category_id=int(category_id),
+            section_id=int(section_id),
             is_veg=is_veg,
             is_available=is_available,
-            image=image_path,
+            image_url=image_path,
         )
         db.session.add(menu_item)
         db.session.commit()
@@ -2062,12 +2075,12 @@ def admin_edit_menu_item(item_id):
     if not current_user.is_admin:
         abort(403)
 
-    item = MenuItem.query.get_or_404(item_id)
+    item = FoodMenu.query.get_or_404(item_id)
 
     name = request.form.get('name', '').strip()
     price = request.form.get('price', '').strip()
     description = request.form.get('description', '').strip()
-    category_id = request.form.get('category_id')
+    section_id = request.form.get('section_id')
     is_veg = request.form.get('is_veg') == 'true'
     is_available = request.form.get('is_available') == 'true'
     image_file = request.files.get('image')
@@ -2076,13 +2089,13 @@ def admin_edit_menu_item(item_id):
         item.name = name
     if price:
         try:
-            item.price = int(price)
+            item.price = float(price)
         except ValueError:
             flash('Price must be a number.', 'error')
             return redirect(url_for('admin_menu.admin_menu_dashboard'))
     item.description = description
-    if category_id:
-        item.category_id = int(category_id)
+    if section_id:
+        item.section_id = int(section_id)
     item.is_veg = is_veg
     item.is_available = is_available
 
@@ -2092,7 +2105,7 @@ def admin_edit_menu_item(item_id):
         os.makedirs(upload_folder, exist_ok=True)
         image_path = os.path.join('menu', filename)
         image_file.save(os.path.join(upload_folder, filename))
-        item.image = image_path
+        item.image_url = image_path
 
     db.session.commit()
     flash('Menu item updated successfully.', 'success')
@@ -2105,7 +2118,17 @@ def admin_delete_menu_item(item_id):
     if not current_user.is_admin:
         abort(403)
 
-    item = MenuItem.query.get_or_404(item_id)
+    item = FoodMenu.query.get_or_404(item_id)
+    
+    # Optional: Delete image file
+    if item.image_url:
+        try:
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], item.image_url)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+        except Exception as e:
+            app.logger.error(f"Error deleting menu image: {e}")
+
     db.session.delete(item)
     db.session.commit()
     flash('Menu item deleted successfully.', 'success')
@@ -2118,18 +2141,12 @@ def admin_toggle_menu_item(item_id):
     if not current_user.is_admin:
         abort(403)
 
-    item = MenuItem.query.get_or_404(item_id)
-    item.is_available = not item.is_available
-    db.session.commit()
-    return redirect(url_for('admin_menu.admin_menu_dashboard'))
-    if not current_user.is_admin:
-        abort(403)
     item = FoodMenu.query.get_or_404(item_id)
     item.is_available = not item.is_available
     db.session.commit()
     status = "available" if item.is_available else "unavailable"
     flash(f'Menu item "{item.name}" is now {status}!')
-    return redirect(url_for('admin_menu'))
+    return redirect(url_for('admin_menu.admin_menu_dashboard'))
 
 @app.route('/admin/sections')
 @login_required
@@ -2137,173 +2154,6 @@ def admin_sections():
     if not current_user.is_admin:
         abort(403)
     return redirect(url_for('admin_menu.admin_menu_dashboard'))
-
-@app.route('/admin/gallery')
-@login_required
-def admin_gallery():
-    if not current_user.is_admin:
-        abort(403)
-    images = GalleryImage.query.order_by(GalleryImage.display_order).all()
-    return render_template('admin/admin_gallery.html', images=images)
-
-@app.route('/admin/gallery/add', methods=['POST'])
-@login_required
-def admin_add_gallery_image():
-    if not current_user.is_admin:
-        abort(403)
-    
-    # Check if image file was uploaded
-    if 'image' not in request.files:
-        flash('No image file uploaded', 'error')
-        return redirect(url_for('admin_gallery'))
-        
-    image_file = request.files['image']
-    if image_file.filename == '':
-        flash('No image selected', 'error')
-        return redirect(url_for('admin_gallery'))
-    
-    # Process the image file
-    if image_file and allowed_file(image_file.filename, {'jpg', 'jpeg', 'png', 'gif'}):
-        # Secure the filename and save the file
-        filename = secure_filename(image_file.filename)
-        # Create a unique filename to avoid overwriting
-        unique_filename = f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{filename}"
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'gallery', unique_filename)
-        
-        # Ensure the directory exists
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        
-        # Save the file
-        image_file.save(file_path)
-        
-        # Get the relative path for storage in the database
-        relative_path = os.path.join('gallery', unique_filename).replace('\\', '/')
-        
-        section = request.form['section']
-        caption = request.form.get('caption', '')
-        alt_text = request.form.get('alt_text', '')
-        is_featured = 'is_featured' in request.form
-        display_order = int(request.form.get('display_order', 1))
-        tags = request.form.get('tags', '')
-        
-        # Check if we're editing an existing image
-        image_id = request.form.get('image_id')
-        if image_id and image_id.strip():
-            # Update existing image
-            image = GalleryImage.query.get(image_id)
-            if image:
-                # If updating an existing image, delete the old file if it exists
-                if image.image_path and os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], image.image_path)):
-                    try:
-                        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], image.image_path))
-                    except Exception as e:
-                        app.logger.error(f"Error deleting old image: {e}")
-                
-                image.section = section
-                image.image_path = relative_path
-                image.caption = caption
-                image.alt_text = alt_text
-                image.is_featured = is_featured
-                image.display_order = display_order
-                image.tags = tags
-                flash('Gallery image updated successfully!', 'success')
-            else:
-                flash('Image not found', 'error')
-                return redirect(url_for('admin_gallery'))
-        else:
-            # Create new image
-            image = GalleryImage(
-                section=section,
-                image_path=relative_path,
-                caption=caption,
-                alt_text=alt_text,
-                is_featured=is_featured,
-                display_order=display_order,
-                tags=tags
-            )
-            db.session.add(image)
-            flash('Gallery image added successfully!', 'success')
-        
-        db.session.commit()
-        return redirect(url_for('admin_gallery'))
-    else:
-        flash('Invalid file type. Allowed types: jpg, jpeg, png, gif', 'error')
-        return redirect(url_for('admin_gallery'))
-
-@app.route('/admin/gallery/delete/<int:image_id>', methods=['POST'])
-@login_required
-def admin_delete_gallery_image(image_id):
-    if not current_user.is_admin:
-        abort(403)
-    
-    image = GalleryImage.query.get_or_404(image_id)
-    
-    # Delete the image file if it exists
-    if image.image_path:
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], image.image_path)
-        if os.path.exists(file_path):
-            try:
-                os.remove(file_path)
-            except Exception as e:
-                app.logger.error(f"Error deleting image file: {e}")
-    
-    # Delete the database record
-    db.session.delete(image)
-    db.session.commit()
-    
-    flash('Gallery image deleted successfully!', 'success')
-    return redirect(url_for('admin_gallery'))
-
-@app.route('/admin/gallery/update-order', methods=['POST'])
-@login_required
-def admin_update_gallery_order():
-    if not current_user.is_admin:
-        abort(403)
-    
-    image_id = request.form.get('image_id')
-    new_order = request.form.get('display_order')
-    
-    if not image_id or not new_order:
-        return jsonify({'success': False, 'message': 'Missing required parameters'}), 400
-    
-    try:
-        image_id = int(image_id)
-        new_order = int(new_order)
-    except ValueError:
-        return jsonify({'success': False, 'message': 'Invalid parameters'}), 400
-    
-    image = GalleryImage.query.get(image_id)
-    if not image:
-        return jsonify({'success': False, 'message': 'Image not found'}), 404
-    
-    image.display_order = new_order
-    db.session.commit()
-    
-    return jsonify({'success': True, 'message': 'Display order updated successfully'})
-
-@app.route('/admin/gallery/get-image/<int:image_id>', methods=['GET'])
-@login_required
-def admin_get_gallery_image(image_id):
-    if not current_user.is_admin:
-        abort(403)
-    
-    image = GalleryImage.query.get(image_id)
-    if not image:
-        return jsonify({'success': False, 'message': 'Image not found'}), 404
-    
-    # Convert the image object to a dictionary
-    image_data = {
-        'id': image.id,
-        'section': image.section,
-        'image_path': image.image_path,
-        'caption': image.caption,
-        'alt_text': image.alt_text,
-        'is_featured': image.is_featured,
-        'display_order': image.display_order,
-        'tags': image.tags
-    }
-    
-    return jsonify({'success': True, 'image': image_data})
 
 @app.route('/admin/contacts')
 @login_required
@@ -2448,6 +2298,15 @@ def mark_contact_as_read(contact_id):
         'stats': stats
     })
 
+def update_setting(key, value):
+    """Update or create a villa setting"""
+    setting = VillaSettings.query.filter_by(setting_key=key).first()
+    if setting:
+        setting.setting_value = value
+    else:
+        setting = VillaSettings(setting_key=key, setting_value=value)
+        db.session.add(setting)
+
 @app.route('/admin/settings', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -2458,12 +2317,7 @@ def admin_settings():
             # Process existing settings
             for key in request.form:
                 if key != 'csrf_token':
-                    setting = VillaSettings.query.filter_by(setting_key=key).first()
-                    if setting:
-                        setting.setting_value = request.form[key]
-                    else:
-                        setting = VillaSettings(setting_key=key, setting_value=request.form[key])
-                        db.session.add(setting)
+                    update_setting(key, request.form[key])
             
             # Process new settings for guest pricing
             max_guests = request.form.get('max_guests', '20')
@@ -2475,6 +2329,9 @@ def admin_settings():
             update_setting('base_guests', base_guests)
             update_setting('additional_guest_fee', additional_guest_fee)
             
+            # Commit the changes to the database
+            db.session.commit()
+            
             # Update email configuration from database settings
             update_email_config_from_db()
             
@@ -2482,6 +2339,7 @@ def admin_settings():
             return redirect(url_for('admin_settings'))
             
         except Exception as e:
+            db.session.rollback()
             flash(f'Error updating settings: {str(e)}', 'error')
     
     # Get all settings

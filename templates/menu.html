@@ -55,24 +55,21 @@
       </div>
     </div>
 
-    <div class="mb-8">
-      <div class="flex items-center justify-between mb-2">
-        <h2 class="text-sm font-semibold text-gray-800">Browse by category</h2>
-        <p class="text-[10px] text-gray-500 hidden sm:block">Scroll sideways to see all sections</p>
+    <div class="mb-8 sticky top-0 z-30 bg-amber-50/80 backdrop-blur-md py-4 -mx-4 px-4 sm:static sm:bg-transparent sm:py-0 sm:mx-0">
+      <div class="flex items-center justify-between mb-2 sm:mb-4">
+        <h2 class="text-sm font-black text-gray-800 uppercase tracking-widest">Categories</h2>
+        <p class="text-[10px] text-gray-500 hidden sm:block">Swipe to explore</p>
       </div>
       <div class="relative">
-        <div class="pointer-events-none absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-amber-50 to-transparent hidden sm:block"></div>
-        <div class="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-amber-50 to-transparent hidden sm:block"></div>
-        <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-          <div class="inline-flex gap-3 pr-6">
+        <div class="overflow-x-auto no-scrollbar">
+          <div class="inline-flex gap-2 pb-2">
             {% for section in sections %}
             <a
               href="#section-{{ section.id }}"
-              class="group flex-shrink-0 px-4 py-2 rounded-full border border-gray-200 bg-white text-[11px] font-medium text-gray-700 hover:border-amber-400 hover:bg-amber-50 hover:text-amber-700 transition-all shadow-sm hover:shadow-md"
+              class="category-pill flex-shrink-0 px-5 py-2.5 rounded-2xl border-2 border-white bg-white text-xs font-bold text-gray-600 hover:border-amber-400 hover:text-amber-600 transition-all shadow-sm flex items-center gap-2"
             >
-              <span class="truncate max-w-[120px] block group-hover:tracking-wide">
-                {{ section.display_name }}
-              </span>
+              <i class="{{ section.icon or 'fas fa-utensils' }} text-amber-500"></i>
+              <span>{{ section.display_name|title }}</span>
             </a>
             {% endfor %}
           </div>
@@ -80,82 +77,60 @@
       </div>
     </div>
 
-    <div class="space-y-5" id="menu-sections">
+    <div class="space-y-12" id="menu-sections">
       {% for section in sections %}
-      <section
-        id="section-{{ section.id }}"
-        class="rounded-2xl border border-gray-200 bg-white/90 overflow-hidden shadow-md"
-      >
-        <button
-          type="button"
-          class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 section-toggle"
-          data-section-id="{{ section.id }}"
-        >
-          <div class="flex items-center gap-3">
-            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-600">
-              {% if section.icon %}
-              <i class="{{ section.icon }}"></i>
-              {% else %}
-              <i class="fas fa-utensils"></i>
-              {% endif %}
-            </div>
-            <div class="text-left">
-              <p class="text-sm md:text-base font-medium text-gray-900">{{ section.display_name }}</p>
-              {% if section.description %}
-              <p class="text-[11px] text-gray-500">{{ section.description }}</p>
-              {% endif %}
-            </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="inline-flex items-center text-[11px] bg-gray-100 text-gray-700 px-2 py-1 rounded-full border border-gray-200">
-              <i class="fas fa-utensils mr-1"></i>
-              {{ items_by_section[section.id] | length }} items
-            </span>
-            <i class="fas fa-chevron-down text-slate-400 transition-transform section-toggle-icon{% if loop.first %} rotate-180{% endif %}"></i>
-          </div>
-        </button>
-        <div class="section-body px-3 pb-4 pt-3{% if not loop.first %} hidden{% endif %}">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {% for item in items_by_section[section.id] %}
-            <article
-              class="menu-item-card border border-gray-200 rounded-xl p-3 bg-white hover:border-amber-400/70 hover:shadow-md transition"
-              data-veg="{{ 1 if item.is_veg else 0 }}"
-              data-name="{{ (item.name ~ ' ' ~ (item.description or ''))|lower }}"
-            >
-              <div class="flex justify-between items-start gap-3">
-                <div>
-                  <p class="text-sm font-medium text-gray-900">{{ item.name }}</p>
-                  {% if item.description %}
-                  <p class="text-[11px] text-gray-500 mt-1 line-clamp-2">{{ item.description }}</p>
-                  {% endif %}
+      <section id="section-{{ section.id }}" class="scroll-mt-24">
+        <div class="flex items-center gap-4 mb-6">
+            <h3 class="text-2xl font-black text-gray-900 tracking-tight">{{ section.display_name|title }}</h3>
+            <div class="h-px flex-1 bg-gradient-to-r from-gray-200 to-transparent"></div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% for item in items_by_section[section.id] %}
+          <article
+            class="menu-item-card group bg-white rounded-[2rem] p-5 border border-gray-100 shadow-sm hover:shadow-2xl hover:border-amber-200 transition-all duration-500 flex flex-col"
+            data-veg="{{ 1 if item.is_veg else 0 }}"
+            data-name="{{ (item.name ~ ' ' ~ (item.description or ''))|lower }}"
+          >
+            <div class="flex gap-5">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                        {% if item.is_veg %}
+                        <div class="w-4 h-4 border-2 border-emerald-500 p-0.5 flex items-center justify-center">
+                            <div class="w-full h-full rounded-full bg-emerald-500"></div>
+                        </div>
+                        {% else %}
+                        <div class="w-4 h-4 border-2 border-rose-500 p-0.5 flex items-center justify-center">
+                            <div class="w-full h-full rounded-full bg-rose-500"></div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <h4 class="text-lg font-black text-gray-900 group-hover:text-amber-600 transition-colors leading-tight mb-2">{{ item.name|title }}</h4>
+                    <p class="text-xs text-gray-500 line-clamp-2 leading-relaxed mb-4">{{ item.description or 'Handcrafted with fresh ingredients by our chefs.' }}</p>
+                    <div class="flex items-center justify-between mt-auto">
+                        <p class="text-xl font-black text-gray-900">₹{{ '%0.0f'|format(item.price) }}</p>
+                        <button
+                            class="w-10 h-10 bg-amber-500 text-white rounded-full flex items-center justify-center hover:bg-amber-600 transition-all duration-300 add-to-cart-btn shadow-md hover:shadow-lg transform hover:scale-110"
+                            data-id="menu-{{ item.id }}"
+                            data-name="{{ item.name }}"
+                            data-price="{{ item.price }}"
+                            data-type="item"
+                            title="Add to Cart"
+                        >
+                            <i class="fas fa-shopping-cart text-sm"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="text-right">
-                  <p class="text-sm font-semibold {% if item.is_veg %}text-emerald-600{% else %}text-rose-600{% endif %}">
-                    ₹{{ '%0.0f'|format(item.price) }}
-                  </p>
-                  <p class="mt-1 text-[10px] inline-flex items-center px-2 py-0.5 rounded-full border {% if item.is_veg %}border-emerald-500/60 text-emerald-700 bg-emerald-50{% else %}border-rose-500/60 text-rose-700 bg-rose-50{% endif %}">
-                    {% if item.is_veg %}
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 mr-1"></span> Veg
-                    {% else %}
-                    <span class="w-2 h-2 rounded-full bg-rose-500 mr-1"></span> Non-Veg
-                    {% endif %}
-                  </p>
+                {% if item.image_url %}
+                <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-[1.5rem] overflow-hidden shadow-lg border-2 border-white">
+                    <img src="{{ url_for('static', filename=item.image_url) }}" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                 </div>
-              </div>
-              <button
-                class="mt-3 w-full px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-400 text-gray-900 rounded-full text-xs font-medium hover:from-amber-400 hover:to-amber-300 transition add-to-cart-btn"
-                data-id="menu-{{ item.id }}"
-                data-name="{{ item.name }}"
-                data-price="{{ item.price }}"
-                data-type="item"
-              >
-                <i class="fas fa-cart-plus mr-2"></i> Add to Order
-              </button>
-            </article>
-            {% else %}
-            <p class="text-[12px] text-gray-500 italic col-span-full">No items available in this category right now.</p>
-            {% endfor %}
-          </div>
+                {% endif %}
+            </div>
+          </article>
+          {% else %}
+          <p class="text-[12px] text-gray-500 italic col-span-full bg-gray-50 p-8 rounded-3xl text-center border-2 border-dashed border-gray-200">Our chefs are preparing something special. Please check back later!</p>
+          {% endfor %}
         </div>
       </section>
       {% endfor %}
@@ -163,11 +138,11 @@
   </div>
 </div>
 
-<div class="fixed bottom-6 right-6 z-[100]">
-  <button id="cart-button" class="flex items-center justify-center bg-amber-500 text-gray-900 rounded-full w-14 h-14 shadow-lg hover:bg-amber-400 transition">
-    <div class="relative">
+<div class="fixed bottom-24 right-6 z-[110]">
+  <button id="cart-button" class="flex items-center justify-center bg-amber-500 text-gray-900 rounded-full w-14 h-14 shadow-lg hover:bg-amber-400 transition-all transform hover:scale-110 active:scale-95 p-0 border-none outline-none cursor-pointer">
+    <div class="relative flex items-center justify-center w-full h-full pointer-events-none">
       <i class="fas fa-shopping-cart text-xl"></i>
-      <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center">0</span>
+      <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center border-2 border-white font-black">0</span>
     </div>
   </button>
 </div>
@@ -203,7 +178,7 @@
   </div>
 </div>
 
-<div id="itemAddedNotification" class="fixed bottom-20 right-6 bg-emerald-600 text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-10 opacity-0 transition-all duration-300 z-[100] text-xs">
+<div id="itemAddedNotification" class="fixed bottom-40 right-6 bg-emerald-600 text-white px-4 py-3 rounded-lg shadow-lg transform translate-y-10 opacity-0 transition-all duration-300 z-[120] text-xs">
   <div class="flex items-center">
     <i class="fas fa-check-circle mr-2"></i>
     <span id="addedItemName">Item added to cart</span>
@@ -331,11 +306,11 @@
         setCart(cart);
         showNotification(name);
         const original = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check mr-2"></i> Added';
-        btn.classList.add('bg-emerald-500');
+        btn.innerHTML = '<i class="fas fa-check text-sm"></i>';
+        btn.classList.replace('bg-amber-500', 'bg-emerald-500');
         setTimeout(function() {
           btn.innerHTML = original;
-          btn.classList.remove('bg-emerald-500');
+          btn.classList.replace('bg-emerald-500', 'bg-amber-500');
         }, 700);
       });
     });
@@ -395,20 +370,6 @@
         });
         btn.classList.add('border-amber-400', 'bg-amber-500/20', 'text-amber-200');
         applyFilters();
-      });
-    });
-
-    sectionToggles.forEach(function(button) {
-      const sectionId = button.dataset.sectionId;
-      const body = document.querySelector('#section-' + sectionId + ' .section-body');
-      const icon = button.querySelector('.section-toggle-icon');
-      button.addEventListener('click', function() {
-        if (body) {
-          body.classList.toggle('hidden');
-        }
-        if (icon) {
-          icon.classList.toggle('rotate-180');
-        }
       });
     });
 

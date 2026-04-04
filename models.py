@@ -88,7 +88,7 @@ class FoodMenu(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Integer, nullable=False)
-    image = db.Column(db.String(200))
+    image_url = db.Column(db.String(200))
     description = db.Column(db.String(300))
     section_id = db.Column(db.Integer, db.ForeignKey('menu_section.id'), nullable=False)
     section = db.Column(db.String(50), nullable=False, default='General')  # Keep for backward compatibility
@@ -138,17 +138,6 @@ class FoodOrder(db.Model):
     special_instructions = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     delivered_at = db.Column(db.DateTime)
-
-class GalleryImage(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    section = db.Column(db.String(50), nullable=False)
-    image_path = db.Column(db.String(200), nullable=False)
-    caption = db.Column(db.String(100))
-    alt_text = db.Column(db.String(200))
-    is_featured = db.Column(db.Boolean, default=False)
-    display_order = db.Column(db.Integer, default=0)
-    tags = db.Column(db.String(200), default='')
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)

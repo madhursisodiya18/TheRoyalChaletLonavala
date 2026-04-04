@@ -24,9 +24,15 @@
               'playfair': ['Playfair Display', 'serif'],
             },
             colors: {
-              'admin-primary': '#0f2557',   // Deeper navy blue
-              'admin-secondary': '#2563eb', // Richer medium blue
-              'admin-accent': '#0ea5e9'     // Teal accent instead of gold
+              'admin-primary': '#0f2557',
+              'admin-secondary': '#2563eb',
+              'admin-accent': '#0ea5e9',
+              dark: {
+                bg: '#0f172a',      // slate-900
+                card: '#1e293b',    // slate-800
+                border: '#334155',  // slate-700
+                text: '#f1f5f9'     // slate-100
+              }
             }
           }
         }
@@ -42,13 +48,25 @@
         background-color: #f8fafc;
       }
       
-      /* Professional header with rich colors */
+      .dark body {
+        background-color: #0f172a;
+        color: #f1f5f9;
+      }
+      
+      /* Professional header with light colors for white logo */
       header, .admin-header, nav, .navbar, .fixed-header {
         position: static !important;
         width: 100%;
         z-index: 10;
-        background: linear-gradient(to right, #0f2557, #1e40af) !important;
+        background: #ffffff !important;
         padding: 0.75rem 0;
+        border-bottom: 1px solid #e2e8f0 !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+      }
+      
+      .dark header, .dark .admin-header, .dark nav, .dark .navbar, .dark .fixed-header {
+        background: #1e293b !important;
+        border-bottom: 1px solid #334155 !important;
       }
       
       .admin-logo {
@@ -60,48 +78,72 @@
         font-family: 'Playfair Display', serif;
         font-size: 1.75rem;
         font-weight: 700;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-        border-bottom: 1px solid #0f2557 !important;
+        color: #0f2557 !important;
+      }
+      
+      .dark .admin-title {
+        color: #f1f5f9 !important;
       }
       
       /* Navigation links styling */
       .nav-link, .nav-item a {
-        color: #f8fafc !important;
-        font-weight: 500 !important;
+        color: #475569 !important;
+        font-weight: 600 !important;
         transition: all 0.3s ease;
       }
       
+      .dark .nav-link, .dark .nav-item a {
+        color: #cbd5e1 !important;
+      }
+      
       .nav-link:hover, .nav-item a:hover {
-        color: #0ea5e9 !important;
+        color: #2563eb !important;
         transform: translateY(-2px);
+      }
+      
+      .dark .nav-link:hover, .dark .nav-item a:hover {
+        color: #38bdf8 !important;
       }
       
       /* Brand styling */
       .brand-text {
-        color: #ffffff !important;
+        color: #0f2557 !important;
         letter-spacing: 1px;
       }
       
+      .dark .brand-text {
+        color: #ffffff !important;
+      }
+      
       .brand-subtext {
-        color: #bfdbfe !important;
+        color: #64748b !important;
+      }
+      
+      .dark .brand-subtext {
+        color: #94a3b8 !important;
       }
       
       /* Icon styling */
       .nav-icon {
-        color: #0ea5e9 !important;
+        color: #2563eb !important;
+      }
+      
+      .dark .nav-icon {
+        color: #38bdf8 !important;
       }
       
       /* Button styling */
       .header-button {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        color: #ffffff !important;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+        background-color: #f1f5f9 !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #475569 !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
       }
       
-      .header-button:hover {
-        background-color: rgba(255, 255, 255, 0.2) !important;
-        transform: translateY(-1px);
+      .dark .header-button {
+        background-color: #334155 !important;
+        border: 1px solid #475569 !important;
+        color: #f1f5f9 !important;
       }
       
       /* Force all dropdown menus to be hidden */
@@ -233,36 +275,36 @@
                     <i class="fas fa-calendar-check text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
                     <span>Bookings</span>
                 </a>
-                <a href="/admin/menu" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
-                    <i class="fas fa-utensils text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
-                    <span>Food Menu</span>
+                <a href="/admin/menu" class="px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
+                    <i class="fas fa-utensils text-blue-600 dark:text-blue-400 group-hover:text-blue-500 transition-colors duration-300 nav-icon"></i>
+                    <span>Menu</span>
                 </a>
-                <a href="/admin/gallery" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
-                    <i class="fas fa-images text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
-                    <span>Gallery</span>
-                </a>
-                <a href="/admin/contacts" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
-                    <i class="fas fa-address-book text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
+                <a href="/admin/contacts" class="px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
+                    <i class="fas fa-address-book text-blue-600 dark:text-blue-400 group-hover:text-blue-500 transition-colors duration-300 nav-icon"></i>
                     <span>Contacts</span>
                 </a>
-                <a href="/admin/settings" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
-                    <i class="fas fa-cog text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
+                <a href="/admin/settings" class="px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
+                    <i class="fas fa-cog text-blue-600 dark:text-blue-400 group-hover:text-blue-500 transition-colors duration-300 nav-icon"></i>
                     <span>Settings</span>
                 </a>
-                <a href="/" class="px-3 py-2 rounded-lg hover:bg-blue-800/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
-                    <i class="fas fa-eye text-amber-400 group-hover:text-amber-300 transition-colors duration-300 nav-icon"></i>
+                <a href="/" class="px-3 py-2 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all duration-300 flex items-center gap-2 text-sm md:text-base font-medium text-white transform hover:scale-105 group nav-link">
+                    <i class="fas fa-eye text-blue-600 dark:text-blue-400 group-hover:text-blue-500 transition-colors duration-300 nav-icon"></i>
                     <span>View Site</span>
                 </a>
             </div>
             
             <div class="flex items-center gap-2">
                 <a href="/profile" class="header-button px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm font-medium">
-                    <i class="fas fa-user-circle text-amber-400"></i>
+                    <i class="fas fa-user-circle text-blue-600 dark:text-blue-400"></i>
                     <span>{{ current_user.username }}</span>
                 </a>
-                <button id="theme-toggle" class="header-button p-2 rounded-full">
-                    <i class="fas fa-sun text-amber-400 dark:hidden" id="sunIcon"></i>
-                    <i class="fas fa-moon text-amber-300 hidden dark:block" id="moonIcon"></i>
+                <a href="{{ url_for('logout') }}" class="header-button px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm font-medium" title="Logout">
+                    <i class="fas fa-sign-out-alt text-red-500"></i>
+                    <span class="hidden lg:inline">Logout</span>
+                </a>
+                <button id="theme-toggle" class="header-button p-2 rounded-full ml-1" title="Toggle Dark Mode">
+                    <i class="fas fa-sun text-blue-600 dark:hidden" id="sunIcon"></i>
+                    <i class="fas fa-moon text-blue-300 hidden dark:block" id="moonIcon"></i>
                 </button>
             </div>
         </div>
@@ -278,20 +320,19 @@
     <script>
     // Dark mode toggle functionality
     function setTheme(isDark) {
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        
         if (isDark) {
             document.documentElement.classList.add('dark');
             localStorage.setItem('theme', 'dark');
-            document.getElementById('sunIcon').classList.add('hidden');
-            document.getElementById('moonIcon').classList.remove('hidden');
-            document.getElementById('mobileSunIcon').classList.add('hidden');
-            document.getElementById('mobileMoonIcon').classList.remove('hidden');
+            if (sunIcon) sunIcon.classList.add('hidden');
+            if (moonIcon) moonIcon.classList.remove('hidden');
         } else {
             document.documentElement.classList.remove('dark');
             localStorage.setItem('theme', 'light');
-            document.getElementById('sunIcon').classList.remove('hidden');
-            document.getElementById('moonIcon').classList.add('hidden');
-            document.getElementById('mobileSunIcon').classList.remove('hidden');
-            document.getElementById('mobileMoonIcon').classList.add('hidden');
+            if (sunIcon) sunIcon.classList.remove('hidden');
+            if (moonIcon) moonIcon.classList.add('hidden');
         }
     }
 
@@ -306,16 +347,13 @@
     }
 
     // Add event listeners for dark mode toggles
-    document.getElementById('darkModeToggle').addEventListener('click', function() {
-        const isDark = document.documentElement.classList.contains('dark');
-        setTheme(!isDark);
-    });
-
-    // Mobile dark mode toggle
-    document.getElementById('mobileDarkModeToggle').addEventListener('click', function() {
-        const isDark = document.documentElement.classList.contains('dark');
-        setTheme(!isDark);
-    });
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+            const isDark = document.documentElement.classList.contains('dark');
+            setTheme(!isDark);
+        });
+    }
     
     // Mobile menu toggle functionality
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');

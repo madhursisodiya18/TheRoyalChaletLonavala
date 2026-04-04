@@ -1,972 +1,266 @@
-{% extends "admin/admin_base.html" %}
-{% block title %}Admin — Food Menu Management{% endblock %}
-
+{% extends 'admin/admin_base.html' %}
 {% block content %}
-<section class="container-fluid mx-auto px-4 md:px-6 py-8">
-  <div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
-    <div>
-      <h1 class="text-3xl md:text-5xl font-bold text-green-800 font-serif">Admin: Food Menu Management</h1>
-      <p class="text-gray-600 mt-3 text-lg">Manage all menu items and meal packages</p>
-      <div class="w-24 h-1 bg-gradient-to-r from-green-500 to-emerald-500 mt-4"></div>
+<div class="p-6 sm:p-10 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+            <div class="flex items-center">
+                <div class="bg-gradient-to-br from-emerald-500 to-emerald-700 text-white p-4 rounded-2xl shadow-xl shadow-emerald-200 dark:shadow-emerald-900/20 mr-6">
+                    <i class="fas fa-utensils text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-4xl font-black text-gray-900 dark:text-white tracking-tight">Menu Management</h1>
+                    <p class="text-gray-500 dark:text-gray-400 font-medium">Add, edit or remove items from your food menu</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <button onclick="document.getElementById('add-item-modal').classList.remove('hidden')" class="flex-1 md:flex-none inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-all transform hover:-translate-y-1 shadow-lg shadow-emerald-200 dark:shadow-none">
+                    <i class="fas fa-plus mr-2"></i> Add Item
+                </button>
+            </div>
+        </div>
+
+        <!-- Search & Filter Bar -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 mb-8 flex flex-col md:flex-row gap-4 items-center">
+            <div class="relative flex-1 w-full">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <form action="{{ url_for('admin_menu.admin_menu_dashboard') }}" method="GET" class="w-full">
+                    <input type="text" name="q" value="{{ search_query }}" placeholder="Search items by name or description..." class="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all dark:text-white">
+                </form>
+            </div>
+            <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+                <a href="{{ url_for('admin_menu.admin_menu_dashboard') }}" class="whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold {{ 'bg-emerald-100 text-emerald-700' if not selected_section_id else 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300' }}">All Items</a>
+                {% for section in sections %}
+                <a href="{{ url_for('admin_menu.admin_menu_dashboard', section=section.id) }}" class="whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold {{ 'bg-emerald-100 text-emerald-700' if selected_section_id == section.id else 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300' }}">{{ section.display_name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Menu Items Table -->
+        <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 dark:bg-gray-900/50 border-b border-gray-100 dark:border-gray-700">
+                        <tr>
+                            <th class="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Item Details</th>
+                            <th class="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Section</th>
+                            <th class="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-center">Dietary</th>
+                            <th class="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Price</th>
+                            <th class="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+                        {% for item in items %}
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-900/30 transition-colors">
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-4">
+                                    {% if item.image_url %}
+                                    <img src="{{ url_for('static', filename=item.image_url) }}" class="w-12 h-12 rounded-xl object-cover">
+                                    {% else %}
+                                    <div class="w-12 h-12 rounded-xl bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-400">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <p class="font-bold text-gray-900 dark:text-white">{{ item.name }}</p>
+                                        <p class="text-xs text-gray-500 line-clamp-1">{{ item.description or 'No description' }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5">
+                                <span class="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-[10px] font-black uppercase tracking-wider">
+                                    {{ item.section.display_name if item.section else 'Uncategorized' }}
+                                </span>
+                            </td>
+                            <td class="px-8 py-5 text-center">
+                                {% if item.is_veg %}
+                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600" title="Vegetarian">
+                                    <i class="fas fa-leaf text-xs"></i>
+                                </span>
+                                {% else %}
+                                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-900/30 text-rose-600" title="Non-Vegetarian">
+                                    <i class="fas fa-drumstick-bite text-xs"></i>
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-8 py-5">
+                                <p class="font-black text-gray-900 dark:text-white">₹{{ item.price }}</p>
+                            </td>
+                            <td class="px-8 py-5 text-right">
+                                <div class="flex justify-end gap-2">
+                                    <button onclick="editItem({{ item.id }}, '{{ item.name }}', {{ item.price }}, '{{ item.description or '' }}', {{ item.section_id }}, {{ 'true' if item.is_veg else 'false' }})" class="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form action="{{ url_for('admin_menu.admin_delete_menu_item', item_id=item.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this item?')" class="inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if pagination and pagination.pages > 1 %}
+            <div class="px-8 py-5 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                <p class="text-sm text-gray-500 font-medium">Showing items {{ pagination.start_index }} to {{ pagination.end_index }} of {{ pagination.total }}</p>
+                <div class="flex gap-2">
+                    {% if pagination.has_prev %}
+                    <a href="{{ url_for('admin_menu.admin_menu_dashboard', page=pagination.prev_num, q=search_query, section=selected_section_id) }}" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 transition-all">Previous</a>
+                    {% endif %}
+                    {% if pagination.has_next %}
+                    <a href="{{ url_for('admin_menu.admin_menu_dashboard', page=pagination.next_num, q=search_query, section=selected_section_id) }}" class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 transition-all">Next</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
     </div>
-    <div class="flex flex-wrap gap-3 mt-6 md:mt-0">
-      <a href="{{ url_for('menu') }}" class="px-4 py-2 border-2 border-green-600 text-green-700 rounded-lg hover:bg-green-50 transition-all duration-300 font-medium">
-        <i class="fas fa-eye mr-2"></i> View User Menu
-      </a>
-      <a href="{{ url_for('admin_dashboard') }}" class="px-4 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-lg hover:from-green-700 hover:to-green-600 transition-all duration-300 shadow-md font-medium">
-        <i class="fas fa-cog mr-2"></i> Admin Dashboard
-      </a>
-      <a href="#" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg hover:from-blue-700 hover:to-blue-600 transition-all duration-300 shadow-md font-medium" id="addNewItemBtn">
-        <i class="fas fa-plus mr-2"></i> Add New Item
-      </a>
-    </div>
-  </div>
-
-  <div class="mb-6 overflow-x-auto">
-    <div class="border-b border-gray-200 min-w-max">
-      <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-        <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-green-500 text-green-600"
-                data-tab="meal-packages">Meal Packages</button>
-        <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                data-tab="breakfast">Breakfast</button>
-        <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                data-tab="sandwiches">Sandwiches</button>
-        <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                data-tab="soups">Soups</button>
-        <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                data-tab="starters">Starters</button>
-        <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                data-tab="main-course">Main Course</button>
-        <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                data-tab="beverages">Beverages</button>
-        <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                data-tab="desserts">Desserts</button>
-      </nav>
-    </div>
-  </div>
-
-  <div class="tab-content">
-    <div id="meal-packages-tab" class="tab-pane active">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white shadow-md rounded-xl border border-green-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Vegetarian Meal Packages</h2>
-            <button class="px-2 py-1 bg-white text-green-700 rounded-md text-sm hover:bg-green-50" onclick="addNewPackage('veg')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-green-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Price/Head</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="veg-packages-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Full Meal Plan – Veg (One Night, Min. 12 Pax)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹1450</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editPackage('vp1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deletePackage('vp1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Full Meal Plan – Veg (Two Night, Min. 12 Pax)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹1250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editPackage('vp2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deletePackage('vp2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Half Meal Plan – Veg (One Night, Min. 12 Pax)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹1300</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editPackage('vp3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deletePackage('vp3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Half Meal Plan – Veg (Two Night, Min. 12 Pax)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹1100</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editPackage('vp4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deletePackage('vp4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Skip Lunch Package - Veg (Without Barbeque, Min. 15 Pax)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹900</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editPackage('vp5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deletePackage('vp5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Skip Lunch Package - Veg (With Barbeque, Min. 15 Pax)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹1150</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editPackage('vp6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deletePackage('vp6')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white shadow-md rounded-xl border border-red-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-red-600 to-red-500 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Non-Vegetarian Meal Packages</h2>
-            <button class="px-2 py-1 bg-white text-red-700 rounded-md text-sm hover:bg-red-50" onclick="addNewPackage('non-veg')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-red-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Price/Head</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="non-veg-packages-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Full Meal Plan – Non-Veg (One Night, Min. 12 Pax)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹1500</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editPackage('nvp1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deletePackage('nvp1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Full Meal Plan – Non-Veg (Two Night, Min. 12 Pax)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹1400</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editPackage('nvp2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deletePackage('nvp2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Half Meal Plan – Non-Veg (One Night, Min. 12 Pax)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹1400</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editPackage('nvp3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deletePackage('nvp3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Half Meal Plan – Non-Veg (Two Night, Min. 12 Pax)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹1300</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editPackage('nvp4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deletePackage('nvp4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Skip Lunch Package - Non-Veg (Without Barbeque, Min. 15 Pax)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹1000</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editPackage('nvp5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deletePackage('nvp5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Skip Lunch Package - Non-Veg (With Barbeque, Min. 15 Pax)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹1200</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editPackage('nvp6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deletePackage('nvp6')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="breakfast-tab" class="tab-pane hidden">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white shadow-md rounded-xl border border-amber-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-amber-500 to-amber-400 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Vegetarian Breakfast</h2>
-            <button class="px-2 py-1 bg-white text-amber-700 rounded-md text-sm hover:bg-amber-50" onclick="addNewItem('breakfast')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-amber-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-amber-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-amber-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-amber-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="breakfast-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Plain Bread</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹15</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Plain Toast</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹30</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Bread Butter</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹50</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Toast Butter</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹60</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Bread Jam</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹50</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Toast Jam</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹60</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b6')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Bread Butter Jam</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹60</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b7')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b7')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Toast Butter Jam</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹70</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b8')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b8')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Plain Maggie</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹60</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b9')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b9')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tadka Maggie</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹80</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b10')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b10')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Vegetable Maggie</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹70</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b11')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b11')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Cheese Maggie</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹80</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b12')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b12')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Upma</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹80</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b13')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b13')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Poha</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹80</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b14')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b14')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Aloo Paratha</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹110</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b15')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b15')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Gobi Paratha</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹110</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b16')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b16')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Onion Paratha</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹110</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b17')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b17')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Mix Veg Paratha</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹130</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b18')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b18')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Paratha</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹140</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b19')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b19')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Puri Bhaji</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹140</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b20')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b20')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chole Puri</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹140</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('b21')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('b21')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white shadow-md rounded-xl border border-orange-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-orange-500 to-orange-400 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Egg Breakfast</h2>
-            <button class="px-2 py-1 bg-white text-orange-700 rounded-md text-sm hover:bg-orange-50" onclick="addNewItem('breakfast-eggs')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-orange-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-orange-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-orange-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-orange-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="breakfast-eggs-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Boiled Egg</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹50</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('be1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('be1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Plain Omelette</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹80</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('be2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('be2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Masala Omelette</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹90</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('be3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('be3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Egg Half Fry</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹90</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('be4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('be4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Scrambled Egg</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹90</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('be5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('be5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Egg Bhurji</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹90</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('be6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('be6')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Cheese Omelette</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹110</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('be7')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('be7')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="sandwiches-tab" class="tab-pane hidden">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white shadow-md rounded-xl border border-teal-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-teal-500 to-teal-400 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Vegetarian Sandwiches & Quick Bites</h2>
-            <button class="px-2 py-1 bg-white text-teal-700 rounded-md text-sm hover:bg-teal-50" onclick="addNewItem('sandwiches')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-teal-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-teal-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-teal-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-teal-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="sandwiches-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Club Sandwich</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹80</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('s1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('s1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Club Grilled Sandwich</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹110</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('s2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('s2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Cheese Sandwich</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹90</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('s3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('s3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Cheese Grilled Sandwich</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹120</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('s4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('s4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Cheese Sandwich</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹100</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('s5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('s5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Cheese Grilled Sandwich</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹130</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('s6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('s6')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Bombay Masala Sandwich</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹120</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('s7')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('s7')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Bombay Masala Grilled Sandwich</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹150</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('s8')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('s8')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">French Fries</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹140</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('s9')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('s9')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white shadow-md rounded-xl border border-yellow-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-yellow-500 to-yellow-400 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Egg Sandwiches & Quick Bites</h2>
-            <button class="px-2 py-1 bg-white text-yellow-700 rounded-md text-sm hover:bg-yellow-50" onclick="addNewItem('egg-sandwiches')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-yellow-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-yellow-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="egg-sandwiches-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Omelette Sandwich</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹100</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('es1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('es1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Omelette Grilled Sandwich</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹130</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('es2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('es2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Omelette Cheese Sandwich</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹120</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('es3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('es3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Omelette Cheese Grilled Sandwich</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹150</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('es4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('es4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chana Chaat</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹160</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('es5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('es5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Peanut Chaat</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹160</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('es6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('es6')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Aloo Chaat</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹140</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('es7')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('es7')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Peri Peri French Fries</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹170</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('es8')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('es8')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Cheese Fresh Fries</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹180</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('es9')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('es9')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="soups-tab" class="tab-pane hidden">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white shadow-md rounded-xl border border-purple-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-purple-600 to-purple-500 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Vegetarian Soups</h2>
-            <button class="px-2 py-1 bg-white text-purple-700 rounded-md text-sm hover:bg-purple-50" onclick="addNewItem('veg-soups')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-purple-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="veg-soups-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Manchow Soup</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹120</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vs1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vs1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Clear Soup</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹120</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vs2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vs2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Hot N Sour Soup</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹120</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vs3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vs3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Coriander Soup</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹120</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vs4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vs4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tomato Soup</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹120</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vs5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vs5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Sweet Corn Soup</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹120</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vs6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vs6')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white shadow-md rounded-xl border border-indigo-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Non-Vegetarian Soups</h2>
-            <button class="px-2 py-1 bg-white text-indigo-700 rounded-md text-sm hover:bg-indigo-50" onclick="addNewItem('non-veg-soups')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-indigo-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="non-veg-soups-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Manchow Soup</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹140</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvs1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvs1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Hot N Sour Soup</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹140</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvs2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvs2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Clear Soup</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹140</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvs3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvs3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Cream Of Chicken Soup</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹140</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvs4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvs4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Coriander Soup</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹140</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvs5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvs5')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="starters-tab" class="tab-pane hidden">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white shadow-md rounded-xl border border-pink-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-pink-600 to-pink-500 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Chinese Starters - Vegetarian</h2>
-            <button class="px-2 py-1 bg-white text-pink-700 rounded-md text-sm hover:bg-pink-50" onclick="addNewItem('veg-chinese-starters')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-pink-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-pink-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-pink-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-pink-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="veg-chinese-starters-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Manchurian Dry</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹190</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vcs1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vcs1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg 65</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹190</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vcs2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vcs2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Crispy</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹190</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vcs3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vcs3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Ching Pong</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹190</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vcs4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vcs4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Gold Coin</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹190</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vcs5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vcs5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer 65</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vcs6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vcs6')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Crispy</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vcs7')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vcs7')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Manchurian Dry</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vcs8')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vcs8')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Chilly Dry</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vcs9')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vcs9')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Schezwan Dry</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹190</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vcs10')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vcs10')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white shadow-md rounded-xl border border-red-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-red-600 to-red-500 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Chinese Starters - Non-Vegetarian</h2>
-            <button class="px-2 py-1 bg-white text-red-700 rounded-md text-sm hover:bg-red-50" onclick="addNewItem('non-veg-chinese-starters')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-red-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="non-veg-chinese-starters-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Chilly Dry</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('ncs1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('ncs1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Manchurian Dry</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('ncs2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('ncs2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken 65</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('ncs3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('ncs3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Crispy</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('ncs4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('ncs4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Lollipop (8 Pieces)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹280</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('ncs5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('ncs5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Lollipop Masala</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹290</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('ncs6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('ncs6')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        
-        <div class="bg-white shadow-md rounded-xl border border-green-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Tandoor Starters - Vegetarian</h2>
-            <button class="px-2 py-1 bg-white text-green-700 rounded-md text-sm hover:bg-green-50" onclick="addNewItem('veg-tandoor-starters')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-green-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="veg-tandoor-starters-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Sheek Kebab</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vtt1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vtt1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Achari Tikka</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vtt2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vtt2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Tikka</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vtt3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vtt3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tandoori Aloo</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vtt4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vtt4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Pudina Tikka</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vtt5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vtt5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Malai Tikka</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vtt6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vtt6')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Haryali Tikka</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vtt7')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vtt7')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tandoori Gobi</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vtt8')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vtt8')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        
-        <div class="bg-white shadow-md rounded-xl border border-red-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-red-600 to-red-500 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Tandoor Starters - Non-Vegetarian</h2>
-            <button class="px-2 py-1 bg-white text-red-700 rounded-md text-sm hover:bg-red-50" onclick="addNewItem('non-veg-tandoor-starters')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-red-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="non-veg-tandoor-starters-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Tikka</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvtt1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvtt1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Pahadi Kebab</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvtt2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvtt2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Malai Kebab</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvtt3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvtt3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Methi Kebab</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvtt4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvtt4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Seekh Kebab</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvtt5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvtt5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tandoori Chicken Half</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvtt6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvtt6')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tandoori Chicken Full</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹550</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvtt7')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvtt7')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Achari Tikka</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvtt8')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvtt8')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Kasturi Kebab</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvtt9')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvtt9')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="main-course-tab" class="tab-pane hidden">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white shadow-md rounded-xl border border-green-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-green-600 to-green-500 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Vegetarian Main Course (Indian/Dal/Rice)</h2>
-            <button class="px-2 py-1 bg-white text-green-700 rounded-md text-sm hover:bg-green-50" onclick="addNewItem('veg-main')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-green-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="veg-main-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Palak Paneer</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Panner Butter Masala</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Kadhai</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Handi</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Do Payzza</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Mutter</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm6')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Kolhapuri</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm7')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm7')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Paneer Pasanda</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm8')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm8')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Mix Veg</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹190</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm9')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm9')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Kadhai</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹190</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm10')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm10')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Handi</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹190</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm11')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm11')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Aloo Jeera Dry</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹180</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm12')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm12')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Aloo Gobi Mutter Dry</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹180</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm13')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm13')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Kofta Curry</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹190</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm14')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm14')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Aloo Mutter</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹160</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm15')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm15')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Mushroom Masala</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹180</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm16')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm16')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Mushroom Tikka Masala</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹190</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm17')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm17')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Dal Fry</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹150</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm18')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm18')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Dal Tadka</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹180</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm19')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm19')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Dal Kolhapuri</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹180</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm20')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm20')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Dal Butter Tadka</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹180</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm21')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm21')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Steam Rice</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹110</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm22')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm22')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Jeera Rice</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹150</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm23')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm23')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Dal Khichadi</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹180</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm24')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm24')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Masala Dal Khichadi</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm25')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm25')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Dum Biryani</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm26')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm26')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Per Kg Veg Biryani</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹850</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('vm27')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('vm27')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white shadow-md rounded-xl border border-rose-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-rose-600 to-rose-500 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Non-Vegetarian Main Course & Rice</h2>
-            <button class="px-2 py-1 bg-white text-rose-700 rounded-md text-sm hover:bg-rose-50" onclick="addNewItem('non-veg-main')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-rose-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-rose-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-rose-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-rose-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="non-veg-main-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Butter Chicken With Bone (Full)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹850</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Butter Chicken With Bone (Half)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹550</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Butter Chicken Boneless (10 Pieces)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹550</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Handi (Full)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹999</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Handi (Half)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹450</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Palak Chicken</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹320</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm6')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Kadhai</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹320</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm7')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm7')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Masala</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹320</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm8')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm8')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Curry</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹320</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm9')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm9')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Kolhapuri</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹320</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm10')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm10')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Black Rassa</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹350</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm11')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm11')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Tikka Masala</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹350</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm12')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm12')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Kheema Masala</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹350</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm13')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm13')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Kheema Dry Fry</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹300</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm14')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm14')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Dum Biryani</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹350</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm15')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm15')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Egg Dum Biryani</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm16')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm16')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Mutton Dum Biryani</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹450</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm17')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm17')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Per Kg Biryani (Chicken)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹1100</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm18')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm18')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Per Kg Biryani (Mutton)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹1800</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('nvm19')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('nvm19')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        
-        <div class="bg-white shadow-md rounded-xl border border-indigo-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Chinese Main Course</h2>
-            <button class="px-2 py-1 bg-white text-indigo-700 rounded-md text-sm hover:bg-indigo-50" onclick="addNewItem('chinese-main')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-indigo-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="chinese-main-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Fried Rice</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cm1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cm1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Hakka Noodles</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cm2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cm2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Schezwan Rice</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cm3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cm3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Schezwan Noodles</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cm4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cm4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Triple Fried Rice</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cm5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cm5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Hong Kong Rice</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cm6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cm6')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Veg Hong Kong Noodles</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹220</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cm7')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cm7')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Fried Rice</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cm8')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cm8')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Schezwan Rice</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cm9')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cm9')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Hakka Noodles</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cm10')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cm10')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Schezwan Noodles</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cm11')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cm11')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Triple Rice</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cm12')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cm12')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Hong Kong Rice</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cm13')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cm13')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Chicken Hong Kong Noodles</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cm14')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cm14')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="beverages-tab" class="tab-pane hidden">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white shadow-md rounded-xl border border-blue-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Hot Beverages</h2>
-            <button class="px-2 py-1 bg-white text-blue-700 rounded-md text-sm hover:bg-blue-50" onclick="addNewItem('hot-beverages')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-blue-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="hot-beverages-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tea</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹30</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('hb1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('hb1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Lemon Tea</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹30</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('hb2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('hb2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Coffee</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹50</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('hb3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('hb3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Black Coffee</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹30</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('hb4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('hb4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Hot Milk</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹80</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('hb5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('hb5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Bournvita</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹80</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('hb6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('hb6')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Hot Chocolate</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹90</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('hb7')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('hb7')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Green Tea</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹40</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('hb8')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('hb8')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white shadow-md rounded-xl border border-cyan-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Cold Beverages & Mocktails</h2>
-            <button class="px-2 py-1 bg-white text-cyan-700 rounded-md text-sm hover:bg-cyan-50" onclick="addNewItem('cold-beverages')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-cyan-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-cyan-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-cyan-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-cyan-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="cold-beverages-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Pineapple Juice</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹110</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cb1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cb1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Watermelon Juice</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹110</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cb2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cb2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Orange Juice</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹110</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cb3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cb3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Mosambi Juice</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹110</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cb4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cb4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Cold Drink (500ml)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹60</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cb5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cb5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Soda (500ml)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹40</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cb6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cb6')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Mojito</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹150</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cb7')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cb7')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Virgin Pinacolada</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹200</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cb8')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cb8')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Virgin Mary</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹150</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cb9')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cb9')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Blue Lagoon</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹150</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cb10')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cb10')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Iced Tea</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹100</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cb11')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cb11')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Cold Coffee</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹80</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cb12')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cb12')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Cold Coffee with Ice Cream</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹120</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('cb13')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('cb13')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="desserts-tab" class="tab-pane hidden">
-      <div class="grid grid-cols-1 gap-6">
-        <div class="bg-white shadow-md rounded-xl border border-amber-200 overflow-hidden">
-          <div class="bg-gradient-to-r from-amber-600 to-amber-500 text-white px-4 py-3 flex justify-between items-center">
-            <h2 class="text-xl font-semibold">Desserts</h2>
-            <button class="px-2 py-1 bg-white text-amber-700 rounded-md text-sm hover:bg-amber-50" onclick="addNewItem('desserts')">
-              <i class="fas fa-plus mr-1"></i> Add
-            </button>
-          </div>
-          <div class="p-4">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-amber-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-amber-700 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-amber-700 uppercase tracking-wider">Price</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-amber-700 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="desserts-table" class="bg-white divide-y divide-gray-200">
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Gulab Jamun</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹60</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('d1')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('d1')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Rasmalai</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹120</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('d2')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('d2')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Angoori Rabdi</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹120</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('d3')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('d3')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Gajar Halwa (Seasonal)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹120</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('d4')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('d4')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Dudhi Halwa</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹120</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('d5')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('d5')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Ice Cream (Any Flavour)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹40</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('d6')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('d6')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Kulfi (Any Flavour)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹50</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('d7')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('d7')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Mango Cream (Seasonal)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('d8')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('d8')"><i class="fas fa-trash"></i></button></td></tr>
-                  <tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Strawberry Cream (Seasonal)</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹250</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><button class="text-blue-600 hover:text-blue-800 mr-3" onclick="editItem('d9')"><i class="fas fa-edit"></i></button><button class="text-red-600 hover:text-red-800" onclick="deleteItem('d9')"><i class="fas fa-trash"></i></button></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    
-       
-
-<div id="adminMenuModal" class="fixed inset-0 z-50 hidden bg-black/70 flex items-center justify-center p-4">
-  <button onclick="closeAdminMenuModal()" class="absolute top-4 right-4 bg-white text-gray-700 rounded-full p-2 shadow-md">
-    <i class="fas fa-times"></i>
-  </button>
-  <img id="adminMenuModalImg" src="" alt="Menu Card" class="max-h-[90vh] max-w-[95vw] rounded-lg shadow-2xl border border-green-200" />
 </div>
 
-<div id="editItemModal" class="fixed inset-0 z-50 hidden bg-black/50 flex items-center justify-center p-4">
-  <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
-    <div class="flex items-center justify-between p-4 border-b">
-      <h3 class="text-lg font-medium text-gray-900" id="modalTitle">Edit Menu Item</h3>
-      <button type="button" class="text-gray-400 hover:text-gray-500" onclick="closeEditModal()">
-        <span class="sr-only">Close</span>
-        <i class="fas fa-times"></i>
-      </button>
+<!-- Add Item Modal -->
+<div id="add-item-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-2xl w-full max-w-xl overflow-hidden transform transition-all">
+        <div class="px-8 py-6 bg-emerald-600 text-white flex justify-between items-center">
+            <h3 class="text-2xl font-black">Add New Menu Item</h3>
+            <button onclick="document.getElementById('add-item-modal').classList.add('hidden')" class="text-white/80 hover:text-white">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <form action="{{ url_for('admin_menu.admin_add_menu_item') }}" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Item Name</label>
+                    <input type="text" name="name" required class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all dark:text-white">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Price (₹)</label>
+                    <input type="number" name="price" required class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all dark:text-white">
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Section</label>
+                <select name="section_id" required class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all dark:text-white">
+                    {% for section in sections %}
+                    <option value="{{ section.id }}">{{ section.display_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Description</label>
+                <textarea name="description" rows="3" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all dark:text-white"></textarea>
+            </div>
+            <div class="flex items-center gap-6">
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    <input type="checkbox" name="is_veg" value="true" checked class="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                    <span class="text-sm font-bold text-gray-600 dark:text-gray-400 group-hover:text-emerald-600 transition-colors">Vegetarian</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    <input type="checkbox" name="is_available" value="true" checked class="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500">
+                    <span class="text-sm font-bold text-gray-600 dark:text-gray-400 group-hover:text-emerald-600 transition-colors">Available</span>
+                </label>
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Item Image</label>
+                <input type="file" name="image" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+            </div>
+            <button type="submit" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl transition-all shadow-lg shadow-emerald-200 dark:shadow-none mt-4">
+                Create Menu Item
+            </button>
+        </form>
     </div>
-    <form id="editItemForm" class="p-4">
-      <input type="hidden" id="editItemId" name="item_id">
-      <input type="hidden" id="editItemType" name="item_type" value="item"> <div class="mb-4">
-        <label for="editItemName" class="block text-sm font-medium text-gray-700">Item Name</label>
-        <input type="text" id="editItemName" name="name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" required>
-      </div>
-      
-      <div class="mb-4">
-        <label for="editItemPrice" class="block text-sm font-medium text-gray-700">Price (₹)</label>
-        <input type="number" id="editItemPrice" name="price" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm" required>
-      </div>
-      
-      <div class="mb-4">
-        <label for="editItemDescription" class="block text-sm font-medium text-gray-700">Description</label>
-        <textarea id="editItemDescription" name="description" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"></textarea>
-      </div>
-      
-      <div class="mb-4" id="foodTypeContainer">
-        <label for="editFoodType" class="block text-sm font-medium text-gray-700">Food Type</label>
-        <select id="editFoodType" name="food_type" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
-          <option value="veg">Vegetarian</option>
-          <option value="non-veg">Non-Vegetarian</option>
-        </select>
-      </div>
-      
-      <div class="mb-4" id="categoryContainer">
-        <label for="editCategory" class="block text-sm font-medium text-gray-700">Category</label>
-        <select id="editCategory" name="category" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
-          <option value="meal-packages">Meal Packages</option>
-          <option value="breakfast">Breakfast</option>
-          <option value="sandwiches">Sandwiches</option>
-          <option value="soups">Soups</option>
-          <option value="starters">Starters</option>
-          <option value="main-course">Main Course</option>
-          <option value="beverages">Beverages</option>
-          <option value="desserts">Desserts</option>
-        </select>
-      </div>
-      
-      <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-        <button type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:col-start-2 sm:text-sm" onclick="saveChanges()">
-          Save Changes
-        </button>
-        <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:mt-0 sm:col-start-1 sm:text-sm" onclick="closeEditModal()">
-          Cancel
-        </button>
-      </div>
-    </form>
-  </div>
+</div>
+
+<!-- Edit Item Modal (Template) -->
+<div id="edit-item-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-2xl w-full max-w-xl overflow-hidden transform transition-all">
+        <div class="px-8 py-6 bg-blue-600 text-white flex justify-between items-center">
+            <h3 class="text-2xl font-black">Edit Menu Item</h3>
+            <button onclick="document.getElementById('edit-item-modal').classList.add('hidden')" class="text-white/80 hover:text-white">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <form id="edit-item-form" method="POST" enctype="multipart/form-data" class="p-8 space-y-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Item Name</label>
+                    <input type="text" name="name" id="edit-name" required class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Price (₹)</label>
+                    <input type="number" name="price" id="edit-price" required class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white">
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Section</label>
+                <select name="section_id" id="edit-section" required class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white">
+                    {% for section in sections %}
+                    <option value="{{ section.id }}">{{ section.display_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Description</label>
+                <textarea name="description" id="edit-description" rows="3" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white"></textarea>
+            </div>
+            <div class="flex items-center gap-6">
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    <input type="checkbox" name="is_veg" id="edit-is-veg" value="true" class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="text-sm font-bold text-gray-600 dark:text-gray-400 group-hover:text-blue-600 transition-colors">Vegetarian</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    <input type="checkbox" name="is_available" id="edit-is-available" value="true" checked class="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="text-sm font-bold text-gray-600 dark:text-gray-400 group-hover:text-blue-600 transition-colors">Available</span>
+                </label>
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Item Image</label>
+                <input type="file" name="image" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+            </div>
+            <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl transition-all shadow-lg shadow-blue-200 dark:shadow-none mt-4">
+                Update Menu Item
+            </button>
+        </form>
+    </div>
 </div>
 
 <script>
-  // Tab switching functionality
-  document.addEventListener('DOMContentLoaded', function() {
-    const tabButtons = document.querySelectorAll('.tab-button');
+function editItem(id, name, price, description, sectionId, isVeg) {
+    const modal = document.getElementById('edit-item-modal');
+    const form = document.getElementById('edit-item-form');
     
-    tabButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        // Remove active class from all tabs
-        document.querySelectorAll('.tab-pane').forEach(tab => {
-          tab.classList.add('hidden');
-          tab.classList.remove('active');
-        });
-        
-        // Remove active styling from all buttons
-        tabButtons.forEach(btn => {
-          btn.classList.remove('border-green-500', 'text-green-600');
-          btn.classList.add('border-transparent', 'text-gray-500');
-        });
-        
-        // Add active class to current tab
-        const tabId = this.getAttribute('data-tab') + '-tab';
-        const currentTab = document.getElementById(tabId);
-        currentTab.classList.remove('hidden');
-        currentTab.classList.add('active');
-        
-        // Add active styling to current button
-        this.classList.remove('border-transparent', 'text-gray-500');
-        this.classList.add('border-green-500', 'text-green-600');
-      });
-    });
-  });
-
-  function openAdminMenuModal(src) {
-    const modal = document.getElementById('adminMenuModal');
-    const img = document.getElementById('adminMenuModalImg');
-    img.src = src;
+    document.getElementById('edit-name').value = name;
+    document.getElementById('edit-price').value = price;
+    document.getElementById('edit-description').value = description;
+    document.getElementById('edit-section').value = sectionId;
+    document.getElementById('edit-is-veg').checked = isVeg;
+    
+    form.action = `/admin/menu/${id}/edit`;
     modal.classList.remove('hidden');
-  }
-  
-  function closeAdminMenuModal() {
-    const modal = document.getElementById('adminMenuModal');
-    modal.classList.add('hidden');
-  }
-  
-  // Edit modal functions (These are placeholder functions for a live application)
-  function editItem(itemId) {
-    document.getElementById('modalTitle').textContent = 'Edit Menu Item';
-    document.getElementById('editItemId').value = itemId;
-    document.getElementById('editItemType').value = 'item';
-    document.getElementById('categoryContainer').style.display = 'block';
-    
-    // DEMO data loading simulation
-    document.getElementById('editItemName').value = 'Item ' + itemId;
-    document.getElementById('editItemPrice').value = '100';
-    document.getElementById('editItemDescription').value = 'Placeholder description.';
-    document.getElementById('editFoodType').value = 'veg';
-    document.getElementById('editCategory').value = document.querySelector('.tab-pane.active').id.replace('-tab', '');
-    
-    document.getElementById('editItemModal').classList.remove('hidden');
-  }
-  
-  function editPackage(packageId) {
-    document.getElementById('modalTitle').textContent = 'Edit Meal Package';
-    document.getElementById('editItemId').value = packageId;
-    document.getElementById('editItemType').value = 'package';
-    document.getElementById('categoryContainer').style.display = 'none';
-    
-    // DEMO data loading simulation
-    document.getElementById('editItemName').value = 'Package ' + packageId;
-    document.getElementById('editItemPrice').value = '1000';
-    document.getElementById('editItemDescription').value = 'Placeholder description.';
-    document.getElementById('editFoodType').value = packageId.startsWith('v') ? 'veg' : 'non-veg';
-    
-    document.getElementById('editItemModal').classList.remove('hidden');
-  }
-  
-  function closeEditModal() {
-    document.getElementById('editItemModal').classList.add('hidden');
-  }
-  
-  function saveChanges() {
-    alert('Changes for ' + document.getElementById('editItemName').value + ' saved successfully! (DEMO)');
-    closeEditModal();
-  }
-  
-  function deleteItem(itemId) {
-    if (confirm('Are you sure you want to delete this item?')) {
-      alert('Item ' + itemId + ' deleted! (DEMO)');
-    }
-  }
-  
-  function deletePackage(packageId) {
-    if (confirm('Are you sure you want to delete this package?')) {
-      alert('Package ' + packageId + ' deleted! (DEMO)');
-    }
-  }
-  
-  function addNewItem(category) {
-    document.getElementById('modalTitle').textContent = 'Add New Menu Item';
-    document.getElementById('editItemId').value = '';
-    document.getElementById('editItemType').value = 'item';
-    document.getElementById('categoryContainer').style.display = 'block';
-    
-    document.getElementById('editItemForm').reset();
-    document.getElementById('editCategory').value = category;
-    
-    document.getElementById('editItemModal').classList.remove('hidden');
-  }
-  
-  function addNewPackage(type) {
-    document.getElementById('modalTitle').textContent = 'Add New Meal Package';
-    document.getElementById('editItemId').value = '';
-    document.getElementById('editItemType').value = 'package';
-    document.getElementById('categoryContainer').style.display = 'none';
-    
-    document.getElementById('editItemForm').reset();
-    document.getElementById('editFoodType').value = type;
-    
-    document.getElementById('editItemModal').classList.remove('hidden');
-  }
-  
-  document.getElementById('addNewItemBtn').addEventListener('click', function() {
-    addNewItem('breakfast');
-  });
-  
-  // Function to update menu item vegetarian status
-  function updateVegStatus(itemId, isVeg) {
-    fetch('/api/update-veg-status/' + itemId, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ is_veg: isVeg })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        showToast('Item updated successfully', 'success');
-        // Update UI to reflect the change
-        const vegStatusBadge = document.getElementById('veg-status-' + itemId);
-        if (vegStatusBadge) {
-          if (isVeg) {
-            vegStatusBadge.textContent = 'Veg';
-            vegStatusBadge.classList.remove('bg-red-100', 'text-red-800');
-            vegStatusBadge.classList.add('bg-green-100', 'text-green-800');
-          } else {
-            vegStatusBadge.textContent = 'Non-Veg';
-            vegStatusBadge.classList.remove('bg-green-100', 'text-green-800');
-            vegStatusBadge.classList.add('bg-red-100', 'text-red-800');
-          }
-        }
-      } else {
-        showToast('Error updating item: ' + data.message, 'error');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      showToast('An error occurred while updating the item', 'error');
-    });
-  }
-  
-  // Add vegetarian status toggle to edit form
-  function editItem(id, name, price, description, sectionId, isVeg) {
-    document.getElementById('modalTitle').textContent = 'Edit Menu Item';
-    document.getElementById('editItemId').value = id;
-    document.getElementById('editItemName').value = name;
-    document.getElementById('editItemPrice').value = price;
-    document.getElementById('editItemDescription').value = description || '';
-    document.getElementById('editItemSection').value = sectionId;
-    document.getElementById('editItemVeg').checked = isVeg;
-    document.getElementById('editItemModal').classList.remove('hidden');
-  }
-  
-  // Function to show toast notifications
-  function showToast(message, type = 'info') {
-    const toast = document.createElement('div');
-    toast.className = 'fixed bottom-4 right-4 px-4 py-2 rounded-lg text-white z-50 transition-all duration-300 transform translate-y-0 opacity-100';
-    
-    if (type === 'success') {
-      toast.classList.add('bg-green-600');
-    } else if (type === 'error') {
-      toast.classList.add('bg-red-600');
-    } else {
-      toast.classList.add('bg-blue-600');
-    }
-    
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-      toast.classList.add('opacity-0', 'translate-y-2');
-      setTimeout(() => {
-        document.body.removeChild(toast);
-      }, 300);
-    }, 3000);
-  }
+}
+
+// Close modals when clicking outside
+window.onclick = function(event) {
+    const addModal = document.getElementById('add-item-modal');
+    const editModal = document.getElementById('edit-item-modal');
+    if (event.target == addModal) addModal.classList.add('hidden');
+    if (event.target == editModal) editModal.classList.add('hidden');
+}
 </script>
+
+<style>
+    .line-clamp-1 {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;  
+        overflow: hidden;
+    }
+</style>
 {% endblock %}
