@@ -1,3 +1,42 @@
+import os
+import sys
+from pathlib import Path
+
+_VENV_BOOTSTRAP = "ROYAL_CHALET_VENV_BOOTSTRAP"
+
+
+def _bootstrap_venv_python():
+    """Re-run with .venv when IDE or Git Bash uses system Python without Flask."""
+    if os.environ.get(_VENV_BOOTSTRAP):
+        return
+    try:
+        import flask  # noqa: F401
+        return
+    except ImportError:
+        pass
+    root = Path(__file__).resolve().parent
+    for rel in (Path("Scripts") / "python.exe", Path("bin") / "python"):
+        venv_python = root / ".venv" / rel
+        if not venv_python.is_file():
+            continue
+        if Path(sys.executable).resolve() != venv_python.resolve():
+            import subprocess
+            os.environ[_VENV_BOOTSTRAP] = "1"
+            script = str(Path(__file__).resolve())
+            args = [str(venv_python), script, *sys.argv[1:]]
+            raise SystemExit(subprocess.call(args))
+        break
+    sys.stderr.write(
+        "Flask is not installed for:\n  %s\n\n"
+        "Run with the project venv instead:\n"
+        "  .venv\\Scripts\\python.exe app.py\n"
+        "  run.bat  or  ./run.sh\n" % sys.executable
+    )
+    sys.exit(1)
+
+
+_bootstrap_venv_python()
+
 from flask import Flask, render_template, redirect, url_for, flash, request, session, jsonify, make_response, send_from_directory, abort, Response, Blueprint
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
