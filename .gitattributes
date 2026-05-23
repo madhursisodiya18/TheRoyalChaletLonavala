@@ -1,0 +1,3 @@
+*.sh text eol=lf
+run.sh text eol=lf
+gitbash-env.sh text eol=lf

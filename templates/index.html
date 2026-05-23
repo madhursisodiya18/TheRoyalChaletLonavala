@@ -5,9 +5,9 @@
   <!-- Image Slider -->
   <div class="hero-slider absolute inset-0 w-full h-full">
     <div class="slide active" style="background-image: url('{{ url_for('static', filename='Slide1.jpg') }}');"></div>
-    <div class="slide" style="background-image: url('{{ url_for('static', filename='Slide2.jpg') }}');"></div>
-    <div class="slide" style="background-image: url('{{ url_for('static', filename='Slide3.jpg') }}');"></div>
-    <div class="slide" style="background-image: url('{{ url_for('static', filename='slide4.jpg') }}');"></div>
+    <div class="slide" data-bg="{{ url_for('static', filename='Slide2.jpg') }}"></div>
+    <div class="slide" data-bg="{{ url_for('static', filename='Slide3.jpg') }}"></div>
+    <div class="slide" data-bg="{{ url_for('static', filename='slide4.jpg') }}"></div>
   </div>
 
   <div class="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-gray-950/70 to-gray-900/80"></div>
@@ -553,20 +553,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const slides = document.querySelectorAll('.slide');
     const dots = document.querySelectorAll('.slider-dot');
     let currentSlide = 0;
-    
-    // Function to change slide
+
+    function ensureSlideBg(slide) {
+      const bg = slide.getAttribute('data-bg');
+      if (bg && !slide.style.backgroundImage) {
+        slide.style.backgroundImage = "url('" + bg + "')";
+      }
+    }
+
+    slides.forEach((slide, i) => {
+      if (i === 0) ensureSlideBg(slide);
+    });
+    requestIdleCallback
+      ? requestIdleCallback(() => slides.forEach(ensureSlideBg))
+      : setTimeout(() => slides.forEach(ensureSlideBg), 800);
+
     function showSlide(index) {
-      // Hide all slides
-      slides.forEach(slide => {
-        slide.classList.remove('active');
-      });
-      
-      // Remove active class from all dots
-      dots.forEach(dot => {
-        dot.classList.remove('active');
-      });
-      
-      // Show the selected slide
+      slides.forEach(slide => slide.classList.remove('active'));
+      dots.forEach(dot => dot.classList.remove('active'));
+      ensureSlideBg(slides[index]);
       slides[index].classList.add('active');
       dots[index].classList.add('active');
       currentSlide = index;

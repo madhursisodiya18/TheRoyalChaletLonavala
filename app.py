@@ -42,7 +42,8 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from extensions import db, csrf
-from sqlalchemy import text
+from sqlalchemy import text, event
+from sqlalchemy.engine import Engine
 import os
 import json
 import uuid
@@ -76,7 +77,7 @@ def admin_required(f):
 app = Flask(__name__)
 # Production: set SECRET_KEY (e.g. openssl rand -hex 32). See .env.example
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_secret_key_here')
-app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', 'true').lower() in ('1', 'true', 'yes', 'on')
+app.config['DEBUG'] = os.environ.get('FLASK_DEBUG', 'false').lower() in ('1', 'true', 'yes', 'on')
 
 # Upload folder configuration
 app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
@@ -107,8 +108,22 @@ os.makedirs(_INSTANCE_DIR, exist_ok=True)
 db_path = os.path.join(_INSTANCE_DIR, 'villa_booking.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'connect_args': {'check_same_thread': False, 'timeout': 30},
+}
 
 db.init_app(app)
+
+
+@event.listens_for(Engine, 'connect')
+def _sqlite_pragmas(dbapi_connection, connection_record):
+    if connection_record.dialect.name != 'sqlite':
+        return
+    cursor = dbapi_connection.cursor()
+    cursor.execute('PRAGMA journal_mode=WAL')
+    cursor.execute('PRAGMA synchronous=NORMAL')
+    cursor.execute('PRAGMA cache_size=-64000')
+    cursor.close()
 csrf.init_app(app)
 
 admin_menu_bp = Blueprint('admin_menu', __name__)
@@ -238,7 +253,8 @@ with app.app_context():
     
     # Update email configuration from database settings
     update_email_config_from_db()
-    
+    _load_settings_cache()
+
     # Create default admin user if it doesn't exist
     if not User.query.filter_by(username='admin').first():
         admin_user = User(
@@ -455,22 +471,41 @@ def coupon_as_date(value):
     return value
 
 
+_settings_cache = {}
+_settings_cache_ready = False
+
+
+def invalidate_settings_cache():
+    global _settings_cache_ready
+    _settings_cache.clear()
+    _settings_cache_ready = False
+
+
+def _load_settings_cache():
+    global _settings_cache_ready
+    try:
+        rows = VillaSettings.query.all()
+        _settings_cache.clear()
+        for setting in rows:
+            _settings_cache[setting.setting_key] = setting.setting_value
+        _settings_cache_ready = True
+    except Exception:
+        _settings_cache_ready = False
+
+
 def get_setting(key, default=None):
-    """Get villa setting value"""
-    setting = VillaSettings.query.filter_by(setting_key=key).first()
-    return setting.setting_value if setting else default
+    """Get villa setting value (cached; one DB read per worker until invalidated)."""
+    if not _settings_cache_ready:
+        _load_settings_cache()
+    return _settings_cache.get(key, default)
+
 
 @app.context_processor
 def inject_settings():
-    """Make settings available to all templates"""
-    settings = {}
-    try:
-        for setting in VillaSettings.query.all():
-            settings[setting.setting_key] = setting.setting_value
-    except:
-        # Handle case when database is not yet created
-        pass
-    return {'villa_settings': settings}
+    """Make settings available to all templates (uses same cache as get_setting)."""
+    if not _settings_cache_ready:
+        _load_settings_cache()
+    return {'villa_settings': dict(_settings_cache)}
 
 def create_notification(user_id, title, message, type='info'):
     """Create a notification for user"""
@@ -2508,8 +2543,7 @@ def admin_settings():
             
             # Commit the changes to the database
             db.session.commit()
-            
-            # Update email configuration from database settings
+            invalidate_settings_cache()
             update_email_config_from_db()
             
             flash('Settings updated successfully!', 'success')
@@ -3200,9 +3234,19 @@ def mark_all_notifications_read():
     return jsonify({'success': True})
 
 @app.after_request
-def add_header(response):
-    if 'Cache-Control' not in response.headers:
-        response.headers['Cache-Control'] = 'public, max-age=31536000'
+def add_cache_headers(response):
+    """Long cache for static assets only; HTML/API stay fresh."""
+    if 'Cache-Control' in response.headers:
+        return response
+    path = (request.path or '').lower()
+    if path.startswith('/static/') or path.endswith((
+        '.css', '.js', '.jpg', '.jpeg', '.png', '.webp', '.gif', '.ico', '.woff2', '.woff',
+    )):
+        response.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
+    elif path.startswith('/api/'):
+        response.headers['Cache-Control'] = 'no-store'
+    else:
+        response.headers['Cache-Control'] = 'no-cache'
     return response
 
 
