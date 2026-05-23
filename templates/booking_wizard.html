@@ -207,6 +207,175 @@
     }
     .booking-btn-primary { transition: none; background-size: auto; }
   }
+  .availability-calendar-wrap {
+    border: 1px solid rgba(197, 160, 89, 0.25);
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 1rem;
+  }
+  .dark .availability-calendar-wrap {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: rgba(71, 85, 105, 0.8);
+  }
+  .cal-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.7rem;
+    margin-bottom: 0.75rem;
+  }
+  .cal-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .cal-legend i {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 0.2rem;
+    display: inline-block;
+  }
+  .cal-legend .lg-available i { background: #059669; }
+  .cal-legend .lg-booked i { background: #dc2626; }
+  .cal-legend .lg-past i { background: #94a3b8; }
+  .cal-legend .lg-selected i { background: #d97706; box-shadow: 0 0 0 2px #fff, 0 0 0 3px #d97706; }
+  .cal-months {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .cal-months { grid-template-columns: 1fr 1fr; }
+  }
+  .cal-month-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: #0f172a;
+  }
+  .dark .cal-month-title { color: #f1f5f9; }
+  .cal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    gap: 0.5rem;
+  }
+  .cal-nav button {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #334155;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .dark .cal-nav button {
+    background: #1e293b;
+    border-color: #475569;
+    color: #e2e8f0;
+  }
+  .cal-nav button:hover:not(:disabled) {
+    border-color: #d97706;
+    background: #fffbeb;
+  }
+  .cal-nav button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .cal-weekdays, .cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    text-align: center;
+  }
+  .cal-weekdays span {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #64748b;
+    padding: 0.25rem 0;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    max-height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border-radius: 0.45rem;
+    border: 1px solid transparent;
+    cursor: default;
+    user-select: none;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .cal-day-empty { visibility: hidden; pointer-events: none; }
+  .cal-day-past {
+    color: #94a3b8;
+    background: #f1f5f9;
+    opacity: 0.65;
+  }
+  .dark .cal-day-past { background: #1e293b; color: #64748b; }
+  .cal-day-booked {
+    background: #fef2f2 !important;
+    color: #b91c1c !important;
+    border-color: #fecaca !important;
+    cursor: not-allowed;
+    text-decoration: line-through;
+    opacity: 0.95;
+  }
+  .dark .cal-day-booked {
+    background: rgba(127, 29, 29, 0.45) !important;
+    color: #fca5a5 !important;
+    border-color: rgba(248, 113, 113, 0.35) !important;
+  }
+  .cal-day-available {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
+    cursor: pointer;
+  }
+  .dark .cal-day-available {
+    background: rgba(6, 78, 59, 0.35);
+    color: #6ee7b7;
+    border-color: rgba(52, 211, 153, 0.35);
+  }
+  .cal-day-available:hover {
+    transform: scale(1.06);
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.25);
+  }
+  .cal-day-in-range {
+    background: #fef3c7 !important;
+    color: #92400e !important;
+    border-color: #fcd34d !important;
+  }
+  .dark .cal-day-in-range {
+    background: rgba(120, 53, 15, 0.4) !important;
+    color: #fde68a !important;
+    border-color: rgba(251, 191, 36, 0.4) !important;
+  }
+  .cal-day-check-in, .cal-day-check-out {
+    background: linear-gradient(135deg, #d97706, #f59e0b) !important;
+    color: #fff !important;
+    border-color: #b45309 !important;
+    box-shadow: 0 2px 10px rgba(217, 119, 6, 0.4);
+    font-weight: 800;
+  }
+  .selected-dates-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, rgba(254, 243, 199, 0.5), rgba(236, 253, 245, 0.5));
+    border: 1px solid rgba(197, 160, 89, 0.3);
+    font-size: 0.8rem;
+  }
+  .dark .selected-dates-bar {
+    background: linear-gradient(135deg, rgba(120, 53, 15, 0.2), rgba(6, 78, 59, 0.2));
+    border-color: rgba(71, 85, 105, 0.8);
+  }
 </style>
 <div class="booking-page min-h-screen booking-hero-pattern bg-gradient-to-b from-amber-50/90 via-white to-stone-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-gray-900 dark:text-slate-100 transition-colors duration-300">
   <div class="max-w-6xl mx-auto px-4 py-10 md:py-14">
@@ -230,7 +399,7 @@
           <span class="text-[10px] uppercase tracking-widest text-amber-800/80 dark:text-amber-400/90 font-semibold">Progress</span>
           <p class="text-sm font-semibold text-slate-800 dark:text-slate-100" id="step-label">Step 1 of 4 — Stay details</p>
         </div>
-        <span class="inline-flex items-center gap-2 self-start sm:self-auto text-sm px-4 py-2 rounded-full bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/60 dark:to-teal-950/40 text-emerald-900 dark:text-emerald-100 border border-emerald-200/80 dark:border-emerald-800/60 font-semibold tabular-nums shadow-sm" id="price-pill" title="Estimated total including taxes">
+        <span class="inline-flex items-center gap-2 self-start sm:self-auto text-sm px-4 py-2 rounded-full bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/60 dark:to-teal-950/40 text-emerald-900 dark:text-emerald-100 border border-emerald-200/80 dark:border-emerald-800/60 font-semibold tabular-nums shadow-sm" id="price-pill" title="Estimated total">
           <i class="fas fa-indian-rupee-sign text-xs opacity-80"></i>
           <span id="price-pill-amount">0</span>
           <span class="text-[10px] font-normal opacity-80 hidden sm:inline">est.</span>
@@ -256,19 +425,32 @@
             <span class="booking-step-badge shrink-0" aria-hidden="true">1</span>
             <div>
               <h2 class="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white" style="font-family: 'Playfair Display', Georgia, serif;">Select your stay</h2>
-              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Choose dates and party size. Weekend nights are priced differently.</p>
+              <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Pick available dates on the calendar. Booked nights cannot be selected.</p>
             </div>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div class="group">
-              <label for="check_in" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Check-in</label>
-              <input type="date" id="check_in" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-shadow group-hover:border-amber-300/60 dark:group-hover:border-amber-600/50" min="">
-              <p class="text-[11px] text-amber-800 dark:text-amber-400 mt-2 leading-snug"><i class="fas fa-tag mr-1 opacity-80"></i> Weekday ₹{{ weekday_price|default(10000)|int|format_number }} · Weekend ₹{{ weekend_price|default(15000)|int|format_number }}</p>
+
+          <input type="hidden" id="check_in" value="">
+          <input type="hidden" id="check_out" value="">
+
+          <div class="availability-calendar-wrap mb-4">
+            <div class="cal-nav">
+              <button type="button" id="cal-prev" aria-label="Previous month"><i class="fas fa-chevron-left"></i></button>
+              <p class="text-sm font-semibold text-slate-800 dark:text-slate-100 flex-1 text-center" id="cal-range-label">Availability</p>
+              <button type="button" id="cal-next" aria-label="Next month"><i class="fas fa-chevron-right"></i></button>
             </div>
-            <div class="group">
-              <label for="check_out" class="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Check-out</label>
-              <input type="date" id="check_out" class="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-xl px-3 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition-shadow group-hover:border-amber-300/60 dark:group-hover:border-amber-600/50" min="">
+            <div class="cal-legend">
+              <span class="lg-available"><i></i> Available</span>
+              <span class="lg-booked"><i></i> Booked night</span>
+              <span class="lg-past"><i></i> Past</span>
+              <span class="lg-selected"><i></i> Your stay</span>
             </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-3 leading-snug">A stay 23 → 24 blocks only the <strong>23rd</strong> (occupied night). Guests leave on the 24th by 11 AM, so the <strong>24th</strong> is open for a new check-in.</p>
+            <div id="cal-months" class="cal-months" aria-live="polite"></div>
+            <div class="selected-dates-bar" id="selected-dates-bar">
+              <span><strong>Check-in:</strong> <span id="display-check-in">—</span></span>
+              <span><strong>Check-out:</strong> <span id="display-check-out">—</span></span>
+            </div>
+            <p class="text-[11px] text-amber-800 dark:text-amber-400 mt-3 leading-snug"><i class="fas fa-tag mr-1 opacity-80"></i> Weekday ₹{{ weekday_price|default(10000)|int|format_number }} · Weekend ₹{{ weekend_price|default(15000)|int|format_number }}</p>
           </div>
           <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Quick length <span class="text-slate-400">(from your check-in)</span></p>
           <div class="flex flex-wrap gap-2 mb-6" id="quick-stay-chips" role="group" aria-label="Quick stay length">
@@ -468,10 +650,6 @@
               <span id="review-discount-amount" class="text-emerald-600 dark:text-emerald-400 font-medium"></span>
             </div>
           </div>
-          <div class="flex items-center justify-between mt-1 text-xs">
-            <span class="text-gray-500 dark:text-slate-400">Estimated taxes</span>
-            <span id="review-tax-amount"></span>
-          </div>
               <div class="border-t border-gray-200 dark:border-slate-600 mt-2 pt-2 flex items-center justify-between">
                 <span class="text-gray-800 dark:text-white font-medium">Total payable</span>
                 <span class="text-lg font-semibold text-emerald-600 dark:text-emerald-400" id="review-total"></span>
@@ -546,10 +724,6 @@
               <span id="summary-discount" class="text-emerald-600 dark:text-emerald-400">−₹0</span>
             </div>
           </div>
-          <div class="flex items-center justify-between">
-            <span class="text-gray-500 dark:text-slate-400">Estimated taxes</span>
-            <span id="summary-tax" class="text-gray-900 dark:text-slate-100">₹0</span>
-          </div>
           <div class="border-t border-gray-200 dark:border-slate-600 pt-2 flex items-center justify-between">
             <span class="text-gray-800 dark:text-white font-medium">Total</span>
             <span class="text-xl font-semibold text-emerald-600 dark:text-emerald-400" id="summary-total">₹0</span>
@@ -557,7 +731,7 @@
         </div>
 
         <div class="text-[11px] text-slate-500 dark:text-slate-500 leading-relaxed border-t border-slate-200/80 dark:border-slate-600/50 pt-4">
-          <p><i class="fas fa-circle-info text-amber-600 dark:text-amber-500 mr-1"></i> Estimate includes taxes shown. Final amount confirmed after we validate your request.</p>
+          <p><i class="fas fa-circle-info text-amber-600 dark:text-amber-500 mr-1"></i> Total shown is your stay estimate. Final amount confirmed after we validate your request.</p>
         </div>
       </aside>
     </div>
@@ -586,8 +760,9 @@
   const WEEKDAY_PRICE = {{ weekday_price|default(10000)|int }};
   const WEEKEND_PRICE = {{ weekend_price|default(15000)|int }};
   const MAX_GUESTS = {{ max_guests|default(20)|int }};
-  const TAX_RATE = 0.12;
   const COUPONS_ENABLED = {{ 'true' if coupons_enabled else 'false' }};
+  const BOOKED_DATES_URL = {{ url_for('get_booked_dates')|tojson }};
+  const INITIAL_BOOKED_DATES = {{ booked_dates|default([])|tojson }};
 
   const state = {
     step: 1,
@@ -599,7 +774,6 @@
     addons: [],
     addonsPrice: 0,
     discountAmount: 0,
-    taxAmount: 0,
     total: 0,
     bookingId: null,
     confirmationUrl: null,
@@ -608,6 +782,225 @@
     couponDiscountType: 'percentage',
     couponFixedAmount: 0,
   };
+
+  let bookedDatesSet = new Set(INITIAL_BOOKED_DATES || []);
+  let calendarViewStart = null;
+  let rangePickPhase = 'check-in';
+
+  function formatDateLocal(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
+
+  function parseDateLocal(str) {
+    if (!str) return null;
+    const parts = str.split('-').map(Number);
+    if (parts.length !== 3) return null;
+    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  function isPastDate(d) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return d < today;
+  }
+
+  function isBookedDate(d) {
+    return bookedDatesSet.has(formatDateLocal(d));
+  }
+
+  function stayNightsConflict(checkIn, checkOut) {
+    if (!checkIn || !checkOut || checkOut <= checkIn) return true;
+    const cur = new Date(checkIn);
+    while (cur < checkOut) {
+      if (isPastDate(cur) || isBookedDate(cur)) return true;
+      cur.setDate(cur.getDate() + 1);
+    }
+    return false;
+  }
+
+  function syncDateInputs() {
+    const checkInInput = document.getElementById('check_in');
+    const checkOutInput = document.getElementById('check_out');
+    const inStr = state.checkIn ? formatDateLocal(state.checkIn) : '';
+    const outStr = state.checkOut ? formatDateLocal(state.checkOut) : '';
+    if (checkInInput) checkInInput.value = inStr;
+    if (checkOutInput) checkOutInput.value = outStr;
+    const dispIn = document.getElementById('display-check-in');
+    const dispOut = document.getElementById('display-check-out');
+    if (dispIn) {
+      dispIn.textContent = state.checkIn
+        ? state.checkIn.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        : '—';
+    }
+    if (dispOut) {
+      dispOut.textContent = state.checkOut
+        ? state.checkOut.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        : '—';
+    }
+  }
+
+  async function loadBookedDates() {
+    try {
+      const resp = await fetch(BOOKED_DATES_URL + '?_=' + Date.now(), {
+        cache: 'no-store',
+        headers: { 'Accept': 'application/json' },
+      });
+      const data = await resp.json();
+      if (resp.ok && Array.isArray(data.booked_dates)) {
+        bookedDatesSet = new Set(data.booked_dates);
+      }
+    } catch (e) {
+      console.error('Could not load booked dates', e);
+      showToast('Could not refresh availability. Showing last known dates.', 'error');
+    }
+    renderAvailabilityCalendar();
+    if (state.checkIn && state.checkOut && stayNightsConflict(state.checkIn, state.checkOut)) {
+      state.checkIn = null;
+      state.checkOut = null;
+      syncDateInputs();
+      recalc();
+    }
+  }
+
+  function monthStart(d) {
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  }
+
+  function addMonths(d, n) {
+    return new Date(d.getFullYear(), d.getMonth() + n, 1);
+  }
+
+  function renderMonthGrid(container, viewDate) {
+    const title = document.createElement('p');
+    title.className = 'cal-month-title';
+    title.textContent = viewDate.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+    container.appendChild(title);
+
+    const weekdays = document.createElement('div');
+    weekdays.className = 'cal-weekdays';
+    ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].forEach(w => {
+      const s = document.createElement('span');
+      s.textContent = w;
+      weekdays.appendChild(s);
+    });
+    container.appendChild(weekdays);
+
+    const daysEl = document.createElement('div');
+    daysEl.className = 'cal-days';
+    const first = monthStart(viewDate);
+    const startPad = first.getDay();
+    const daysInMonth = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+
+    for (let i = 0; i < startPad; i++) {
+      const empty = document.createElement('span');
+      empty.className = 'cal-day cal-day-empty';
+      daysEl.appendChild(empty);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const cellDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
+      cellDate.setHours(0, 0, 0, 0);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'cal-day';
+      btn.textContent = String(day);
+      btn.setAttribute('data-date', formatDateLocal(cellDate));
+
+      const past = isPastDate(cellDate);
+      const booked = isBookedDate(cellDate);
+      const inRange = state.checkIn && state.checkOut && cellDate > state.checkIn && cellDate < state.checkOut;
+      const isCheckIn = state.checkIn && formatDateLocal(cellDate) === formatDateLocal(state.checkIn);
+      const isCheckOut = state.checkOut && formatDateLocal(cellDate) === formatDateLocal(state.checkOut);
+
+      if (past) {
+        btn.classList.add('cal-day-past');
+        btn.disabled = true;
+        btn.setAttribute('aria-label', day + ', past');
+      } else if (booked) {
+        btn.classList.add('cal-day-booked');
+        btn.disabled = true;
+        btn.setAttribute('aria-label', day + ', booked');
+      } else {
+        btn.classList.add('cal-day-available');
+        btn.setAttribute('aria-label', day + ', available');
+        btn.addEventListener('click', () => onCalendarDayClick(cellDate));
+      }
+
+      if (inRange) btn.classList.add('cal-day-in-range');
+      if (isCheckIn) btn.classList.add('cal-day-check-in');
+      if (isCheckOut) btn.classList.add('cal-day-check-out');
+
+      daysEl.appendChild(btn);
+    }
+    container.appendChild(daysEl);
+  }
+
+  function renderAvailabilityCalendar() {
+    const wrap = document.getElementById('cal-months');
+    if (!wrap) return;
+    if (!calendarViewStart) {
+      const t = new Date();
+      t.setHours(0, 0, 0, 0);
+      calendarViewStart = monthStart(t);
+    }
+    wrap.innerHTML = '';
+    const m1 = document.createElement('div');
+    const m2 = document.createElement('div');
+    renderMonthGrid(m1, calendarViewStart);
+    renderMonthGrid(m2, addMonths(calendarViewStart, 1));
+    wrap.appendChild(m1);
+    wrap.appendChild(m2);
+
+    const label = document.getElementById('cal-range-label');
+    if (label) {
+      label.textContent =
+        calendarViewStart.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) +
+        ' – ' +
+        addMonths(calendarViewStart, 1).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const prevBtn = document.getElementById('cal-prev');
+    if (prevBtn) {
+      const prevMonthEnd = new Date(calendarViewStart.getFullYear(), calendarViewStart.getMonth(), 0);
+      prevBtn.disabled = prevMonthEnd < today;
+    }
+  }
+
+  function onCalendarDayClick(clicked) {
+    if (isPastDate(clicked) || isBookedDate(clicked)) {
+      showToast('This date is not available', 'error');
+      return;
+    }
+
+    if (!state.checkIn || (state.checkIn && state.checkOut) || clicked <= state.checkIn) {
+      state.checkIn = new Date(clicked);
+      state.checkOut = null;
+      rangePickPhase = 'check-out';
+      showToast('Now select your check-out date', 'info');
+    } else {
+      const checkOut = new Date(clicked);
+      if (stayNightsConflict(state.checkIn, checkOut)) {
+        showToast('Your stay includes booked nights. Pick different dates.', 'error');
+        state.checkIn = new Date(clicked);
+        state.checkOut = null;
+        rangePickPhase = 'check-out';
+      } else {
+        state.checkOut = checkOut;
+        rangePickPhase = 'check-in';
+        showToast('Dates selected', 'success');
+      }
+    }
+    syncDateInputs();
+    recalc();
+    renderAvailabilityCalendar();
+  }
 
   function formatCurrency(amount) {
     return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(amount || 0);
@@ -637,7 +1030,6 @@
     document.getElementById('summary-nights').textContent = state.nights;
     document.getElementById('summary-base-price').textContent = '₹' + formatCurrency(state.basePrice);
     document.getElementById('summary-addons-price').textContent = '₹' + formatCurrency(state.addonsPrice);
-    document.getElementById('summary-tax').textContent = '₹' + formatCurrency(state.taxAmount);
     document.getElementById('summary-total').textContent = '₹' + formatCurrency(state.total);
     document.getElementById('price-pill-amount').textContent = formatCurrency(state.total);
 
@@ -677,7 +1069,6 @@
     const reviewGuests = document.getElementById('review-guests');
     const reviewBase = document.getElementById('review-base-price');
     const reviewAddonsPrice = document.getElementById('review-addons-price');
-    const reviewTax = document.getElementById('review-tax-amount');
     const reviewTotal = document.getElementById('review-total');
     const addonsList = document.getElementById('review-addons-list');
     const addonsEmpty = document.getElementById('review-addons-empty');
@@ -693,7 +1084,6 @@
     reviewGuests.textContent = state.guests + (state.guests === 1 ? ' guest' : ' guests');
     reviewBase.textContent = '₹' + formatCurrency(state.basePrice);
     reviewAddonsPrice.textContent = '₹' + formatCurrency(state.addonsPrice);
-    reviewTax.textContent = '₹' + formatCurrency(state.taxAmount);
     reviewTotal.textContent = '₹' + formatCurrency(state.total);
 
     const reviewCouponBlock = document.getElementById('review-coupon-block');
@@ -762,9 +1152,7 @@
       }
     }
     state.discountAmount = discount;
-    const afterDiscount = Math.max(0, subtotal - discount);
-    state.taxAmount = Math.round(afterDiscount * TAX_RATE);
-    state.total = afterDiscount + state.taxAmount;
+    state.total = Math.max(0, subtotal - discount);
     updateSummary();
     updateReview();
     pulsePricePill();
@@ -816,14 +1204,23 @@
     if (step === 4) stepLabel.textContent = 'Step 4 of 4 — Review & confirm';
   }
 
+  function findNextAvailableCheckIn(fromDate) {
+    const d = new Date(fromDate);
+    d.setHours(0, 0, 0, 0);
+    for (let i = 0; i < 366; i++) {
+      if (!isPastDate(d) && !isBookedDate(d)) return new Date(d);
+      d.setDate(d.getDate() + 1);
+    }
+    return null;
+  }
+
   function initBookingWizard() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const minStr = today.toISOString().split('T')[0];
+    calendarViewStart = monthStart(today);
+
     const checkInInput = document.getElementById('check_in');
     const checkOutInput = document.getElementById('check_out');
-    checkInInput.min = minStr;
-    checkOutInput.min = minStr;
 
     const bar = document.getElementById('sticky-booking-bar');
     if (bar) {
@@ -831,6 +1228,22 @@
         bar.classList.toggle('is-stuck', window.scrollY > 56);
       }, { passive: true });
     }
+
+    document.getElementById('cal-prev')?.addEventListener('click', () => {
+      calendarViewStart = addMonths(calendarViewStart, -1);
+      renderAvailabilityCalendar();
+    });
+    document.getElementById('cal-next')?.addEventListener('click', () => {
+      calendarViewStart = addMonths(calendarViewStart, 1);
+      renderAvailabilityCalendar();
+    });
+
+    renderAvailabilityCalendar();
+    loadBookedDates();
+
+    window.addEventListener('pageshow', (event) => {
+      loadBookedDates();
+    });
 
     document.querySelectorAll('#quick-stay-chips [data-nights]').forEach(chip => {
       chip.addEventListener('click', () => {
@@ -841,56 +1254,23 @@
           x.setDate(x.getDate() + days);
           return x;
         };
-        let ci = state.checkIn ? new Date(state.checkIn) : addDays(today, 1);
-        if (!state.checkIn) {
-          state.checkIn = ci;
-          checkInInput.value = ci.toISOString().split('T')[0];
+        let ci = state.checkIn ? new Date(state.checkIn) : findNextAvailableCheckIn(addDays(today, 1));
+        if (!ci) {
+          showToast('No available dates found soon. Pick dates on the calendar.', 'error');
+          return;
         }
         const co = addDays(ci, n);
-        state.checkOut = co;
-        checkOutInput.value = co.toISOString().split('T')[0];
-        if (checkOutInput.min && checkOutInput.value < checkOutInput.min) {
-          checkOutInput.min = checkInInput.value;
+        if (stayNightsConflict(ci, co)) {
+          showToast('That stay length hits booked nights. Choose dates on the calendar.', 'error');
+          return;
         }
+        state.checkIn = ci;
+        state.checkOut = co;
+        syncDateInputs();
         recalc();
+        renderAvailabilityCalendar();
         showToast(n + '-night stay applied', 'success');
       });
-    });
-
-    checkInInput.addEventListener('change', () => {
-      if (!checkInInput.value) return;
-      const selected = new Date(checkInInput.value);
-      selected.setHours(0, 0, 0, 0);
-      if (selected < today) {
-        showToast('Past dates are not allowed', 'error');
-        checkInInput.value = '';
-        state.checkIn = null;
-        recalc();
-        return;
-      }
-      state.checkIn = selected;
-      if (!state.checkOut || state.checkOut <= state.checkIn) {
-        const out = new Date(selected);
-        out.setDate(out.getDate() + 1);
-        checkOutInput.value = out.toISOString().split('T')[0];
-        state.checkOut = out;
-      }
-      recalc();
-    });
-
-    checkOutInput.addEventListener('change', () => {
-      if (!checkOutInput.value) return;
-      const selected = new Date(checkOutInput.value);
-      selected.setHours(0, 0, 0, 0);
-      if (state.checkIn && selected <= state.checkIn) {
-        showToast('Check-out must be after check-in', 'error');
-        checkOutInput.value = '';
-        state.checkOut = null;
-        recalc();
-        return;
-      }
-      state.checkOut = selected;
-      recalc();
     });
 
     const guestCountSpan = document.getElementById('guest-count');
@@ -987,9 +1367,16 @@
 
     document.getElementById('step-1-next').addEventListener('click', async () => {
       if (!state.checkIn || !state.checkOut || state.nights <= 0) {
-        showToast('Select valid check-in and check-out dates', 'error');
+        showToast('Select check-in and check-out on the calendar', 'error');
         return;
       }
+      if (stayNightsConflict(state.checkIn, state.checkOut)) {
+        showToast('Selected dates include booked nights. Please choose again.', 'error');
+        renderAvailabilityCalendar();
+        return;
+      }
+      const btn = document.getElementById('step-1-next');
+      if (btn) btn.disabled = true;
       try {
         const resp = await fetch('{{ url_for("booking_api.check_availability") }}', {
           method: 'POST',
@@ -1003,19 +1390,22 @@
         try {
           data = await resp.json();
         } catch (e) {}
-        if (resp.ok && data.available === false) {
-          showToast(data.message || 'Selected dates are not available', 'error');
+        if (!resp.ok) {
+          showToast('Could not verify availability. Please try again.', 'error');
           return;
         }
-        if (!resp.ok) {
-          console.error('Availability check failed', resp.status, data);
-          showToast('Could not verify availability, continuing anyway.', 'error');
+        if (data.available === false) {
+          showToast(data.message || 'Selected dates are not available', 'error');
+          await loadBookedDates();
+          return;
         }
+        setStep(2);
       } catch (e) {
         console.error('Availability check error', e);
-        showToast('Could not verify availability, continuing anyway.', 'error');
+        showToast('Could not verify availability. Please try again.', 'error');
+      } finally {
+        if (btn) btn.disabled = false;
       }
-      setStep(2);
     });
 
     document.getElementById('step-2-next').addEventListener('click', () => {
@@ -1115,6 +1505,7 @@
         const data = await resp.json();
         if (!resp.ok || !data.success) {
           showToast(data.message || 'Could not confirm booking', 'error');
+          if (resp.status === 409) await loadBookedDates();
           return;
         }
         state.bookingId = data.booking_id;

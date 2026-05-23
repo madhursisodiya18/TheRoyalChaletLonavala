@@ -710,37 +710,48 @@ def calculate_price():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+def find_booking_conflict(check_in, check_out, exclude_booking_id=None):
+    """Return the first overlapping pending/confirmed booking, or None."""
+    query = Booking.query.filter(
+        Booking.check_in < check_out,
+        Booking.check_out > check_in,
+        Booking.status.in_(['pending', 'confirmed']),
+    )
+    if exclude_booking_id is not None:
+        query = query.filter(Booking.id != exclude_booking_id)
+    return query.first()
+
+
+def collect_booked_date_strings():
+    """Occupied nights only: check-in through the night before check-out (check-out day stays open)."""
+    bookings = Booking.query.filter(
+        Booking.status.in_(['confirmed', 'pending'])
+    ).all()
+    booked_dates = set()
+    confirmed_dates = set()
+    for booking in bookings:
+        current_date = booking.check_in
+        while current_date < booking.check_out:
+            date_str = current_date.strftime('%Y-%m-%d')
+            booked_dates.add(date_str)
+            if booking.status == 'confirmed':
+                confirmed_dates.add(date_str)
+            current_date += timedelta(days=1)
+    return sorted(booked_dates), sorted(confirmed_dates)
+
+
 @app.route('/api/booked-dates', methods=['GET'])
 def get_booked_dates():
-    """API endpoint to get all booked dates"""
+    """API endpoint to get all booked dates for the booking calendar."""
     try:
-        # Get all confirmed and pending bookings
-        bookings = Booking.query.filter(
-            Booking.status.in_(['confirmed', 'pending'])
-        ).all()
-        
-        # Create a list of all booked dates
-        booked_dates = []
-        # Create a list of confirmed dates
-        confirmed_dates = []
-        
-        for booking in bookings:
-            current_date = booking.check_in
-            while current_date < booking.check_out:
-                date_str = current_date.strftime('%Y-%m-%d')
-                booked_dates.append(date_str)
-                
-                # If booking is confirmed, add to confirmed dates as well
-                if booking.status == 'confirmed':
-                    confirmed_dates.append(date_str)
-                    
-                current_date += timedelta(days=1)
-        
-        return jsonify({
+        booked_dates, confirmed_dates = collect_booked_date_strings()
+        response = jsonify({
             'booked_dates': booked_dates,
-            'confirmed_dates': confirmed_dates
+            'confirmed_dates': confirmed_dates,
         })
-    
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+        return response
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -750,12 +761,14 @@ def booking():
     weekend_price = int(get_setting('weekend_price', 15000))
     max_guests = int(get_setting('max_guests', '20'))
     coupons_enabled = str(get_setting('enable_coupons', 'true')).lower() in ('1', 'true', 'yes', 'on')
+    booked_dates, _confirmed_dates = collect_booked_date_strings()
     return render_template(
         'booking_wizard.html',
         weekday_price=weekday_price,
         weekend_price=weekend_price,
         max_guests=max_guests,
         coupons_enabled=coupons_enabled,
+        booked_dates=booked_dates,
     )
 
 
@@ -805,15 +818,7 @@ def compute_booking_price(check_in, check_out, adults, children, villa_type, mea
         raise ValueError(f'Maximum {max_guests} guests allowed')
     if check_out <= check_in:
         raise ValueError('Check-out date must be after check-in date')
-    conflicting_bookings = Booking.query.filter(
-        db.or_(
-            db.and_(Booking.check_in <= check_in, Booking.check_out > check_in),
-            db.and_(Booking.check_in < check_out, Booking.check_out >= check_out),
-            db.and_(Booking.check_in >= check_in, Booking.check_out <= check_out)
-        ),
-        Booking.status.in_(['confirmed', 'pending'])
-    ).first()
-    if conflicting_bookings:
+    if find_booking_conflict(check_in, check_out):
         raise ValueError('Villa is not available for selected dates')
     nights = (check_out - check_in).days
     weekdays = 0
@@ -864,9 +869,7 @@ def compute_booking_price(check_in, check_out, adults, children, villa_type, mea
         if coupon:
             discount = coupon_discount_rupees(coupon, subtotal)
             applied_coupon = coupon
-    tax_rate = 0.18
-    tax_amount = int((subtotal - discount) * tax_rate)
-    total_price = subtotal - discount + tax_amount
+    total_price = subtotal - discount
     return {
         'guests': guests,
         'nights': nights,
@@ -880,8 +883,8 @@ def compute_booking_price(check_in, check_out, adults, children, villa_type, mea
         'amenities_cost': amenities_cost,
         'subtotal': subtotal,
         'discount': discount,
-        'tax_rate': tax_rate * 100,
-        'tax_amount': tax_amount,
+        'tax_rate': 0,
+        'tax_amount': 0,
         'total_price': total_price,
         'coupon': applied_coupon
     }
@@ -962,15 +965,7 @@ def booking_check_availability():
         return jsonify({'available': False, 'message': 'Invalid date format'}), 400
     if check_out <= check_in:
         return jsonify({'available': False, 'message': 'Check-out must be after check-in'}), 400
-    conflicting = Booking.query.filter(
-        db.or_(
-            db.and_(Booking.check_in <= check_in, Booking.check_out > check_in),
-            db.and_(Booking.check_in < check_out, Booking.check_out >= check_out),
-            db.and_(Booking.check_in >= check_in, Booking.check_out <= check_out),
-        ),
-        Booking.status.in_(['pending', 'confirmed']),
-    ).first()
-    if conflicting:
+    if find_booking_conflict(check_in, check_out):
         return jsonify({'available': False, 'message': 'These dates are not available'}), 200
     return jsonify({'available': True}), 200
 
@@ -1002,16 +997,8 @@ def booking_create():
     if check_out <= check_in:
         return jsonify({'success': False, 'message': 'Check-out must be after check-in'}), 400
 
-    conflicting = Booking.query.filter(
-        db.or_(
-            db.and_(Booking.check_in <= check_in, Booking.check_out > check_in),
-            db.and_(Booking.check_in < check_out, Booking.check_out >= check_out),
-            db.and_(Booking.check_in >= check_in, Booking.check_out <= check_out),
-        ),
-        Booking.status.in_(['pending', 'confirmed']),
-    ).first()
-    if conflicting:
-        return jsonify({'success': False, 'message': 'These dates are no longer available'}), 200
+    if find_booking_conflict(check_in, check_out):
+        return jsonify({'success': False, 'message': 'These dates are no longer available'}), 409
 
     weekday_p = int(get_setting('weekday_price', 10000))
     weekend_p = int(get_setting('weekend_price', 15000))
@@ -1050,8 +1037,7 @@ def booking_create():
         discount_amt = coupon_discount_rupees(coupon_obj, subtotal_before_discount)
 
     subtotal_after_discount = subtotal_before_discount - discount_amt
-    tax_amount = int(round(subtotal_after_discount * 0.12))
-    total = subtotal_after_discount + tax_amount
+    total = subtotal_after_discount
 
     booking_code = datetime.now(timezone.utc).strftime('%y%m%d') + '-' + uuid.uuid4().hex[:6].upper()
 
@@ -1066,7 +1052,7 @@ def booking_create():
         guests=int(guests),
         base_price=base_price,
         subtotal=subtotal_after_discount,
-        gst=tax_amount,
+        gst=0,
         total_price=total,
         status='pending',
         payment_status='pending',

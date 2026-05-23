@@ -89,7 +89,7 @@
         <div class="bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-3">
           <p class="text-slate-400 mb-1">Price breakdown</p>
           {% set addons_total = addons|sum(attribute='addon_price') if addons else 0 %}
-          {% if booking.base_price is not none and booking.gst is not none %}
+          {% if booking.base_price is not none %}
           <div class="flex items-center justify-between">
             <span>Base stay</span>
             <span>₹{{ "{:,.0f}".format(booking.base_price) }}</span>
@@ -111,18 +111,10 @@
             <span class="text-emerald-300">−₹{{ "{:,.0f}".format(booking.coupon_discount_amount or 0) }}</span>
           </div>
           {% endif %}
-          <div class="flex items-center justify-between mt-1">
-            <span>Estimated taxes (12%)</span>
-            <span>₹{{ "{:,.0f}".format(booking.gst) }}</span>
-          </div>
           {% else %}
           <div class="flex items-center justify-between">
-            <span>Base + add-ons (before tax)</span>
-            <span>₹{{ "{:,.0f}".format(booking.total_price / 1.12) }}</span>
-          </div>
-          <div class="flex items-center justify-between mt-1">
-            <span>Estimated taxes</span>
-            <span>₹{{ "{:,.0f}".format(booking.total_price - (booking.total_price / 1.12)) }}</span>
+            <span>Stay total</span>
+            <span>₹{{ "{:,.0f}".format(booking.total_price) }}</span>
           </div>
           {% endif %}
           <div class="border-t border-slate-700 mt-2 pt-2 flex items-center justify-between">
